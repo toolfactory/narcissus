@@ -3,17 +3,18 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>narcissus</groupId>
     <artifactId>narcissus</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-
+    <version>${revision}</version>
     <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.locales>en_US</project.build.locales>
+        <revision>0.0.1-SNAPSHOT</revision>
     </properties>
-    
-    
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>jni</module>
+        <module>native</module>
+    </modules>
 </project>

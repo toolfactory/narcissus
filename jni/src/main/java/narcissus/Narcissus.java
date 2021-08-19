@@ -12,12 +12,21 @@ public class Narcissus {
         loadLibraryFromJar("lib/narcissus.so");
     }
 
+    //public static native Object getObjectField(Object object, String fieldName);
+
+    public static native int test();
+
+    public static void main(String[] args) {
+        System.out.println(test());
+    }
+
     private static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
         InputStream inputSream = null;
         try {
-            inputSream = Narcissus.class.getResourceAsStream(libraryResourcePath);
+            inputSream = Narcissus.class.getResourceAsStream(
+                    libraryResourcePath.startsWith("/") ? libraryResourcePath : "/" + libraryResourcePath);
             if (inputSream == null) {
                 throw new FileNotFoundException("Could not find library within jar: " + libraryResourcePath);
             }
