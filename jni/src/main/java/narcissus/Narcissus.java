@@ -11,15 +11,13 @@ public class Narcissus {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        return nativeGetObjectFieldVal(Test.class.getClassLoader(), fieldName,
-                "L" + classNameOfFieldType.replace('.', '/') + ";");
+        return nativeGetObjectFieldVal(object, fieldName, "L" + classNameOfFieldType.replace('.', '/') + ";");
     }
 
     public static Object getObjectFieldVal(Object object, String fieldName, Class<?> fieldType) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        return nativeGetObjectFieldVal(Test.class.getClassLoader(), fieldName,
-                Utils.getFieldTypeSignature(fieldType));
+        return nativeGetObjectFieldVal(object, fieldName, Utils.getFieldTypeSignature(fieldType));
     }
 }
