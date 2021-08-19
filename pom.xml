@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>jni</module>
         <module>native</module>
+        <module>jni</module>
     </modules>
 </project>

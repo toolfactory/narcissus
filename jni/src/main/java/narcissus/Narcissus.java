@@ -12,13 +12,7 @@ public class Narcissus {
         loadLibraryFromJar("lib/narcissus.so");
     }
 
-    //public static native Object getObjectField(Object object, String fieldName);
-
-    public static native int test();
-
-    public static void main(String[] args) {
-        System.out.println(test());
-    }
+    public static native Object getObjectField(Object object, String fieldName, String fieldSignature);
 
     private static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;
@@ -36,7 +30,7 @@ public class Narcissus {
             int dotIdx = filename.indexOf('.');
             String baseName = dotIdx < 0 ? filename : filename.substring(0, dotIdx);
             String suffix = dotIdx < 0 ? ".so" : filename.substring(dotIdx);
-            tempFile = File.createTempFile("lib_" + baseName, suffix);
+            tempFile = File.createTempFile("lib_" + baseName + "_", suffix);
 
             try {
                 if (tempFile.toPath().getFileSystem().supportedFileAttributeViews().contains("posix")) {

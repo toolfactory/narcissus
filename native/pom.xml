@@ -57,8 +57,8 @@
                         <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
                     </linkerStartOptions>
                     <linkerEndOptions>
-                        <linkerEndOption>-shared</linkerEndOption>
                         <linkerEndOption>-fPIC</linkerEndOption>
+                        <linkerEndOption>-shared</linkerEndOption>
                     </linkerEndOptions>
                 </configuration>
             </plugin>
