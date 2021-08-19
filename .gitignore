@@ -7,7 +7,7 @@ release.properties
 !CompiledWithJDK8.class
 !module-info.class
 
-/target/
+target/
 bin/
 tmp/
 lib/
