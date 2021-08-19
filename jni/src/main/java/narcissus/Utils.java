@@ -15,16 +15,16 @@ public class Utils {
             arrayDepth++;
             eltType = eltType.componentType();
         }
-        String eltSig = fieldType == int.class ? "I"
-                : fieldType == long.class ? "J"
-                        : fieldType == short.class ? "S"
-                                : fieldType == char.class ? "C"
-                                        : fieldType == double.class ? "D"
-                                                : fieldType == float.class ? "F"
-                                                        : fieldType == byte.class ? "B"
-                                                                : fieldType == boolean.class ? "Z"
-                                                                        : fieldType == short.class ? "S"
-                                                                                : "L" + fieldType.getName()
+        String eltSig = eltType == int.class ? "I"
+                : eltType == long.class ? "J"
+                        : eltType == short.class ? "S"
+                                : eltType == char.class ? "C"
+                                        : eltType == double.class ? "D"
+                                                : eltType == float.class ? "F"
+                                                        : eltType == byte.class ? "B"
+                                                                : eltType == boolean.class ? "Z"
+                                                                        : eltType == short.class ? "S"
+                                                                                : "L" + eltType.getName()
                                                                                         .replace('.', '/') + ";";
         String fieldSig;
         if (arrayDepth == 0) {
