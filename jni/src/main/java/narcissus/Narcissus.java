@@ -65,6 +65,8 @@ public class Narcissus {
             return nativeGetObjectFieldVal(object, field);
         }
     }
+    
+    // TODO: add methods like `int getIntFieldVal(...)` to avoid boxing on return
 
     // -------------------------------------------------------------------------------------------------------------
 
@@ -119,4 +121,6 @@ public class Narcissus {
             return nativeCallObjectMethod(object, method, params);
         }
     }
+    
+    // TODO: add methods like `int callIntMethod(...)` to avoid boxing on return
 }
