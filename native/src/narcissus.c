@@ -33,7 +33,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredMethods
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID, (jboolean) 0);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
@@ -42,7 +42,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredConstru
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID, (jboolean) 0);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
@@ -51,6 +51,6 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredFields(
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID, (jboolean) 0);
 }
 
