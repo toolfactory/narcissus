@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class Utils {
-    public static String getFieldTypeSignature(Class<?> fieldType) {
+    public static String getClassTypeSignature(Class<?> fieldType) {
         Class<?> eltType = fieldType;
         int arrayDepth = 0;
         while (eltType.isArray()) {

@@ -10,3 +10,13 @@ JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_nativeGetObjectFieldVal(JNIEn
     return (*env)->GetObjectField(env, obj, fieldID);
 }
 
+JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_nativeCallObjectMethod(JNIEnv *env, jclass cls, jobject obj, jstring methodName, jstring methodSig) {
+    const jclass objClass = (*env)->GetObjectClass(env, obj);
+    const char* methodNameUTF8 = (*env)->GetStringUTFChars(env, methodName, NULL);
+    const char* methodSigUTF8 = (*env)->GetStringUTFChars(env, methodSig, NULL);
+    const jmethodID methodID = (*env)->GetMethodID(env, objClass, methodNameUTF8, methodSigUTF8);
+    (*env)->ReleaseStringUTFChars(env, methodSig, methodSigUTF8);
+    (*env)->ReleaseStringUTFChars(env, methodName, methodNameUTF8);
+    return (*env)->CallObjectMethod(env, obj, methodID);
+}
+

@@ -5,6 +5,8 @@ public class Narcissus {
         Utils.loadLibraryFromJar("lib/narcissus.so");
     }
 
+    // -------------------------------------------------------------------------------------------------------------
+
     private static native Object nativeGetObjectFieldVal(Object object, String fieldName, String fieldSignature);
 
     public static Object getObjectFieldVal(Object object, String fieldName, String classNameOfFieldType) {
@@ -18,6 +20,25 @@ public class Narcissus {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        return nativeGetObjectFieldVal(object, fieldName, Utils.getFieldTypeSignature(fieldType));
+        return nativeGetObjectFieldVal(object, fieldName, Utils.getClassTypeSignature(fieldType));
+    }
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    private static native Object nativeCallObjectMethod(Object object, String methodName, String methodSignature);
+
+    public static Object callObjectMethod(Object object, String methodName, String classNameOfMethodReturnType) {
+        if (object == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        return nativeCallObjectMethod(object, methodName,
+                "()L" + classNameOfMethodReturnType.replace('.', '/') + ";");
+    }
+
+    public static Object callObjectMethod(Object object, String methodName, Class<?> methodReturnType) {
+        if (object == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        return nativeCallObjectMethod(object, methodName, "()" + Utils.getClassTypeSignature(methodReturnType));
     }
 }
