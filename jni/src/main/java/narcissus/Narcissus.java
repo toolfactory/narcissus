@@ -54,6 +54,4 @@ public class Narcissus {
 
     public static native Field[] nativeGetDeclaredFields(Class<?> cls);
 
-    private native Method[]      getDeclaredMethods0(boolean publicOnly);
-    
 }
