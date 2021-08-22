@@ -46,18 +46,22 @@ public class Utils {
     }
 
     public static Field findField(Object obj, String fieldName) {
-        for (Field field : enumerateFields(obj.getClass())) {
-            if (field.getName().equals(fieldName)) {
-                return field;
+        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+            for (Field field : Narcissus.nativeGetDeclaredFields(c)) {
+                if (field.getName().equals(fieldName)) {
+                    return field;
+                }
             }
         }
         return null;
     }
 
     public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes) {
-        for (Method method : enumerateMethods(obj.getClass())) {
-            if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
-                return method;
+        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+            for (Method method : Narcissus.nativeGetDeclaredMethods(c)) {
+                if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
+                    return method;
+                }
             }
         }
         return null;
