@@ -1,5 +1,9 @@
 package narcissus;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 public class Narcissus {
     static {
         Utils.loadLibraryFromJar("lib/narcissus.so");
@@ -41,4 +45,15 @@ public class Narcissus {
         }
         return nativeCallObjectMethod(object, methodName, "()" + Utils.getClassTypeSignature(methodReturnType));
     }
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    public static native Method[] nativeGetDeclaredMethods(Class<?> cls);
+
+    public static native <T> Constructor<T>[] nativeGetDeclaredConstructors(Class<T> cls);
+
+    public static native Field[] nativeGetDeclaredFields(Class<?> cls);
+
+    private native Method[]      getDeclaredMethods0(boolean publicOnly);
+    
 }

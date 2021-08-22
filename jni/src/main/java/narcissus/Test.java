@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Test {
-
     public static void main(String[] args) {
         try {
             final ClassLoader classLoader = Test.class.getClassLoader();
@@ -15,8 +14,7 @@ public class Test {
             // Enumerate private fields
             List<Field> fields = new ArrayList<>();
             for (Class<?> cls = classLoader.getClass(); cls != null; cls = cls.getSuperclass()) {
-                for (Field field : (Field[]) Narcissus.callObjectMethod(classLoader.getClass(),
-                        "getDeclaredFields0", "java.lang.reflect.Field[]")) {
+                for (Field field : Narcissus.nativeGetDeclaredFields(classLoader.getClass())) {
                     fields.add(field);
                 }
             }
