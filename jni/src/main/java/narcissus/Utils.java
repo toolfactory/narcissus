@@ -6,71 +6,64 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Utils {
-    public static String getClassTypeSignature(Class<?> cls) {
-        Class<?> eltType = cls;
-        int arrayDepth = 0;
-        while (eltType.isArray()) {
-            arrayDepth++;
-            eltType = eltType.componentType();
-        }
-        String eltSig = eltType == int.class ? "I"
-                : eltType == long.class ? "J"
-                        : eltType == short.class ? "S"
-                                : eltType == char.class ? "C"
-                                        : eltType == double.class ? "D"
-                                                : eltType == float.class ? "F"
-                                                        : eltType == byte.class ? "B"
-                                                                : eltType == boolean.class ? "Z"
-                                                                        : eltType == short.class ? "S"
-                                                                                : "L" + eltType.getName()
-                                                                                        .replace('.', '/') + ";";
-        String fieldSig;
-        if (arrayDepth == 0) {
-            fieldSig = eltSig;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            for (int i = 0; i < arrayDepth; i++) {
-                buf.append('[');
+
+    public static List<Field> enumerateFields(Class<?> cls) {
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Field field : Narcissus.nativeGetDeclaredFields(c)) {
+                fields.add(field);
             }
-            buf.append(eltSig);
-            fieldSig = buf.toString();
         }
-        return fieldSig;
+        return fields;
     }
 
-    public static String getClassTypeSignature(String className) {
-        String eltType = className;
-        int arrayDepth = 0;
-        while (eltType.endsWith("[]")) {
-            arrayDepth++;
-            eltType = eltType.substring(0, eltType.length() - 2);
-        }
-        String eltSig = eltType.equals("int") ? "I"
-                : eltType.equals("long") ? "J"
-                        : eltType.equals("short") ? "S"
-                                : eltType.equals("char") ? "C"
-                                        : eltType.equals("double") ? "D"
-                                                : eltType.equals("float") ? "F"
-                                                        : eltType.equals("byte") ? "B"
-                                                                : eltType.equals("boolean") ? "Z"
-                                                                        : eltType.equals("short") ? "S"
-                                                                                : "L" + eltType.replace('.', '/')
-                                                                                        + ";";
-        String fieldSig;
-        if (arrayDepth == 0) {
-            fieldSig = eltSig;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            for (int i = 0; i < arrayDepth; i++) {
-                buf.append('[');
+    public static List<Method> enumerateMethods(Class<?> cls) {
+        List<Method> methods = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Method method : Narcissus.nativeGetDeclaredMethods(c)) {
+                methods.add(method);
             }
-            buf.append(eltSig);
-            fieldSig = buf.toString();
         }
-        return fieldSig;
+        return methods;
     }
+
+    public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
+        List<Constructor<?>> constructors = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Constructor<?> constructor : Narcissus.nativeGetDeclaredConstructors(c)) {
+                constructors.add(constructor);
+            }
+        }
+        return constructors;
+    }
+
+    public static Field findField(Object obj, String fieldName) {
+        for (Field field : enumerateFields(obj.getClass())) {
+            if (field.getName().equals(fieldName)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes) {
+        for (Method method : enumerateMethods(obj.getClass())) {
+            if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    // -------------------------------------------------------------------------------------------------------------
 
     public static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;
