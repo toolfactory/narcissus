@@ -36,18 +36,18 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredMethods
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
-    const jmethodID ctorID = (*env)->GetMethodID(env, cls, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
-    if (ctorID == 0) {
+    const jmethodID methodID = (*env)->GetMethodID(env, cls, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
+    if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, cls, ctorID);
+    return (*env)->CallObjectMethod(env, cls, methodID);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
-    const jfieldID fieldID = (*env)->GetMethodID(env, cls, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
-    if (fieldID == 0) {
+    const jmethodID methodID = (*env)->GetMethodID(env, cls, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
+    if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, cls, fieldID);
+    return (*env)->CallObjectMethod(env, cls, methodID);
 }
 
