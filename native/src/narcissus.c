@@ -28,26 +28,29 @@ JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_nativeCallObjectMethod(JNIEnv
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
-    const jmethodID methodID = (*env)->GetMethodID(env, cls, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
+    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class object -> class object's descriptor
+    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, cls, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
-    const jmethodID methodID = (*env)->GetMethodID(env, cls, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
+    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class object -> class object's descriptor
+    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, cls, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
-    const jmethodID methodID = (*env)->GetMethodID(env, cls, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
+    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class object -> class object's descriptor
+    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
     if (methodID == 0) {
         return NULL;
     }
-    return (*env)->CallObjectMethod(env, cls, methodID);
+    return (*env)->CallObjectMethod(env, clsDescriptor, methodID);
 }
 
