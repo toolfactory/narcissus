@@ -13,7 +13,7 @@ public class Narcissus {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        return nativeGetObjectFieldVal(object, fieldName, "L" + classNameOfFieldType.replace('.', '/') + ";");
+        return nativeGetObjectFieldVal(object, fieldName, Utils.getClassTypeSignature(classNameOfFieldType));
     }
 
     public static Object getObjectFieldVal(Object object, String fieldName, Class<?> fieldType) {
@@ -32,7 +32,7 @@ public class Narcissus {
             throw new IllegalArgumentException("Object cannot be null");
         }
         return nativeCallObjectMethod(object, methodName,
-                "()L" + classNameOfMethodReturnType.replace('.', '/') + ";");
+                "()" + Utils.getClassTypeSignature(classNameOfMethodReturnType));
     }
 
     public static Object callObjectMethod(Object object, String methodName, Class<?> methodReturnType) {

@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class Utils {
-    public static String getClassTypeSignature(Class<?> fieldType) {
-        Class<?> eltType = fieldType;
+    public static String getClassTypeSignature(Class<?> cls) {
+        Class<?> eltType = cls;
         int arrayDepth = 0;
         while (eltType.isArray()) {
             arrayDepth++;
@@ -26,6 +26,38 @@ public class Utils {
                                                                         : eltType == short.class ? "S"
                                                                                 : "L" + eltType.getName()
                                                                                         .replace('.', '/') + ";";
+        String fieldSig;
+        if (arrayDepth == 0) {
+            fieldSig = eltSig;
+        } else {
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < arrayDepth; i++) {
+                buf.append('[');
+            }
+            buf.append(eltSig);
+            fieldSig = buf.toString();
+        }
+        return fieldSig;
+    }
+
+    public static String getClassTypeSignature(String className) {
+        String eltType = className;
+        int arrayDepth = 0;
+        while (eltType.endsWith("[]")) {
+            arrayDepth++;
+            eltType = eltType.substring(0, eltType.length() - 2);
+        }
+        String eltSig = eltType.equals("int") ? "I"
+                : eltType.equals("long") ? "J"
+                        : eltType.equals("short") ? "S"
+                                : eltType.equals("char") ? "C"
+                                        : eltType.equals("double") ? "D"
+                                                : eltType.equals("float") ? "F"
+                                                        : eltType.equals("byte") ? "B"
+                                                                : eltType.equals("boolean") ? "Z"
+                                                                        : eltType.equals("short") ? "S"
+                                                                                : "L" + eltType.replace('.', '/')
+                                                                                        + ";";
         String fieldSig;
         if (arrayDepth == 0) {
             fieldSig = eltSig;
