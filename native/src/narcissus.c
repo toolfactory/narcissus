@@ -44,7 +44,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredConstru
 }
 
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_nativeGetDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
-    const jmethodID fieldID = (*env)->GetMethodID(env, cls, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
+    const jfieldID fieldID = (*env)->GetMethodID(env, cls, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
     if (fieldID == 0) {
         return NULL;
     }
