@@ -126,6 +126,11 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_setObjectFieldVal(JNIEnv *env, j
 // TODO: method calls that take parameters are not yet supported, the `params` parameter is ignored
 // See https://stackoverflow.com/a/30961708/3950982
 
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    (*env)->CallVoidMethod(env, obj, methodID);
+}
+
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     return (*env)->CallIntMethod(env, obj, methodID);
@@ -164,11 +169,6 @@ JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_callFloatMethod(JNIEnv *env, j
 JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_callDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     return (*env)->CallDoubleMethod(env, obj, methodID);
-}
-
-JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    (*env)->CallVoidMethod(env, obj, methodID);
 }
 
 JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {

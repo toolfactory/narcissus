@@ -112,8 +112,10 @@ public class Narcissus {
             setObjectFieldVal(object, field, val);
         }
     }
-    
+
     // -------------------------------------------------------------------------------------------------------------
+
+    public static native void callVoidMethod(Object object, Method method, Object... params);
 
     public static native int callIntMethod(Object object, Method method, Object... params);
 
@@ -131,8 +133,6 @@ public class Narcissus {
 
     public static native double callDoubleMethod(Object object, Method method, Object... params);
 
-    public static native void callVoidMethod(Object object, Method method, Object... params);
-
     public static native Object callObjectMethod(Object object, Method method, Object... params);
 
     public static Object callMethod(Object object, Method method, Object... params) {
@@ -146,7 +146,10 @@ public class Narcissus {
             throw new IllegalArgumentException("Params are not yet supported -- see narcissus.c");
         }
         Class<?> returnType = method.getReturnType();
-        if (returnType == int.class) {
+        if (returnType == void.class) {
+            callVoidMethod(object, method, params);
+            return null;
+        } else if (returnType == int.class) {
             return callIntMethod(object, method, params);
         } else if (returnType == long.class) {
             return callLongMethod(object, method, params);
@@ -166,6 +169,6 @@ public class Narcissus {
             return callObjectMethod(object, method, params);
         }
     }
-    
+
     // TODO: add methods like `int callIntMethod(...)` to avoid boxing on return
 }
