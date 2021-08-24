@@ -18,7 +18,7 @@ public class Utils {
     public static List<Field> enumerateFields(Class<?> cls) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.nativeGetDeclaredFields(c)) {
+            for (Field field : Narcissus.getDeclaredFields(c)) {
                 fields.add(field);
             }
         }
@@ -28,7 +28,7 @@ public class Utils {
     public static List<Method> enumerateMethods(Class<?> cls) {
         List<Method> methods = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.nativeGetDeclaredMethods(c)) {
+            for (Method method : Narcissus.getDeclaredMethods(c)) {
                 methods.add(method);
             }
         }
@@ -38,7 +38,7 @@ public class Utils {
     public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
         List<Constructor<?>> constructors = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Constructor<?> constructor : Narcissus.nativeGetDeclaredConstructors(c)) {
+            for (Constructor<?> constructor : Narcissus.getDeclaredConstructors(c)) {
                 constructors.add(constructor);
             }
         }
@@ -47,7 +47,7 @@ public class Utils {
 
     public static Field findField(Object obj, String fieldName) {
         for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.nativeGetDeclaredFields(c)) {
+            for (Field field : Narcissus.getDeclaredFields(c)) {
                 if (field.getName().equals(fieldName)) {
                     return field;
                 }
@@ -58,7 +58,7 @@ public class Utils {
 
     public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes) {
         for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.nativeGetDeclaredMethods(c)) {
+            for (Method method : Narcissus.getDeclaredMethods(c)) {
                 if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
                     return method;
                 }

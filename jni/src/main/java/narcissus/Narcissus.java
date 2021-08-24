@@ -11,88 +11,133 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
-    public static native Method[] nativeGetDeclaredMethods(Class<?> cls);
+    public static native Method[] getDeclaredMethods(Class<?> cls);
 
-    public static native <T> Constructor<T>[] nativeGetDeclaredConstructors(Class<T> cls);
+    public static native <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
-    public static native Field[] nativeGetDeclaredFields(Class<?> cls);
+    public static native Field[] getDeclaredFields(Class<?> cls);
 
     // -------------------------------------------------------------------------------------------------------------
 
-    private static native int nativeGetIntFieldVal(Object object, Field field);
+    public static native int getIntFieldVal(Object object, Field field);
 
-    private static native long nativeGetLongFieldVal(Object object, Field field);
+    public static native long getLongFieldVal(Object object, Field field);
 
-    private static native short nativeGetShortFieldVal(Object object, Field field);
+    public static native short getShortFieldVal(Object object, Field field);
 
-    private static native char nativeGetCharFieldVal(Object object, Field field);
+    public static native char getCharFieldVal(Object object, Field field);
 
-    private static native boolean nativeGetBooleanFieldVal(Object object, Field field);
+    public static native boolean getBooleanFieldVal(Object object, Field field);
 
-    private static native byte nativeGetByteFieldVal(Object object, Field field);
+    public static native byte getByteFieldVal(Object object, Field field);
 
-    private static native float nativeGetFloatFieldVal(Object object, Field field);
+    public static native float getFloatFieldVal(Object object, Field field);
 
-    private static native double nativeGetDoubleFieldVal(Object object, Field field);
+    public static native double getDoubleFieldVal(Object object, Field field);
 
-    private static native Object nativeGetObjectFieldVal(Object object, Field field);
+    public static native Object getObjectFieldVal(Object object, Field field);
 
     public static Object getFieldVal(Object object, Field field) {
         if (object == null) {
-            throw new IllegalArgumentException("Object cannot be null");
+            throw new IllegalArgumentException("object cannot be null");
         }
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
         Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
-            return nativeGetIntFieldVal(object, field);
+            return getIntFieldVal(object, field);
         } else if (fieldType == long.class) {
-            return nativeGetLongFieldVal(object, field);
+            return getLongFieldVal(object, field);
         } else if (fieldType == short.class) {
-            return nativeGetShortFieldVal(object, field);
+            return getShortFieldVal(object, field);
         } else if (fieldType == char.class) {
-            return nativeGetCharFieldVal(object, field);
+            return getCharFieldVal(object, field);
         } else if (fieldType == boolean.class) {
-            return nativeGetBooleanFieldVal(object, field);
+            return getBooleanFieldVal(object, field);
         } else if (fieldType == byte.class) {
-            return nativeGetByteFieldVal(object, field);
+            return getByteFieldVal(object, field);
         } else if (fieldType == float.class) {
-            return nativeGetFloatFieldVal(object, field);
+            return getFloatFieldVal(object, field);
         } else if (fieldType == double.class) {
-            return nativeGetDoubleFieldVal(object, field);
+            return getDoubleFieldVal(object, field);
         } else {
-            return nativeGetObjectFieldVal(object, field);
+            return getObjectFieldVal(object, field);
+        }
+    }
+
+    public static native void setIntFieldVal(Object object, Field field, int val);
+
+    public static native void setLongFieldVal(Object object, Field field, long val);
+
+    public static native void setShortFieldVal(Object object, Field field, short val);
+
+    public static native void setCharFieldVal(Object object, Field field, char val);
+
+    public static native void setBooleanFieldVal(Object object, Field field, boolean val);
+
+    public static native void setByteFieldVal(Object object, Field field, byte val);
+
+    public static native void setFloatFieldVal(Object object, Field field, float val);
+
+    public static native void setDoubleFieldVal(Object object, Field field, double val);
+
+    public static native void setObjectFieldVal(Object object, Field field, Object val);
+
+    public static void setFieldVal(Object object, Field field, Object val) {
+        if (object == null) {
+            throw new IllegalArgumentException("object cannot be null");
+        }
+        if (field == null) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
+        Class<?> fieldType = field.getType();
+        if (fieldType == int.class) {
+            setIntFieldVal(object, field, ((Integer) val).intValue());
+        } else if (fieldType == long.class) {
+            setLongFieldVal(object, field, ((Long) val).longValue());
+        } else if (fieldType == short.class) {
+            setShortFieldVal(object, field, ((Short) val).shortValue());
+        } else if (fieldType == char.class) {
+            setCharFieldVal(object, field, ((Character) val).charValue());
+        } else if (fieldType == boolean.class) {
+            setBooleanFieldVal(object, field, ((Boolean) val).booleanValue());
+        } else if (fieldType == byte.class) {
+            setByteFieldVal(object, field, ((Byte) val).byteValue());
+        } else if (fieldType == float.class) {
+            setFloatFieldVal(object, field, ((Float) val).floatValue());
+        } else if (fieldType == double.class) {
+            setDoubleFieldVal(object, field, ((Double) val).doubleValue());
+        } else {
+            setObjectFieldVal(object, field, val);
         }
     }
     
-    // TODO: add methods like `int getIntFieldVal(...)` to avoid boxing on return
-
     // -------------------------------------------------------------------------------------------------------------
 
-    private static native int nativeCallIntMethod(Object object, Method method, Object... params);
+    public static native int callIntMethod(Object object, Method method, Object... params);
 
-    private static native long nativeCallLongMethod(Object object, Method method, Object... params);
+    public static native long callLongMethod(Object object, Method method, Object... params);
 
-    private static native short nativeCallShortMethod(Object object, Method method, Object... params);
+    public static native short callShortMethod(Object object, Method method, Object... params);
 
-    private static native char nativeCallCharMethod(Object object, Method method, Object... params);
+    public static native char callCharMethod(Object object, Method method, Object... params);
 
-    private static native boolean nativeCallBooleanMethod(Object object, Method method, Object... params);
+    public static native boolean callBooleanMethod(Object object, Method method, Object... params);
 
-    private static native byte nativeCallByteMethod(Object object, Method method, Object... params);
+    public static native byte callByteMethod(Object object, Method method, Object... params);
 
-    private static native float nativeCallFloatMethod(Object object, Method method, Object... params);
+    public static native float callFloatMethod(Object object, Method method, Object... params);
 
-    private static native double nativeCallDoubleMethod(Object object, Method method, Object... params);
+    public static native double callDoubleMethod(Object object, Method method, Object... params);
 
-    private static native void nativeCallVoidMethod(Object object, Method method, Object... params);
+    public static native void callVoidMethod(Object object, Method method, Object... params);
 
-    private static native Object nativeCallObjectMethod(Object object, Method method, Object... params);
+    public static native Object callObjectMethod(Object object, Method method, Object... params);
 
     public static Object callMethod(Object object, Method method, Object... params) {
         if (object == null) {
-            throw new IllegalArgumentException("Object cannot be null");
+            throw new IllegalArgumentException("object cannot be null");
         }
         if (method == null) {
             throw new IllegalArgumentException("method cannot be null");
@@ -102,23 +147,23 @@ public class Narcissus {
         }
         Class<?> returnType = method.getReturnType();
         if (returnType == int.class) {
-            return nativeCallIntMethod(object, method, params);
+            return callIntMethod(object, method, params);
         } else if (returnType == long.class) {
-            return nativeCallLongMethod(object, method, params);
+            return callLongMethod(object, method, params);
         } else if (returnType == short.class) {
-            return nativeCallShortMethod(object, method, params);
+            return callShortMethod(object, method, params);
         } else if (returnType == char.class) {
-            return nativeCallCharMethod(object, method, params);
+            return callCharMethod(object, method, params);
         } else if (returnType == boolean.class) {
-            return nativeCallBooleanMethod(object, method, params);
+            return callBooleanMethod(object, method, params);
         } else if (returnType == byte.class) {
-            return nativeCallByteMethod(object, method, params);
+            return callByteMethod(object, method, params);
         } else if (returnType == float.class) {
-            return nativeCallFloatMethod(object, method, params);
+            return callFloatMethod(object, method, params);
         } else if (returnType == double.class) {
-            return nativeCallDoubleMethod(object, method, params);
+            return callDoubleMethod(object, method, params);
         } else {
-            return nativeCallObjectMethod(object, method, params);
+            return callObjectMethod(object, method, params);
         }
     }
     
