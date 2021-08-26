@@ -35,7 +35,7 @@ public class Narcissus {
         }
     }
 
-    public static native void init();
+    private static native void init();
 
     // -------------------------------------------------------------------------------------------------------------
 
