@@ -1,4 +1,4 @@
-# Narcissus -- thwart Java's strong encapsulation
+# Narcissus: thwart Java's strong encapsulation
 
 Narcissus is a JNI native code library that completely circumvents all class, method, and field reflection visibility restrictions on the JVM. This allows reflection code to keep working even now that strong encapsulation is being enforced in JDK 16+.
 
