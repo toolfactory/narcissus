@@ -31,7 +31,7 @@ public class Narcissus {
             LibraryLoader.loadLibraryFromJar(libraryResourcePath);
             init();
         } catch (Throwable t) {
-            throw new RuntimeException("Could not load native library", t);
+            throw new RuntimeException("Could not load native library " + libraryResourcePath, t);
         }
     }
 
