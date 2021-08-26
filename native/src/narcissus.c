@@ -1,5 +1,197 @@
 #include <jni.h>
+#include <stdbool.h>
+#include <stdio.h>
 
+// -----------------------------------------------------------------------------------------------------------------
+
+// Prelookup of frequently-used classes and methods:
+
+jclass Integer_class;
+jclass int_class;
+jmethodID int_value_methodID;
+
+jclass Long_class;
+jclass long_class;
+jmethodID long_value_methodID;
+
+jclass Short_class;
+jclass short_class;
+jmethodID short_value_methodID;
+
+jclass Character_class;
+jclass char_class;
+jmethodID char_value_methodID;
+
+jclass Boolean_class;
+jclass boolean_class;
+jmethodID boolean_value_methodID;
+
+jclass Byte_class;
+jclass byte_class;
+jmethodID byte_value_methodID;
+
+jclass Float_class;
+jclass float_class;
+jmethodID float_value_methodID;
+
+jclass Double_class;
+jclass double_class;
+jmethodID double_value_methodID;
+
+// Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_init(JNIEnv *env, jclass ignored) {
+    Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
+    int_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Integer_class, (*env)->GetStaticFieldID(env, Integer_class, "TYPE", "Ljava/lang/Class;")));
+    int_value_methodID = (*env)->GetMethodID(env, Integer_class, "intValue", "()I");
+
+    Long_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Long"));
+    long_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Long_class, (*env)->GetStaticFieldID(env, Long_class, "TYPE", "Ljava/lang/Class;")));
+    long_value_methodID = (*env)->GetMethodID(env, Long_class, "longValue", "()J");
+
+    Short_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Short"));
+    short_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Short_class, (*env)->GetStaticFieldID(env, Short_class, "TYPE", "Ljava/lang/Class;")));
+    short_value_methodID = (*env)->GetMethodID(env, Short_class, "shortValue", "()S");
+
+    Character_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Character"));
+    char_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Character_class, (*env)->GetStaticFieldID(env, Character_class, "TYPE", "Ljava/lang/Class;")));
+    char_value_methodID = (*env)->GetMethodID(env, Character_class, "charValue", "()C");
+
+    Boolean_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Boolean"));
+    boolean_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Boolean_class, (*env)->GetStaticFieldID(env, Boolean_class, "TYPE", "Ljava/lang/Class;")));
+    boolean_value_methodID = (*env)->GetMethodID(env, Boolean_class, "booleanValue", "()Z");
+
+    Byte_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Byte"));
+    byte_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Byte_class, (*env)->GetStaticFieldID(env, Byte_class, "TYPE", "Ljava/lang/Class;")));
+    byte_value_methodID = (*env)->GetMethodID(env, Byte_class, "byteValue", "()B");
+
+    Float_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Float"));
+    float_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Float_class, (*env)->GetStaticFieldID(env, Float_class, "TYPE", "Ljava/lang/Class;")));
+    float_value_methodID = (*env)->GetMethodID(env, Float_class, "floatValue", "()F");
+
+    Double_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Double"));
+    double_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Double_class, (*env)->GetStaticFieldID(env, Double_class, "TYPE", "Ljava/lang/Class;")));
+    double_value_methodID = (*env)->GetMethodID(env, Double_class, "doubleValue", "()D");
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+void throwIllegalArgumentException(JNIEnv* env, char* msg) {
+    (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/IllegalArgumentException"), msg);
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+// Unbox a jobjectArray of method invocation args into a jvalue array.
+int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue* arg_jvalues) {
+    // Get parameter types of method
+    jclass methodClass = (*env)->GetObjectClass(env, method);
+    jmethodID getParameterTypesMethodID = (*env)->GetMethodID(env, methodClass, "getParameterTypes", "()[Ljava/lang/Class;");
+    jobject parameterTypes = (*env)->CallObjectMethod(env, method, getParameterTypesMethodID);
+    jsize num_params = (*env)->GetArrayLength(env, parameterTypes);
+
+    // Check arg arity
+    if (num_args != num_params) {
+        throwIllegalArgumentException(env, "Tried to invoke method with wrong number of arguments");
+        return 0;
+    }
+    
+    // Unbox args
+    for (jsize i = 0; i < num_args; i++) {
+        jobject paramType = (*env)->GetObjectArrayElement(env, parameterTypes, i);
+        jobject arg = (*env)->GetObjectArrayElement(env, args, i);
+        jclass argType = arg == NULL ? (jclass) NULL : (*env)->GetObjectClass(env, arg);
+
+        if ((*env)->IsSameObject(env, paramType, int_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Integer");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Integer_class)) {
+                arg_jvalues[i].i = (*env)->CallIntMethod(env, arg, int_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Integer");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, long_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Long");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Long_class)) {
+                arg_jvalues[i].j = (*env)->CallLongMethod(env, arg, long_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Long");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, short_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Short");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Short_class)) {
+                arg_jvalues[i].s = (*env)->CallShortMethod(env, arg, short_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Short");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, char_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Character");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Character_class)) {
+                arg_jvalues[i].c = (*env)->CallCharMethod(env, arg, char_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Character");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, boolean_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Boolean");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Boolean_class)) {
+                arg_jvalues[i].z = (*env)->CallBooleanMethod(env, arg, boolean_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Boolean");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, byte_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Byte");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Byte_class)) {
+                arg_jvalues[i].b = (*env)->CallByteMethod(env, arg, byte_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Byte");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, float_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Float");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Float_class)) {
+                arg_jvalues[i].f = (*env)->CallFloatMethod(env, arg, float_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Float");
+                return 0;
+            }
+        } else if ((*env)->IsSameObject(env, paramType, double_class)) {
+            if (arg == NULL) {
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Double");
+                return 0;
+            } else if ((*env)->IsSameObject(env, argType, Double_class)) {
+                arg_jvalues[i].d = (*env)->CallDoubleMethod(env, arg, double_value_methodID);
+            } else {
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Double");
+                return 0;
+            }
+        } else {
+            // Arg does not need unboxing
+            arg_jvalues[i].l = arg;
+        }
+    }
+    return 1;
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+// Get declared methods without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
@@ -9,6 +201,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredMethods(JNIEn
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
 
+// Get declared constructors without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
@@ -18,6 +211,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredConstructors(
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
 
+// Get declared fields without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
@@ -28,6 +222,8 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredFields(JNIEnv
 }
 
 // -----------------------------------------------------------------------------------------------------------------
+
+// Field getters:
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_getIntFieldVal(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     jfieldID fieldID = (*env)->FromReflectedField(env, field);
@@ -74,7 +270,7 @@ JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_getObjectFieldVal(JNIEnv *env
     return (*env)->GetObjectField(env, obj, fieldID);
 }
 
-// ----
+// Field setters:
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setIntFieldVal(JNIEnv *env, jclass ignored, jobject obj, jobject field, jint val) {
     jfieldID fieldID = (*env)->FromReflectedField(env, field);
@@ -123,56 +319,109 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_setObjectFieldVal(JNIEnv *env, j
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// TODO: method calls that take parameters are not yet supported, the `params` parameter is ignored
-// See https://stackoverflow.com/a/30961708/3950982
+// Call methods
 
-JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    (*env)->CallVoidMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return;
+    }
+    if (num_args == 0) {
+        (*env)->CallVoidMethod(env, obj, methodID);
+    } else {
+        (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
+    }
 }
 
-JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallIntMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jint) 0;
+    }
+    return num_args == 0 ? (*env)->CallIntMethod(env, obj, methodID) : (*env)->CallIntMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_callLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_callLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallLongMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jlong) 0;
+    }
+    return num_args == 0 ? (*env)->CallLongMethod(env, obj, methodID) : (*env)->CallLongMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_callShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_callShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallShortMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jshort) 0;
+    }
+    return num_args == 0 ? (*env)->CallShortMethod(env, obj, methodID) : (*env)->CallShortMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_callCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_callCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallCharMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jchar) 0;
+    }
+    return num_args == 0 ? (*env)->CallCharMethod(env, obj, methodID) : (*env)->CallCharMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_callBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_callBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallBooleanMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jboolean) 0;
+    }
+    return num_args == 0 ? (*env)->CallBooleanMethod(env, obj, methodID) : (*env)->CallBooleanMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_callByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_callByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallByteMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jbyte) 0;
+    }
+    return num_args == 0 ? (*env)->CallByteMethod(env, obj, methodID) : (*env)->CallByteMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_callFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_callFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallFloatMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jfloat) 0;
+    }
+    return num_args == 0 ? (*env)->CallFloatMethod(env, obj, methodID) : (*env)->CallFloatMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_callDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_callDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallDoubleMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jdouble) 0;
+    }
+    return num_args == 0 ? (*env)->CallDoubleMethod(env, obj, methodID) : (*env)->CallDoubleMethodA(env, obj, methodID, arg_jvalues);
 }
 
-JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray params) {
+JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    return (*env)->CallObjectMethod(env, obj, methodID);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (!unbox(env, method, args, num_args, arg_jvalues)) {
+        return (jobject) 0;
+    }
+    return num_args == 0 ? (*env)->CallObjectMethod(env, obj, methodID) : (*env)->CallObjectMethodA(env, obj, methodID, arg_jvalues);
 }
 

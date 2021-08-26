@@ -7,8 +7,11 @@ import java.lang.reflect.Method;
 public class Narcissus {
     static {
         Utils.loadLibraryFromJar("lib/narcissus.so");
+        init();
     }
 
+    public static native void init();
+    
     // -------------------------------------------------------------------------------------------------------------
 
     public static native Method[] getDeclaredMethods(Class<?> cls);
@@ -115,60 +118,55 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
-    public static native void callVoidMethod(Object object, Method method, Object... params);
+    public static native void callVoidMethod(Object object, Method method, Object... args);
 
-    public static native int callIntMethod(Object object, Method method, Object... params);
+    public static native int callIntMethod(Object object, Method method, Object... args);
 
-    public static native long callLongMethod(Object object, Method method, Object... params);
+    public static native long callLongMethod(Object object, Method method, Object... args);
 
-    public static native short callShortMethod(Object object, Method method, Object... params);
+    public static native short callShortMethod(Object object, Method method, Object... args);
 
-    public static native char callCharMethod(Object object, Method method, Object... params);
+    public static native char callCharMethod(Object object, Method method, Object... args);
 
-    public static native boolean callBooleanMethod(Object object, Method method, Object... params);
+    public static native boolean callBooleanMethod(Object object, Method method, Object... args);
 
-    public static native byte callByteMethod(Object object, Method method, Object... params);
+    public static native byte callByteMethod(Object object, Method method, Object... args);
 
-    public static native float callFloatMethod(Object object, Method method, Object... params);
+    public static native float callFloatMethod(Object object, Method method, Object... args);
 
-    public static native double callDoubleMethod(Object object, Method method, Object... params);
+    public static native double callDoubleMethod(Object object, Method method, Object... args);
 
-    public static native Object callObjectMethod(Object object, Method method, Object... params);
+    public static native Object callObjectMethod(Object object, Method method, Object... args);
 
-    public static Object callMethod(Object object, Method method, Object... params) {
+    public static Object callMethod(Object object, Method method, Object... args) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
         }
         if (method == null) {
             throw new IllegalArgumentException("method cannot be null");
         }
-        if (params.length > 0) {
-            throw new IllegalArgumentException("Params are not yet supported -- see narcissus.c");
-        }
         Class<?> returnType = method.getReturnType();
         if (returnType == void.class) {
-            callVoidMethod(object, method, params);
+            callVoidMethod(object, method, args);
             return null;
         } else if (returnType == int.class) {
-            return callIntMethod(object, method, params);
+            return callIntMethod(object, method, args);
         } else if (returnType == long.class) {
-            return callLongMethod(object, method, params);
+            return callLongMethod(object, method, args);
         } else if (returnType == short.class) {
-            return callShortMethod(object, method, params);
+            return callShortMethod(object, method, args);
         } else if (returnType == char.class) {
-            return callCharMethod(object, method, params);
+            return callCharMethod(object, method, args);
         } else if (returnType == boolean.class) {
-            return callBooleanMethod(object, method, params);
+            return callBooleanMethod(object, method, args);
         } else if (returnType == byte.class) {
-            return callByteMethod(object, method, params);
+            return callByteMethod(object, method, args);
         } else if (returnType == float.class) {
-            return callFloatMethod(object, method, params);
+            return callFloatMethod(object, method, args);
         } else if (returnType == double.class) {
-            return callDoubleMethod(object, method, params);
+            return callDoubleMethod(object, method, args);
         } else {
-            return callObjectMethod(object, method, params);
+            return callObjectMethod(object, method, args);
         }
     }
-
-    // TODO: add methods like `int callIntMethod(...)` to avoid boxing on return
 }

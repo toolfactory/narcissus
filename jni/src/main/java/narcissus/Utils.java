@@ -45,7 +45,7 @@ public class Utils {
         return constructors;
     }
 
-    public static Field findField(Object obj, String fieldName) {
+    public static Field findField(Object obj, String fieldName) throws NoSuchFieldException {
         for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
             for (Field field : Narcissus.getDeclaredFields(c)) {
                 if (field.getName().equals(fieldName)) {
@@ -53,10 +53,11 @@ public class Utils {
                 }
             }
         }
-        return null;
+        throw new NoSuchFieldException(fieldName);
     }
 
-    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes) {
+    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes)
+            throws NoSuchMethodException {
         for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
             for (Method method : Narcissus.getDeclaredMethods(c)) {
                 if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
@@ -64,7 +65,7 @@ public class Utils {
                 }
             }
         }
-        return null;
+        throw new NoSuchMethodException(methodName);
     }
 
     // -------------------------------------------------------------------------------------------------------------
