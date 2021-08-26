@@ -324,104 +324,103 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_setObjectFieldVal(JNIEnv *env, j
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
+    if (num_args == 0) {
+        (*env)->CallVoidMethod(env, obj, methodID);
+    }
+    jvalue arg_jvalues[num_args];
     if (!unbox(env, method, args, num_args, arg_jvalues)) {
         return;
     }
-    if (num_args == 0) {
-        (*env)->CallVoidMethod(env, obj, methodID);
-    } else {
-        (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
-    }
+    (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
 }
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jint) 0;
+    if (num_args == 0) {
+        return (*env)->CallIntMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallIntMethod(env, obj, methodID) : (*env)->CallIntMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallIntMethodA(env, obj, methodID, arg_jvalues) : (jint) 0;
 }
 
 JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_callLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jlong) 0;
+    if (num_args == 0) {
+        return (*env)->CallLongMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallLongMethod(env, obj, methodID) : (*env)->CallLongMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallLongMethodA(env, obj, methodID, arg_jvalues) : (jlong) 0;
 }
 
 JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_callShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jshort) 0;
+    if (num_args == 0) {
+        return (*env)->CallShortMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallShortMethod(env, obj, methodID) : (*env)->CallShortMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallShortMethodA(env, obj, methodID, arg_jvalues) : (jshort) 0;
 }
 
 JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_callCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jchar) 0;
+    if (num_args == 0) {
+        return (*env)->CallCharMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallCharMethod(env, obj, methodID) : (*env)->CallCharMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallCharMethodA(env, obj, methodID, arg_jvalues) : (jchar) 0;
 }
 
 JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_callBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jboolean) 0;
+    if (num_args == 0) {
+        return (*env)->CallBooleanMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallBooleanMethod(env, obj, methodID) : (*env)->CallBooleanMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallBooleanMethodA(env, obj, methodID, arg_jvalues) : (jboolean) 0;
 }
 
 JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_callByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jbyte) 0;
+    if (num_args == 0) {
+        return (*env)->CallByteMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallByteMethod(env, obj, methodID) : (*env)->CallByteMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallByteMethodA(env, obj, methodID, arg_jvalues) : (jbyte) 0;
 }
 
 JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_callFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jfloat) 0;
+    if (num_args == 0) {
+        return (*env)->CallFloatMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallFloatMethod(env, obj, methodID) : (*env)->CallFloatMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallFloatMethodA(env, obj, methodID, arg_jvalues) : (jfloat) 0;
 }
 
 JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_callDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jdouble) 0;
+    if (num_args == 0) {
+        return (*env)->CallDoubleMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallDoubleMethod(env, obj, methodID) : (*env)->CallDoubleMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallDoubleMethodA(env, obj, methodID, arg_jvalues) : (jdouble) 0;
 }
 
 JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return (jobject) 0;
+    if (num_args == 0) {
+        return (*env)->CallObjectMethod(env, obj, methodID);
     }
-    return num_args == 0 ? (*env)->CallObjectMethod(env, obj, methodID) : (*env)->CallObjectMethodA(env, obj, methodID, arg_jvalues);
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallObjectMethodA(env, obj, methodID, arg_jvalues) : (jobject) NULL;
 }
 
