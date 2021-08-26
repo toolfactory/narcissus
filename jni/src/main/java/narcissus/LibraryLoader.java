@@ -6,69 +6,61 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
 
-public class Utils {
+public class LibraryLoader {
+    /** The operating system type. */
+    public static final OperatingSystem OS;
 
-    public static List<Field> enumerateFields(Class<?> cls) {
-        List<Field> fields = new ArrayList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.getDeclaredFields(c)) {
-                fields.add(field);
-            }
-        }
-        return fields;
+    /** The operating system type. */
+    public enum OperatingSystem {
+        /** Windows. */
+        Windows,
+
+        /** Mac OS X. */
+        MacOSX,
+
+        /** Linux. */
+        Linux,
+
+        /** Solaris. */
+        Solaris,
+
+        /** BSD. */
+        BSD,
+
+        /** Unix or AIX. */
+        Unix,
+
+        /** Unknown. */
+        Unknown
     }
 
-    public static List<Method> enumerateMethods(Class<?> cls) {
-        List<Method> methods = new ArrayList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.getDeclaredMethods(c)) {
-                methods.add(method);
-            }
+    static {
+        String osName = null;
+        try {
+            osName = System.getProperty("os.name", "unknown").toLowerCase(Locale.ENGLISH);
+        } catch (final SecurityException e) {
+            // Ignore
         }
-        return methods;
-    }
-
-    public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
-        List<Constructor<?>> constructors = new ArrayList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Constructor<?> constructor : Narcissus.getDeclaredConstructors(c)) {
-                constructors.add(constructor);
-            }
+        if (osName == null) {
+            OS = OperatingSystem.Unknown;
+        } else if (osName.contains("mac") || osName.contains("darwin")) {
+            OS = OperatingSystem.MacOSX;
+        } else if (osName.contains("win")) {
+            OS = OperatingSystem.Windows;
+        } else if (osName.contains("nux")) {
+            OS = OperatingSystem.Linux;
+        } else if (osName.contains("sunos") || osName.contains("solaris")) {
+            OS = OperatingSystem.Solaris;
+        } else if (osName.contains("bsd")) {
+            OS = OperatingSystem.Unix;
+        } else if (osName.contains("nix") || osName.contains("aix")) {
+            OS = OperatingSystem.Unix;
+        } else {
+            OS = OperatingSystem.Unknown;
         }
-        return constructors;
     }
-
-    public static Field findField(Object obj, String fieldName) throws NoSuchFieldException {
-        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.getDeclaredFields(c)) {
-                if (field.getName().equals(fieldName)) {
-                    return field;
-                }
-            }
-        }
-        throw new NoSuchFieldException(fieldName);
-    }
-
-    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes)
-            throws NoSuchMethodException {
-        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.getDeclaredMethods(c)) {
-                if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
-                    return method;
-                }
-            }
-        }
-        throw new NoSuchMethodException(methodName);
-    }
-
-    // -------------------------------------------------------------------------------------------------------------
 
     public static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;

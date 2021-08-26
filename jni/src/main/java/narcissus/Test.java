@@ -14,16 +14,16 @@ public class Test {
     public static void main(String[] args) throws Exception {
         final ClassLoader classLoader = Test.class.getClassLoader();
 
-        final Field ucpField = Utils.findField(classLoader, "ucp");
+        final Field ucpField = Narcissus.findField(classLoader, "ucp");
         final Object ucpVal = Narcissus.getFieldVal(classLoader, ucpField);
 
-        final Method getURLsMethod = Utils.findMethod(ucpVal, "getURLs");
+        final Method getURLsMethod = Narcissus.findMethod(ucpVal, "getURLs");
         for (URL url : (URL[]) Narcissus.callMethod(ucpVal, getURLsMethod)) {
             System.out.println("Classpath URL: " + url);
         }
 
         Cls cls = new Cls();
-        Method prt = Utils.findMethod(cls, "prt", int.class);
+        Method prt = Narcissus.findMethod(cls, "prt", int.class);
         Narcissus.callVoidMethod(cls, prt, 5);
     }
 }

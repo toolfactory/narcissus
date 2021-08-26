@@ -3,15 +3,95 @@ package narcissus;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Narcissus {
     static {
-        Utils.loadLibraryFromJar("lib/narcissus.so");
-        init();
+        final String libraryResourcePath;
+        switch (LibraryLoader.OS) {
+        case Linux:
+            libraryResourcePath = "lib/narcissus.so";
+            break;
+        case MacOSX:
+            libraryResourcePath = "lib/narcissus.dylib";
+            break;
+        case Windows:
+            libraryResourcePath = "lib/narcissus.dll";
+            break;
+        case BSD:
+        case Solaris:
+        case Unix:
+        case Unknown:
+        default:
+            throw new RuntimeException("No native library available for this operating system");
+        }
+        try {
+            LibraryLoader.loadLibraryFromJar(libraryResourcePath);
+            init();
+        } catch (Throwable t) {
+            throw new RuntimeException("Could not load native library", t);
+        }
     }
 
     public static native void init();
-    
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    public static List<Field> enumerateFields(Class<?> cls) {
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Field field : Narcissus.getDeclaredFields(c)) {
+                fields.add(field);
+            }
+        }
+        return fields;
+    }
+
+    public static List<Method> enumerateMethods(Class<?> cls) {
+        List<Method> methods = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Method method : Narcissus.getDeclaredMethods(c)) {
+                methods.add(method);
+            }
+        }
+        return methods;
+    }
+
+    public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
+        List<Constructor<?>> constructors = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (Constructor<?> constructor : Narcissus.getDeclaredConstructors(c)) {
+                constructors.add(constructor);
+            }
+        }
+        return constructors;
+    }
+
+    public static Field findField(Object obj, String fieldName) throws NoSuchFieldException {
+        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+            for (Field field : Narcissus.getDeclaredFields(c)) {
+                if (field.getName().equals(fieldName)) {
+                    return field;
+                }
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
+    }
+
+    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes)
+            throws NoSuchMethodException {
+        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+            for (Method method : Narcissus.getDeclaredMethods(c)) {
+                if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
+                    return method;
+                }
+            }
+        }
+        throw new NoSuchMethodException(methodName);
+    }
+
     // -------------------------------------------------------------------------------------------------------------
 
     public static native Method[] getDeclaredMethods(Class<?> cls);
@@ -40,6 +120,7 @@ public class Narcissus {
 
     public static native Object getObjectFieldVal(Object object, Field field);
 
+    /** Get a field value, boxing the value if necessary. */
     public static Object getFieldVal(Object object, Field field) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
@@ -87,6 +168,7 @@ public class Narcissus {
 
     public static native void setObjectFieldVal(Object object, Field field, Object val);
 
+    /** Set a field value, unboxing the passed value if necessary. */
     public static void setFieldVal(Object object, Field field, Object val) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
@@ -138,6 +220,7 @@ public class Narcissus {
 
     public static native Object callObjectMethod(Object object, Method method, Object... args);
 
+    /** Call a method, boxing the result if necessary. */
     public static Object callMethod(Object object, Method method, Object... args) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
