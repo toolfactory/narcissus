@@ -6,8 +6,8 @@ import java.net.URL;
 
 public class Test {
     private static class Cls {
-        private void prt(int x) {
-            System.out.println(x);
+        private int prt(int x) {
+            return x * 3;
         }
     }
 
@@ -24,6 +24,6 @@ public class Test {
 
         Cls cls = new Cls();
         Method prt = Narcissus.findMethod(cls, "prt", int.class);
-        Narcissus.callVoidMethod(cls, prt, 5);
+        int val = Narcissus.callIntMethod(cls, prt, 5);
     }
 }
