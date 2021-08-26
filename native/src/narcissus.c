@@ -1,6 +1,5 @@
 #include <jni.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -81,7 +80,7 @@ void throwIllegalArgumentException(JNIEnv* env, char* msg) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Unbox a jobjectArray of method invocation args into a jvalue array.
+// Unbox a jobjectArray of method invocation args into a jvalue array. Returns 0 if an exception was thrown, or 1 if unboxing succeeded.
 int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue* arg_jvalues) {
     // Get parameter types of method
     jclass methodClass = (*env)->GetObjectClass(env, method);
@@ -328,10 +327,9 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jcla
         (*env)->CallVoidMethod(env, obj, methodID);
     }
     jvalue arg_jvalues[num_args];
-    if (!unbox(env, method, args, num_args, arg_jvalues)) {
-        return;
+    if (unbox(env, method, args, num_args, arg_jvalues)) {
+        (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
     }
-    (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
 }
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
