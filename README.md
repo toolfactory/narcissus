@@ -27,7 +27,7 @@ No. It is not the job of the JDK team to support APIs that are clearly marked as
 
 > It is not a goal to remove, encapsulate, or modify any critical internal APIs of the JDK for which standard replacements do not yet exist. This means that `sun.misc.Unsafe` will remain available. *(--[JEP 396](https://openjdk.java.net/jeps/396))*
 
-However this principle has not been adhered to, since there are many useful private classes, fields, and methods that aren't in `Unsafe` but rather scattered all over the Java standard libraries, for which no standard replacement exists or will probably ever exist. Many libraries depend upon unfettered access to these internals just to be able to function.
+However this principle has not been adhered to, since there are many useful private classes, fields, and methods that aren't in `Unsafe` but rather scattered all over the Java standard libraries, for which no standard replacement exists or will probably ever exist. Many libraries depend upon unfettered access to these internals just to be able to function -- and JDK 16 has broken all of these libraries.
 
 ## How is it possible to circumvent Java strong encapsulation for JDK 16+?
 
