@@ -12,7 +12,7 @@ The JDK team's *security* justification for enforcing encapsulation was stated a
 
 > Some non-public classes, methods, and fields of `java.*` packages define privileged operations such as the ability to define a new class in a specific class loader, while others convey sensitive data such as cryptographic keys. These elements are internal to the JDK, despite being in `java.*` packages. The use of these internal elements by external code, via reflection, puts the security of the platform at risk.  *(--[JEP 396](https://openjdk.java.net/jeps/396))*
 
-However the Java Native Interface is a huge gaping hole in Java's intricate security structure, so this argument is moot:
+However the Java Native Interface is a huge gaping hole in Java's intricate security structure, so this argument is moot. Furthermore, this gaping security hole is by design, presumably because the JDK team preferred to code the security infrastructure in Java rather than in C++:
 
 > The JNI does not enforce class, field, and method access control restrictions that can be expressed at the Java programming language level through the use of modifiers such as `private` and `final`. It is possible to write native code to access or modify fields of an object even though doing so at the Java programming language level would lead to an `IllegalAccessException`. JNI’s permissiveness was a conscious design decision, given that native code can access and modify any
 memory location in the heap anyway. *(--[The Java Native Interface — Programmer’s Guide and Specification](https://github.com/iTimeTraveler/mybooks/blob/master/The%20Java%20Native%20Interface%20%E2%80%94%20Programmer%E2%80%99s%20Guide%20and%20Specification.pdf), section 10.9)*
