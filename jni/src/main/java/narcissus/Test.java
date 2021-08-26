@@ -6,7 +6,7 @@ import java.net.URL;
 
 public class Test {
     private static class Cls {
-        private int prt(int x) {
+        private int triple(int x) {
             return x * 3;
         }
     }
@@ -23,7 +23,8 @@ public class Test {
         }
 
         Cls cls = new Cls();
-        Method prt = Narcissus.findMethod(cls, "prt", int.class);
-        int val = Narcissus.callIntMethod(cls, prt, 5);
+        Method triple = Narcissus.findMethod(cls, "triple", int.class);
+        System.out.println(Narcissus.callIntMethod(cls, triple, 5));
+        System.out.println(Narcissus.callMethod(cls, triple, 2));
     }
 }
