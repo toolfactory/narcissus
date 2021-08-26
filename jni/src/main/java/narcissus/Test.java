@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 
+// TODO: Yes, Narcissus needs proper unit tests...
 public class Test {
     private static class Cls {
         private int triple(int x) {
