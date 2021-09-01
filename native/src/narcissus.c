@@ -190,6 +190,16 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
 
 // -----------------------------------------------------------------------------------------------------------------
 
+// Find a class by name with no security checks. Name should be of the form "java/lang/String", or "[Ljava/lang/Object;" for an array class.
+JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_findClassInternal(JNIEnv *env, jclass ignored, jstring class_name_internal) {
+    const char* class_name_internal_chars = (*env)->GetStringUTFChars(env, class_name_internal, NULL);
+    jclass class_ref = (*env)->FindClass(env, class_name_internal_chars);
+    (*env)->ReleaseStringUTFChars(env, class_name_internal, class_name_internal_chars);
+    return class_ref;
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
 // Get declared methods without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class

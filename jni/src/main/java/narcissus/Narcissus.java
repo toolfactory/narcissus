@@ -41,6 +41,29 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
+    // Find a class by name with no security checks. Name should be of the form "java/lang/String",
+    // or "[Ljava/lang/Object;" for an array class.
+    private static native Class<?> findClassInternal(String classNameInternal);
+
+    /**
+     * Finds a class by name (e.g. {@code "com.xyz.MyClass"}) using the current classloader or the system
+     * classloader, without any security checks. Finds array classes if the class name is of the form
+     * {@code "com.xyz.MyClass[][]"}.
+     */
+    public static Class<?> findClass(String className) {
+        String classNameInternal = className.replace('.', '/');
+        if (classNameInternal.endsWith("[]")) {
+            classNameInternal = 'L' + classNameInternal;
+            do {
+                classNameInternal = '[' + classNameInternal.substring(0, classNameInternal.length() - 2);
+            } while (classNameInternal.endsWith("[]"));
+            classNameInternal += ';';
+        }
+        return findClassInternal(classNameInternal);
+    }
+
+    // -------------------------------------------------------------------------------------------------------------
+
     /** Enumerate all fields in the given class, ignoring visibility. */
     public static List<Field> enumerateFields(Class<?> cls) {
         List<Field> fields = new ArrayList<>();
@@ -101,10 +124,13 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
+    /** Get declared methods without any visibility checks. */
     public static native Method[] getDeclaredMethods(Class<?> cls);
 
+    /** Get declared constructors without any visibility checks. */
     public static native <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
+    /** Get declared fields without any visibility checks. */
     public static native Field[] getDeclaredFields(Class<?> cls);
 
     // -------------------------------------------------------------------------------------------------------------
