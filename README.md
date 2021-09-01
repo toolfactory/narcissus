@@ -1,4 +1,4 @@
-# Narcissus: thwart Java's strong encapsulation
+# Narcissus: thwart strong encapsulation in JDK 16+
 
 Narcissus is a JNI native code library that provides a small subset of the Java reflection API, while bypassing all of Java's reflection access checks via JNI. 
 
@@ -42,6 +42,10 @@ Of course if you make use of JNI to bypass Java's security, and things break, yo
 ## Status
 
 Narcissus works today; however, work is needed to port the build configuration to every major operating system and architecture. Please get in touch if you can help with this.
+
+## Usage
+
+The API is all contained in [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
 ## Why "Narcissus"?
 
