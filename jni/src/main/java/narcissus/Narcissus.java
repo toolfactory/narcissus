@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Narcissus {
+    // Statically load the native library
     static {
         final String libraryResourcePath;
         switch (LibraryLoader.OS) {
@@ -35,10 +36,12 @@ public class Narcissus {
         }
     }
 
+    // Native init method (sets up global refs to primitive type classes, for speed)
     private static native void init();
 
     // -------------------------------------------------------------------------------------------------------------
 
+    /** Enumerate all fields in the given class, ignoring visibility. */
     public static List<Field> enumerateFields(Class<?> cls) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
@@ -49,6 +52,7 @@ public class Narcissus {
         return fields;
     }
 
+    /** Enumerate all methods in the given class, ignoring visibility. */
     public static List<Method> enumerateMethods(Class<?> cls) {
         List<Method> methods = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
@@ -59,6 +63,7 @@ public class Narcissus {
         return methods;
     }
 
+    /** Enumerate all constructors in the given class, ignoring visibility. */
     public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
         List<Constructor<?>> constructors = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
@@ -69,8 +74,9 @@ public class Narcissus {
         return constructors;
     }
 
-    public static Field findField(Object obj, String fieldName) throws NoSuchFieldException {
-        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+    /** Find a field by name in the given class, ignoring visibility. */
+    public static Field findField(Class<?> cls, String fieldName) throws NoSuchFieldException {
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
             for (Field field : Narcissus.getDeclaredFields(c)) {
                 if (field.getName().equals(fieldName)) {
                     return field;
@@ -80,9 +86,10 @@ public class Narcissus {
         throw new NoSuchFieldException(fieldName);
     }
 
-    public static Method findMethod(Object obj, String methodName, Class<?>... paramTypes)
+    /** Find a method by name in the given class, ignoring visibility. */
+    public static Method findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)
             throws NoSuchMethodException {
-        for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
             for (Method method : Narcissus.getDeclaredMethods(c)) {
                 if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
                     return method;
