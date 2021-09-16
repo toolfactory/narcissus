@@ -1,0 +1,29 @@
+name: Java CI
+
+on:
+  pull_request:
+    branches:
+      - latest
+  push:
+    branches:
+      - latest
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        java: [ '8', '11', '12', '13', '14', '15', '16' ]
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+        java-version: ${{ matrix.java }}
+    - name: print Java version
+      run: java -version
+    - name: Build with Maven
+      run: ./mvnw --no-transfer-progress -B clean test
