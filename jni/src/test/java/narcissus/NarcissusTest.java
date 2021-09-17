@@ -163,6 +163,10 @@ public class NarcissusTest {
         assertThrows(NullPointerException.class, () -> {
             Narcissus.invokeDoubleMethod(null, dm);
         });
+        Method _dm = Narcissus.findMethod(Z.class, "_d");
+        assertThrows(NullPointerException.class, () -> {
+            Narcissus.invokeDoubleMethod(null, _dm);
+        });
     }
 
     @Test
