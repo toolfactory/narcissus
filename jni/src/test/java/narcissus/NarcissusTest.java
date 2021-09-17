@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -177,5 +178,28 @@ public class NarcissusTest {
         assertThrows(IllegalArgumentException.class, () -> {
             Narcissus.invokeDoubleMethod(new Y(), dm);
         });
+    }
+
+    @Test
+    public void findClass() throws Exception {
+        Class<?> cls = Narcissus.findClass(Y.class.getName());
+        assertThat(cls).isNotNull();
+        assertThat(cls.getName()).isEqualTo(Y.class.getName());
+        Class<?> arrCls = Narcissus.findClass(Y.class.getName() + "[]");
+        assertThat(arrCls).isNotNull();
+        assertThat(arrCls.getName()).isEqualTo("[L" + Y.class.getName() + ";");
+    }
+
+    @Test
+    public void enumerateFields() throws Exception {
+        assertThat(Narcissus.enumerateFields(Y.class).stream().map(Field::getName).collect(Collectors.toList()))
+                .containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f",
+                        "_d");
+    }
+
+    @Test
+    public void enumerateMethods() throws Exception {
+        assertThat(Narcissus.enumerateMethods(Z.class).stream().map(Method::getName).collect(Collectors.toList()))
+                .contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f", "_d");
     }
 }
