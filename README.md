@@ -44,22 +44,26 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 * Getting/Setting fields
 
   * **`<<T>> Narcissus.get<<T>>Field(Object object, Field field)`**, e.g. `int Narcissus.getIntField(Object object, Field field)`
-  * **`void Narcissus.set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void Narcissus.setIntField(Object object, Field field, int value)`
+  
+    **`void Narcissus.set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void Narcissus.setIntField(Object object, Field field, int value)`
   
     Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
   * **`Object Narcissus.getField(Object object, Field field)`**
-  * **`void Narcissus.setField(Object object, Field field, Object value)`**
+  
+    **`void Narcissus.setField(Object object, Field field, Object value)`**
   
     Get/set a non-static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
   
   * **`<<T>> Narcissus.getStatic<<T>>Field(Field field)`**, e.g. `int Narcissus.getStaticIntField(Field field)`
-  * **`void Narcissus.setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void Narcissus.setStaticIntField(Field field, int value)`
+  
+    **`void Narcissus.setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void Narcissus.setStaticIntField(Field field, int value)`
 
     Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
   * **`Object Narcissus.getStaticField(Field field)`**
-  * **`void Narcissus.setStaticField(Field field, Object value)`**
+  
+    **`void Narcissus.setStaticField(Field field, Object value)`**
   
     Get/set a static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
 
