@@ -24,7 +24,7 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
   * **`Field Narcissus.findField(Class<?> cls, String fieldName)`**
 
-    Find a field of a class by name.
+    Find a field of a class by name, bypassing all security and visibility checks.
 
 * Finding methods
   * **`Method[] Narcissus.getDeclaredMethods(Class<?> cls)`**
@@ -41,9 +41,19 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
   * **`Method Narcissus.findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)`**
 
-    Find a method of a class by name and parameter types.
+    Find a method of a class by name and parameter types, bypassing all security and visibility checks.
 
-* 
+* Getting/Setting fields
+
+  * **`<<PT>> get<<PT>>Field(Object object, Field field)`**, e.g. `int getIntField(Object object, Field field)`
+  * **`void set<<PT>>Field(Object object, Field field, <<PT>> value)`**, e.g. `void setIntField(Object object, Field field, int value)`
+  
+    Get/set a non-static field value.
+  
+  * **`<<PT>> getStatic<<PT>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
+  * **`void setStatic<<PT>>Field(Field field, <<PT>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
+
+    Get/set a static field value.
 
 
 ## Status
