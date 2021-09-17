@@ -18,6 +18,8 @@ public class Narcissus {
      */
     public static final boolean libraryLoaded;
 
+    private static final boolean DEBUG = false;
+
     /*
      * Load and initialize the native library.
      * 
@@ -50,7 +52,9 @@ public class Narcissus {
             loaded = true;
 
         } catch (Throwable t) {
-            throw new IllegalArgumentException("Could not load Narcissus native library: " + t.getMessage());
+            if (DEBUG) {
+                System.err.println("Could not load Narcissus native library: " + t.getMessage());
+            }
         }
         libraryLoaded = loaded;
     }
@@ -63,8 +67,8 @@ public class Narcissus {
 
     /**
      * Finds a class by name (e.g. {@code "com.xyz.MyClass"}) using the current classloader or the system
-     * classloader, without any security checks. Finds array classes if the class name is of the form
-     * {@code "com.xyz.MyClass[][]"}.
+     * classloader, ignoring visibility and bypassing security checks. Finds array classes if the class name is of
+     * the form {@code "com.xyz.MyClass[][]"}.
      *
      * @param className
      *            the class name
@@ -138,7 +142,7 @@ public class Narcissus {
     // -------------------------------------------------------------------------------------------------------------
 
     /**
-     * Find a field by name in the given class, ignoring visibility.
+     * Find a field by name in the given class, ignoring visibility and bypassing security checks.
      *
      * @param cls
      *            the class
@@ -160,7 +164,7 @@ public class Narcissus {
     }
 
     /**
-     * Find a method by name in the given class, ignoring visibility.
+     * Find a method by name in the given class, ignoring visibility and bypassing security checks.
      *
      * @param cls
      *            the class
@@ -187,7 +191,7 @@ public class Narcissus {
     // -------------------------------------------------------------------------------------------------------------
 
     /**
-     * Get declared methods without any visibility or security checks.
+     * Get declared methods, ignoring visibility and bypassing security checks.
      *
      * @param cls
      *            the class
@@ -196,7 +200,7 @@ public class Narcissus {
     public static native Method[] getDeclaredMethods(Class<?> cls);
 
     /**
-     * Get declared constructors without any visibility or security checks.
+     * Get declared constructors, ignoring visibility and bypassing security checks.
      *
      * @param <T>
      *            the generic type
@@ -207,7 +211,7 @@ public class Narcissus {
     public static native <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
     /**
-     * Get declared fields without any visibility or security checks.
+     * Get declared fields, ignoring visibility and bypassing security checks.
      *
      * @param cls
      *            the class
@@ -220,7 +224,7 @@ public class Narcissus {
     // Object field getters and setters
 
     /**
-     * Get the value of an int field without any visibility or security checks.
+     * Get the value of an int field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -231,7 +235,7 @@ public class Narcissus {
     public static native int getIntField(Object object, Field field);
 
     /**
-     * Get the value of a long field without any visibility or security checks.
+     * Get the value of a long field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -242,7 +246,7 @@ public class Narcissus {
     public static native long getLongField(Object object, Field field);
 
     /**
-     * Get the value of a short field without any visibility or security checks.
+     * Get the value of a short field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -253,7 +257,7 @@ public class Narcissus {
     public static native short getShortField(Object object, Field field);
 
     /**
-     * Get the value of a char field without any visibility or security checks.
+     * Get the value of a char field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -264,7 +268,7 @@ public class Narcissus {
     public static native char getCharField(Object object, Field field);
 
     /**
-     * Get the value of a boolean field without any visibility or security checks.
+     * Get the value of a boolean field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -275,7 +279,7 @@ public class Narcissus {
     public static native boolean getBooleanField(Object object, Field field);
 
     /**
-     * Get the value of a byte field without any visibility or security checks.
+     * Get the value of a byte field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -286,7 +290,7 @@ public class Narcissus {
     public static native byte getByteField(Object object, Field field);
 
     /**
-     * Get the value of a float field without any visibility or security checks.
+     * Get the value of a float field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -297,7 +301,7 @@ public class Narcissus {
     public static native float getFloatField(Object object, Field field);
 
     /**
-     * Get the value of a double field without any visibility or security checks.
+     * Get the value of a double field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -308,7 +312,7 @@ public class Narcissus {
     public static native double getDoubleField(Object object, Field field);
 
     /**
-     * Get the value of an object field without any visibility or security checks.
+     * Get the value of an object field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to get the field value from
@@ -319,7 +323,8 @@ public class Narcissus {
     public static native Object getObjectField(Object object, Field field);
 
     /**
-     * Get the value of an object field without any visibility or security checks, boxing the value if necessary.
+     * Get the value of an object field, ignoring visibility and bypassing security checks, boxing the value if
+     * necessary.
      *
      * @param object
      *            the object instance to get the field value from
@@ -360,7 +365,7 @@ public class Narcissus {
     }
 
     /**
-     * Set the value of an int field without any visibility or security checks.
+     * Set the value of an int field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -372,7 +377,7 @@ public class Narcissus {
     public static native void setIntField(Object object, Field field, int val);
 
     /**
-     * Set the value of a long field without any visibility or security checks.
+     * Set the value of a long field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -384,7 +389,7 @@ public class Narcissus {
     public static native void setLongField(Object object, Field field, long val);
 
     /**
-     * Set the value of a short field without any visibility or security checks.
+     * Set the value of a short field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -396,7 +401,7 @@ public class Narcissus {
     public static native void setShortField(Object object, Field field, short val);
 
     /**
-     * Set the value of a char field without any visibility or security checks.
+     * Set the value of a char field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -408,7 +413,7 @@ public class Narcissus {
     public static native void setCharField(Object object, Field field, char val);
 
     /**
-     * Set the value of a boolean field without any visibility or security checks.
+     * Set the value of a boolean field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -420,7 +425,7 @@ public class Narcissus {
     public static native void setBooleanField(Object object, Field field, boolean val);
 
     /**
-     * Set the value of a byte field without any visibility or security checks.
+     * Set the value of a byte field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -432,7 +437,7 @@ public class Narcissus {
     public static native void setByteField(Object object, Field field, byte val);
 
     /**
-     * Set the value of a float field without any visibility or security checks.
+     * Set the value of a float field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -444,7 +449,7 @@ public class Narcissus {
     public static native void setFloatField(Object object, Field field, float val);
 
     /**
-     * Set the value of a double field without any visibility or security checks.
+     * Set the value of a double field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -456,7 +461,7 @@ public class Narcissus {
     public static native void setDoubleField(Object object, Field field, double val);
 
     /**
-     * Set the value of a object field without any visibility or security checks.
+     * Set the value of a object field, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -468,8 +473,8 @@ public class Narcissus {
     public static native void setObjectField(Object object, Field field, Object val);
 
     /**
-     * Set the value of an object field without any visibility or security checks, unboxing the passed value if
-     * necessary.
+     * Set the value of an object field, ignoring visibility and bypassing security checks, unboxing the passed
+     * value if necessary.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -515,7 +520,7 @@ public class Narcissus {
     // Static field getters and setters
 
     /**
-     * Get the value of a static int field without any visibility or security checks.
+     * Get the value of a static int field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -524,7 +529,7 @@ public class Narcissus {
     public static native int getStaticIntField(Field field);
 
     /**
-     * Get the value of a static long field without any visibility or security checks.
+     * Get the value of a static long field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -533,7 +538,7 @@ public class Narcissus {
     public static native long getStaticLongField(Field field);
 
     /**
-     * Get the value of a static short field without any visibility or security checks.
+     * Get the value of a static short field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -542,7 +547,7 @@ public class Narcissus {
     public static native short getStaticShortField(Field field);
 
     /**
-     * Get the value of a static char field without any visibility or security checks.
+     * Get the value of a static char field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -551,7 +556,7 @@ public class Narcissus {
     public static native char getStaticCharField(Field field);
 
     /**
-     * Get the value of a static boolean field without any visibility or security checks.
+     * Get the value of a static boolean field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -560,7 +565,7 @@ public class Narcissus {
     public static native boolean getStaticBooleanField(Field field);
 
     /**
-     * Get the value of a static byte field without any visibility or security checks.
+     * Get the value of a static byte field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -569,7 +574,7 @@ public class Narcissus {
     public static native byte getStaticByteField(Field field);
 
     /**
-     * Get the value of a static float field without any visibility or security checks.
+     * Get the value of a static float field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -578,7 +583,7 @@ public class Narcissus {
     public static native float getStaticFloatField(Field field);
 
     /**
-     * Get the value of a static double field without any visibility or security checks.
+     * Get the value of a static double field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -587,7 +592,7 @@ public class Narcissus {
     public static native double getStaticDoubleField(Field field);
 
     /**
-     * Get the value of a static object field without any visibility or security checks.
+     * Get the value of a static object field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -596,7 +601,8 @@ public class Narcissus {
     public static native Object getStaticObjectField(Field field);
 
     /**
-     * Get the value of a static field without any visibility or security checks, boxing the value if necessary.
+     * Get the value of a static field, ignoring visibility and bypassing security checks, boxing the value if
+     * necessary.
      *
      * @param field
      *            the static field
@@ -632,7 +638,7 @@ public class Narcissus {
     }
 
     /**
-     * Set the value of a static int field without any visibility or security checks.
+     * Set the value of a static int field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -642,7 +648,7 @@ public class Narcissus {
     public static native void setStaticIntField(Field field, int val);
 
     /**
-     * Set the value of a static long field without any visibility or security checks.
+     * Set the value of a static long field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -652,7 +658,7 @@ public class Narcissus {
     public static native void setStaticLongField(Field field, long val);
 
     /**
-     * Set the value of a static short field without any visibility or security checks.
+     * Set the value of a static short field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -662,7 +668,7 @@ public class Narcissus {
     public static native void setStaticShortField(Field field, short val);
 
     /**
-     * Set the value of a static char field without any visibility or security checks.
+     * Set the value of a static char field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -672,7 +678,7 @@ public class Narcissus {
     public static native void setStaticCharField(Field field, char val);
 
     /**
-     * Set the value of a static boolean field without any visibility or security checks.
+     * Set the value of a static boolean field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -682,7 +688,7 @@ public class Narcissus {
     public static native void setStaticBooleanField(Field field, boolean val);
 
     /**
-     * Set the value of a static byte field without any visibility or security checks.
+     * Set the value of a static byte field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -692,7 +698,7 @@ public class Narcissus {
     public static native void setStaticByteField(Field field, byte val);
 
     /**
-     * Set the value of a static float field without any visibility or security checks.
+     * Set the value of a static float field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -702,7 +708,7 @@ public class Narcissus {
     public static native void setStaticFloatField(Field field, float val);
 
     /**
-     * Set the value of a static double field without any visibility or security checks.
+     * Set the value of a static double field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -712,7 +718,7 @@ public class Narcissus {
     public static native void setStaticDoubleField(Field field, double val);
 
     /**
-     * Set the value of a static object field without any visibility or security checks.
+     * Set the value of a static object field, ignoring visibility and bypassing security checks.
      *
      * @param field
      *            the static field
@@ -722,8 +728,8 @@ public class Narcissus {
     public static native void setStaticObjectField(Field field, Object val);
 
     /**
-     * Set the value of a static field without any visibility or security checks, unboxing the passed value if
-     * necessary.
+     * Set the value of a static field, ignoring visibility and bypassing security checks, unboxing the passed value
+     * if necessary.
      *
      * @param field
      *            the static field
@@ -764,7 +770,7 @@ public class Narcissus {
     // Invoke object methods:
 
     /**
-     * Invoke a non-static void-return-type method without any visibility or security checks.
+     * Invoke a non-static void-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -776,7 +782,7 @@ public class Narcissus {
     public static native void invokeVoidMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static int-return-type method without any visibility or security checks.
+     * Invoke a non-static int-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -789,7 +795,7 @@ public class Narcissus {
     public static native int invokeIntMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static long-return-type method without any visibility or security checks.
+     * Invoke a non-static long-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -802,7 +808,7 @@ public class Narcissus {
     public static native long invokeLongMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static short-return-type method without any visibility or security checks.
+     * Invoke a non-static short-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -815,7 +821,7 @@ public class Narcissus {
     public static native short invokeShortMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static char-return-type method without any visibility or security checks.
+     * Invoke a non-static char-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -828,7 +834,7 @@ public class Narcissus {
     public static native char invokeCharMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static boolean-return-type method without any visibility or security checks.
+     * Invoke a non-static boolean-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -841,7 +847,7 @@ public class Narcissus {
     public static native boolean invokeBooleanMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static byte-return-type method without any visibility or security checks.
+     * Invoke a non-static byte-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -854,7 +860,7 @@ public class Narcissus {
     public static native byte invokeByteMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static float-return-type method without any visibility or security checks.
+     * Invoke a non-static float-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -867,7 +873,7 @@ public class Narcissus {
     public static native float invokeFloatMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static double-return-type method without any visibility or security checks.
+     * Invoke a non-static double-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -880,7 +886,7 @@ public class Narcissus {
     public static native double invokeDoubleMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static {@link Object}-return-type method without any visibility or security checks.
+     * Invoke a non-static {@link Object}-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -893,8 +899,8 @@ public class Narcissus {
     public static native Object invokeObjectMethod(Object object, Method method, Object... args);
 
     /**
-     * Invoke a non-static {@link Object}-return-type method without any visibility or security checks, boxing the
-     * result if necessary.
+     * Invoke a non-static {@link Object}-return-type method, ignoring visibility and bypassing security checks,
+     * boxing the result if necessary.
      *
      * @param object
      *            the object instance to invoke the method on
@@ -944,7 +950,7 @@ public class Narcissus {
     // Invoke static methods:
 
     /**
-     * Invoke a static void-return-type method without any visibility or security checks.
+     * Invoke a static void-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -954,7 +960,7 @@ public class Narcissus {
     public static native void invokeStaticVoidMethod(Method method, Object... args);
 
     /**
-     * Invoke a static int-return-type method without any visibility or security checks.
+     * Invoke a static int-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -965,7 +971,7 @@ public class Narcissus {
     public static native int invokeStaticIntMethod(Method method, Object... args);
 
     /**
-     * Invoke a static long-return-type method without any visibility or security checks.
+     * Invoke a static long-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -976,7 +982,7 @@ public class Narcissus {
     public static native long invokeStaticLongMethod(Method method, Object... args);
 
     /**
-     * Invoke a static short-return-type method without any visibility or security checks.
+     * Invoke a static short-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -987,7 +993,7 @@ public class Narcissus {
     public static native short invokeStaticShortMethod(Method method, Object... args);
 
     /**
-     * Invoke a static char-return-type method without any visibility or security checks.
+     * Invoke a static char-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -998,7 +1004,7 @@ public class Narcissus {
     public static native char invokeStaticCharMethod(Method method, Object... args);
 
     /**
-     * Invoke a static boolean-return-type method without any visibility or security checks.
+     * Invoke a static boolean-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -1009,7 +1015,7 @@ public class Narcissus {
     public static native boolean invokeStaticBooleanMethod(Method method, Object... args);
 
     /**
-     * Invoke a static byte-return-type method without any visibility or security checks.
+     * Invoke a static byte-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -1020,7 +1026,7 @@ public class Narcissus {
     public static native byte invokeStaticByteMethod(Method method, Object... args);
 
     /**
-     * Invoke a static float-return-type method without any visibility or security checks.
+     * Invoke a static float-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -1031,7 +1037,7 @@ public class Narcissus {
     public static native float invokeStaticFloatMethod(Method method, Object... args);
 
     /**
-     * Invoke a static double-return-type method without any visibility or security checks.
+     * Invoke a static double-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -1042,7 +1048,7 @@ public class Narcissus {
     public static native double invokeStaticDoubleMethod(Method method, Object... args);
 
     /**
-     * Invoke a static {@link Object}-return-type method without any visibility or security checks.
+     * Invoke a static {@link Object}-return-type method, ignoring visibility and bypassing security checks.
      *
      * @param method
      *            the static method
@@ -1053,8 +1059,8 @@ public class Narcissus {
     public static native Object invokeStaticObjectMethod(Method method, Object... args);
 
     /**
-     * Invoke a static {@link Object}-return-type method without any visibility or security checks, boxing the
-     * result if necessary.
+     * Invoke a static {@link Object}-return-type method, ignoring visibility and bypassing security checks, boxing
+     * the result if necessary.
      *
      * @param method
      *            the static method
