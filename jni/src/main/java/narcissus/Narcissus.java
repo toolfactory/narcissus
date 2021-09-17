@@ -85,11 +85,12 @@ public class Narcissus {
     // -------------------------------------------------------------------------------------------------------------
 
     /**
-     * Enumerate all fields in the given class, ignoring visibility and bypassing security checks.
+     * Enumerate all fields in the given class, ignoring visibility and bypassing security checks. Also iterates up
+     * through superclasses, to collect all fields of the class and its superclasses.
      *
      * @param cls
      *            the class
-     * @return a list of {@link Field} objects representing all fields declared by the class
+     * @return a list of {@link Field} objects representing all fields declared by the class or a superclass.
      */
     public static List<Field> enumerateFields(Class<?> cls) {
         List<Field> fields = new ArrayList<>();
@@ -102,11 +103,12 @@ public class Narcissus {
     }
 
     /**
-     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks.
+     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks. Also iterates up
+     * through superclasses, to collect all methods of the class and its superclasses.
      *
      * @param cls
      *            the class
-     * @return a list of {@link Method} objects representing all methods declared by the class
+     * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
      */
     public static List<Method> enumerateMethods(Class<?> cls) {
         List<Method> methods = new ArrayList<>();
@@ -119,7 +121,8 @@ public class Narcissus {
     }
 
     /**
-     * Enumerate all constructors in the given class, ignoring visibility and bypassing security checks.
+     * Enumerate all constructors in the given class, ignoring visibility and bypassing security checks. Also
+     * iterates up through superclasses, to collect all constructors of the class and its superclasses.
      *
      * @param cls
      *            the class
