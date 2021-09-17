@@ -45,15 +45,15 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
 * Getting/Setting fields
 
-  * **`<<PT>> get<<PT>>Field(Object object, Field field)`**, e.g. `int getIntField(Object object, Field field)`
-  * **`void set<<PT>>Field(Object object, Field field, <<PT>> value)`**, e.g. `void setIntField(Object object, Field field, int value)`
+  * **`<<T>> get<<T>>Field(Object object, Field field)`**, e.g. `int getIntField(Object object, Field field)`
+  * **`void set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void setIntField(Object object, Field field, int value)`
   
-    Get/set a non-static field value.
+    Get/set a non-static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
   
-  * **`<<PT>> getStatic<<PT>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
-  * **`void setStatic<<PT>>Field(Field field, <<PT>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
+  * **`<<T>> getStatic<<T>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
+  * **`void setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
 
-    Get/set a static field value.
+    Get/set a static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
 
 
 ## Status
