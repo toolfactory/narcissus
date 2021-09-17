@@ -10,23 +10,39 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
+
     Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks.
+
 * Finding fields
   * **`Field[] Narcissus.getDeclaredFields(Class<?> cls)`**
+
     Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks.
+
   * **`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
+
     Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all fields of the class and its superclasses.
+
   * **`Field Narcissus.findField(Class<?> cls, String fieldName)`**
+
     Find a field of a class by name.
+
 * Finding methods
   * **`Method[] Narcissus.getDeclaredMethods(Class<?> cls)`**
+
     Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks.
+
   * **`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
+
     Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all methods of the class and its superclasses.
+
   * **`List<Constructor> Narcissus.enumerateConstructors(Class<?> cls)`**
+
     Equivalent to `cls.getDeclaredConstructors()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all constructors of the class and its superclasses.
+
   * **`Method Narcissus.findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)`**
+
     Find a method of a class by name and parameter types.
+
 * 
 
 
