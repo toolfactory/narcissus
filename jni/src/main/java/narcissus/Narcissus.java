@@ -16,7 +16,7 @@ public class Narcissus {
      * Whether or not the library was successfully loaded. If this value is false, you will get
      * {@link UnsatisfiedLinkError} when you try calling methods in this class.
      */
-    public static boolean libraryLoaded;
+    public static final boolean libraryLoaded;
 
     /*
      * Load and initialize the native library.
@@ -25,6 +25,7 @@ public class Narcissus {
      *             if the native library could not be loaded or initialized.
      */
     static {
+        boolean loaded = false;
         try {
             final String libraryResourcePath;
             switch (LibraryLoader.OS) {
@@ -46,10 +47,12 @@ public class Narcissus {
             }
 
             LibraryLoader.loadLibraryFromJar(libraryResourcePath);
+            loaded = true;
 
         } catch (Throwable t) {
             throw new IllegalArgumentException("Could not load Narcissus native library: " + t.getMessage());
         }
+        libraryLoaded = loaded;
     }
 
     // -------------------------------------------------------------------------------------------------------------
