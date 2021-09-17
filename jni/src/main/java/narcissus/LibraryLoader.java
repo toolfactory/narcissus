@@ -15,6 +15,9 @@ public class LibraryLoader {
     /** The operating system type. */
     public static final OperatingSystem OS;
 
+    /** The machine word size. */
+    public static int archBits;
+
     /** The operating system type. */
     public enum OperatingSystem {
         /** Windows. */
@@ -62,6 +65,17 @@ public class LibraryLoader {
             OS = OperatingSystem.Unix;
         } else {
             OS = OperatingSystem.Unknown;
+        }
+
+        archBits = 64;
+        String osArch = System.getProperty("os.arch");
+        if (osArch != null && (osArch.contains("86") || osArch.contains("32"))) {
+            archBits = 32;
+        } else {
+            String dataModel = System.getProperty("sun.arch.data.model");
+            if (dataModel != null && dataModel.contains("32")) {
+                archBits = 32;
+            }
         }
     }
 
