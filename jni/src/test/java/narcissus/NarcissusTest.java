@@ -1,6 +1,7 @@
 package narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,7 +15,7 @@ public class NarcissusTest {
     public static void before() {
         Narcissus.init();
     }
-    
+
     static class X {
         int triple(int x) {
             return x * 3;
@@ -154,5 +155,29 @@ public class NarcissusTest {
                 assertThat(Narcissus.invokeMethod(z, nm)).isEqualTo(m.invoke(z));
             }
         }
+    }
+
+    @Test
+    public void checkNullPointerException() throws Exception {
+        Method dm = Narcissus.findMethod(Z.class, "_d");
+        assertThrows(NullPointerException.class, () -> {
+            Narcissus.invokeDoubleMethod(null, dm);
+        });
+    }
+
+    @Test
+    public void checkStaticModifierException1() throws Exception {
+        Method dm = Narcissus.findMethod(Z.class, "d");
+        assertThrows(IllegalArgumentException.class, () -> {
+            Narcissus.invokeStaticDoubleMethod(dm);
+        });
+    }
+
+    @Test
+    public void checkObjectClassDoesNotMatchDeclaringClass() throws Exception {
+        Method dm = Narcissus.findMethod(Z.class, "d");
+        assertThrows(IllegalArgumentException.class, () -> {
+            Narcissus.invokeDoubleMethod(new Y(), dm);
+        });
     }
 }

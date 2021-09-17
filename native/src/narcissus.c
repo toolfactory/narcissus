@@ -142,7 +142,7 @@ bool argIsNull(JNIEnv* env, jobject obj) {
 
 bool checkFieldStaticModifier(JNIEnv* env, jobject field, bool expectStatic) {
     if ((((*env)->CallIntMethod(env, field, Field_getModifiers_methodID) & 8) ? 1 : 0) != (expectStatic ? 1 : 0)) {
-        throwNullPointerException(env, expectStatic ? "Expected static field" : "Expected non-static field");
+        throwIllegalArgumentException(env, expectStatic ? "Expected static field" : "Expected non-static field");
         return false;
     } else {
         return true;
@@ -151,7 +151,25 @@ bool checkFieldStaticModifier(JNIEnv* env, jobject field, bool expectStatic) {
 
 bool checkMethodStaticModifier(JNIEnv* env, jobject method, bool expectStatic) {
     if ((((*env)->CallIntMethod(env, method, Method_getModifiers_methodID) & 8) ? 1 : 0) != (expectStatic ? 1 : 0)) {
-        throwNullPointerException(env, expectStatic ? "Expected static method" : "Expected non-static method");
+        throwIllegalArgumentException(env, expectStatic ? "Expected static method" : "Expected non-static method");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool checkFieldReceiver(JNIEnv* env, jobject obj, jobject field) {
+    if (!(*env)->IsSameObject(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID))) {
+        throwIllegalArgumentException(env, "Object class does not match declaring class of field");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool checkMethodReceiver(JNIEnv* env, jobject obj, jobject method) {
+    if (!(*env)->IsSameObject(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID))) {
+        throwIllegalArgumentException(env, "Object class does not match declaring class of method");
         return false;
     } else {
         return true;
@@ -319,94 +337,94 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredFields(JNIEnv
 // Object field getters:
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_getIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jint) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jint) 0; }
     return (*env)->GetIntField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_getLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jlong) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jlong) 0; }
     return (*env)->GetLongField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_getShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jshort) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jshort) 0; }
     return (*env)->GetShortField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_getCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jchar) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jchar) 0; }
     return (*env)->GetCharField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_getBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jboolean) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jboolean) 0; }
     return (*env)->GetBooleanField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_getByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jbyte) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jbyte) 0; }
     return (*env)->GetByteField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_getFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jfloat) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jfloat) 0; }
     return (*env)->GetFloatField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_getDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return (jdouble) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jdouble) 0; }
     return (*env)->GetDoubleField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_getObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return NULL; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return NULL; }
     return (*env)->GetObjectField(env, obj, (*env)->FromReflectedField(env, field));
 }
 
 // Object field setters:
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jint val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetIntField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jlong val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetLongField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jshort val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetShortField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jchar val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetCharField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jboolean val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetBooleanField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jbyte val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetByteField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jfloat val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetFloatField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jdouble val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
    (*env)->SetDoubleField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jobject val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
     (*env)->SetObjectField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
@@ -511,7 +529,7 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticObjectField(JNIEnv *env
 // Invoke object methods
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_invokeVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -524,7 +542,7 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_invokeVoidMethod(JNIEnv *env, jc
 }
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_invokeIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jint) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jint) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -535,7 +553,7 @@ JNIEXPORT jint JNICALL Java_narcissus_Narcissus_invokeIntMethod(JNIEnv *env, jcl
 }
 
 JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_invokeLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jlong) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jlong) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -546,7 +564,7 @@ JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_invokeLongMethod(JNIEnv *env, j
 }
 
 JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_invokeShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jshort) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jshort) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -557,7 +575,7 @@ JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_invokeShortMethod(JNIEnv *env,
 }
 
 JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_invokeCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jchar) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jchar) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -568,7 +586,7 @@ JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_invokeCharMethod(JNIEnv *env, j
 }
 
 JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_invokeBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jboolean) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jboolean) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -579,7 +597,7 @@ JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_invokeBooleanMethod(JNIEnv *
 }
 
 JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_invokeByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jbyte) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jbyte) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -590,7 +608,7 @@ JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_invokeByteMethod(JNIEnv *env, j
 }
 
 JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_invokeFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jfloat) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jfloat) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -601,7 +619,7 @@ JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_invokeFloatMethod(JNIEnv *env,
 }
 
 JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_invokeDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return (jdouble) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return (jdouble) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
@@ -612,7 +630,7 @@ JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_invokeDoubleMethod(JNIEnv *en
 }
 
 JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_invokeObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false)) { return NULL; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return NULL; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     jsize num_args = (*env)->GetArrayLength(env, args);
     if (num_args == 0) {
