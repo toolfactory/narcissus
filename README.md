@@ -69,7 +69,7 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
   * **`<<T>> invoke<<T>>Method(Object object, Method method, Object... args)`**, e.g. `int invokeIntMethod(Object object, Method method, Object... args)`
   
-    Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
+    Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
   * **`Object invokeMethod(Object object, Method method, Object... args)`**
   
@@ -77,7 +77,7 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
   * **`<<T>> invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int invokeStaticIntMethod(Method method, Object... args)`
   
-    Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
+    Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
   * **`Object invokeStaticMethod(Method method, Object... args)`**
   
