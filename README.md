@@ -11,7 +11,7 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
 
-    Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks.
+    Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks. Finds array classes if the class name is of the form `"com.xyz.MyClass[][]"`.
 
 * Finding fields
   * **`Field[] Narcissus.getDeclaredFields(Class<?> cls)`**

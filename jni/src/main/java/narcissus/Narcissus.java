@@ -71,15 +71,17 @@ public class Narcissus {
      * @return the class reference
      */
     public static Class<?> findClass(String className) {
-        String classNameInternal = className.replace('.', '/');
-        if (classNameInternal.endsWith("[]")) {
-            classNameInternal = 'L' + classNameInternal;
-            do {
-                classNameInternal = '[' + classNameInternal.substring(0, classNameInternal.length() - 2);
-            } while (classNameInternal.endsWith("[]"));
-            classNameInternal += ';';
+        if (className == null) {
+            throw new IllegalArgumentException("Class name cannot be null");
         }
-        return findClassInternal(classNameInternal);
+        String classNameInternal = className.replace('.', '/');
+        String arrayDims = "";
+        while (classNameInternal.endsWith("[]")) {
+            arrayDims += '[';
+            classNameInternal = classNameInternal.substring(0, classNameInternal.length() - 2);
+        }
+        return findClassInternal(
+                arrayDims.isEmpty() ? classNameInternal : arrayDims + 'L' + classNameInternal + ';');
     }
 
     // -------------------------------------------------------------------------------------------------------------
