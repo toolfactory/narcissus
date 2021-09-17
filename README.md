@@ -43,41 +43,41 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
 * Getting/Setting fields
 
-  * **`<<T>> get<<T>>Field(Object object, Field field)`**, e.g. `int getIntField(Object object, Field field)`
-  * **`void set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void setIntField(Object object, Field field, int value)`
+  * **`<<T>> Narcissus.get<<T>>Field(Object object, Field field)`**, e.g. `int Narcissus.getIntField(Object object, Field field)`
+  * **`void Narcissus.set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void Narcissus.setIntField(Object object, Field field, int value)`
   
     Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
-  * **`Object getField(Object object, Field field)`**
-  * **`void setField(Object object, Field field, Object value)`**
+  * **`Object Narcissus.getField(Object object, Field field)`**
+  * **`void Narcissus.setField(Object object, Field field, Object value)`**
   
     Get/set a non-static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
   
-  * **`<<T>> getStatic<<T>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
-  * **`void setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
+  * **`<<T>> Narcissus.getStatic<<T>>Field(Field field)`**, e.g. `int Narcissus.getStaticIntField(Field field)`
+  * **`void Narcissus.setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void Narcissus.setStaticIntField(Field field, int value)`
 
     Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
-  * **`Object getStaticField(Field field)`**
-  * **`void setStaticField(Field field, Object value)`**
+  * **`Object Narcissus.getStaticField(Field field)`**
+  * **`void Narcissus.setStaticField(Field field, Object value)`**
   
     Get/set a static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
 
 * Invoking methods
 
-  * **`<<T>> invoke<<T>>Method(Object object, Method method, Object... args)`**, e.g. `int invokeIntMethod(Object object, Method method, Object... args)`
+  * **`<<T>> Narcissus.invoke<<T>>Method(Object object, Method method, Object... args)`**, e.g. `int Narcissus.invokeIntMethod(Object object, Method method, Object... args)`
   
     Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
-  * **`Object invokeMethod(Object object, Method method, Object... args)`**
+  * **`Object Narcissus.invokeMethod(Object object, Method method, Object... args)`**
   
     Invoke a non-static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
 
-  * **`<<T>> invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int invokeStaticIntMethod(Method method, Object... args)`
+  * **`<<T>> Narcissus.invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int Narcissus.invokeStaticIntMethod(Method method, Object... args)`
   
     Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
-  * **`Object invokeStaticMethod(Method method, Object... args)`**
+  * **`Object Narcissus.invokeStaticMethod(Method method, Object... args)`**
   
     Invoke a static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
 
