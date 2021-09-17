@@ -44,16 +44,12 @@ public class Narcissus {
             }
             try {
                 LibraryLoader.loadLibraryFromJar(libraryResourcePath);
-                nativeInit();
             } catch (Throwable t) {
                 throw new IllegalArgumentException("Could not load Narcissus native library " + libraryResourcePath,
                         t);
             }
         }
     }
-
-    // Native init method (sets up global refs to primitive type classes, for speed)
-    private static native void nativeInit();
 
     // -------------------------------------------------------------------------------------------------------------
 

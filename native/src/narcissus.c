@@ -43,7 +43,12 @@ jmethodID Field_getDeclaringClass_methodID;
 jmethodID Field_getModifiers_methodID;
 
 // Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
-JNIEXPORT void JNICALL Java_narcissus_Narcissus_nativeInit(JNIEnv *env, jclass ignored) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    JNIEnv* env = NULL;
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_1) != JNI_OK) {
+        return -1;
+    }
+
     Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
     int_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Integer_class, (*env)->GetStaticFieldID(env, Integer_class, "TYPE", "Ljava/lang/Class;")));
     int_value_methodID = (*env)->GetMethodID(env, Integer_class, "intValue", "()I");
@@ -83,6 +88,37 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_nativeInit(JNIEnv *env, jclass i
     jclass Field_class = (*env)->FindClass(env, "java/lang/reflect/Field");
     Field_getDeclaringClass_methodID = (*env)->GetMethodID(env, Field_class, "getDeclaringClass", "()Ljava/lang/Class;");
     Field_getModifiers_methodID = (*env)->GetMethodID(env, Field_class, "getModifiers", "()I");
+
+    return JNI_VERSION_1_1;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+    JNIEnv* env = NULL;
+    (*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_1);
+
+    (*env)->DeleteGlobalRef(env, Integer_class);
+    (*env)->DeleteGlobalRef(env, int_class);
+
+    (*env)->DeleteGlobalRef(env, Long_class);
+    (*env)->DeleteGlobalRef(env, long_class);
+
+    (*env)->DeleteGlobalRef(env, Short_class);
+    (*env)->DeleteGlobalRef(env, short_class);
+
+    (*env)->DeleteGlobalRef(env, Character_class);
+    (*env)->DeleteGlobalRef(env, char_class);
+
+    (*env)->DeleteGlobalRef(env, Boolean_class);
+    (*env)->DeleteGlobalRef(env, boolean_class);
+
+    (*env)->DeleteGlobalRef(env, Byte_class);
+    (*env)->DeleteGlobalRef(env, byte_class);
+
+    (*env)->DeleteGlobalRef(env, Float_class);
+    (*env)->DeleteGlobalRef(env, float_class);
+
+    (*env)->DeleteGlobalRef(env, Double_class);
+    (*env)->DeleteGlobalRef(env, double_class);
 }
 
 // -----------------------------------------------------------------------------------------------------------------
