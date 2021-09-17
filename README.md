@@ -48,13 +48,22 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
   * **`<<T>> get<<T>>Field(Object object, Field field)`**, e.g. `int getIntField(Object object, Field field)`
   * **`void set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void setIntField(Object object, Field field, int value)`
   
-    Get/set a non-static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
+    Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
   * **`<<T>> getStatic<<T>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
   * **`void setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
 
-    Get/set a static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
+    Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
 
+* Invoking methods
+
+  * **`<<T>> invoke<<T>>Method(Object object, Method method, Object... args)`**, e.g. `int invokeIntMethod(Object object, Method method, Object... args)`
+  
+    Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
+
+  * **`<<T>> invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int invokeStaticIntMethod(Method method, Object... args)`
+  
+    Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
 
 ## Status
 
