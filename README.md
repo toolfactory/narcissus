@@ -83,7 +83,7 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
 ## Status
 
-Narcissus works today; however, work is needed to port the build configuration to every major operating system and architecture. Please get in touch if you can help with this.
+Narcissus is feature complete; however, work is needed to port the build configuration to every major operating system and architecture. Please get in touch if you can help with this.
 
 ## Why do this?
 
