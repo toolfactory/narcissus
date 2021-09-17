@@ -16,7 +16,8 @@ public class Narcissus {
     private static AtomicBoolean loaded = new AtomicBoolean(false);
 
     /**
-     * Load and initialize the native library. Call this once before calling any other Narcissus methods.
+     * Load and initialize the native library. Call this once before calling any other Narcissus methods, otherwise
+     * you will get an {@link UnsatisfiedLinkError} when you try calling other methods.
      * 
      * @throws IllegalArgumentException
      *             if the native library could not be loaded or initialized.

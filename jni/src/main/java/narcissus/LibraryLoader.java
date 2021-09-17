@@ -121,11 +121,8 @@ public class LibraryLoader {
                 os.close();
             }
 
-            try {
-                // Load the library
-                System.load(tempFile.getAbsolutePath());
-            } finally {
-            }
+            // Load the library
+            System.load(tempFile.getAbsolutePath());
 
         } catch (Exception e) {
             throw new RuntimeException("Could not load library " + libraryResourcePath, e);

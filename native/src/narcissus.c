@@ -92,7 +92,7 @@ void throwIllegalArgumentException(JNIEnv* env, char* msg) {
 }
 
 void throwNullPointerException(JNIEnv* env, char* msg) {
-    (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/IllegalArgumentException"), msg);
+    (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/NullPointerException"), msg);
 }
 
 bool argIsNull(JNIEnv* env, jobject obj) {
