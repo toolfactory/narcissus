@@ -202,81 +202,81 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Integer");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Integer_class)) {
-                arg_jvalues[i].i = (*env)->CallIntMethod(env, arg, int_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Integer_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Integer");
                 return 0;
+            } else {
+                arg_jvalues[i].i = (*env)->CallIntMethod(env, arg, int_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, long_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Long");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Long_class)) {
-                arg_jvalues[i].j = (*env)->CallLongMethod(env, arg, long_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Long_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Long");
                 return 0;
+            } else {
+                arg_jvalues[i].j = (*env)->CallLongMethod(env, arg, long_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, short_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Short");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Short_class)) {
-                arg_jvalues[i].s = (*env)->CallShortMethod(env, arg, short_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Short_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Short");
                 return 0;
+            } else {
+                arg_jvalues[i].s = (*env)->CallShortMethod(env, arg, short_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, char_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Character");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Character_class)) {
-                arg_jvalues[i].c = (*env)->CallCharMethod(env, arg, char_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Character_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Character");
                 return 0;
+            } else {
+                arg_jvalues[i].c = (*env)->CallCharMethod(env, arg, char_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, boolean_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Boolean");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Boolean_class)) {
-                arg_jvalues[i].z = (*env)->CallBooleanMethod(env, arg, boolean_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Boolean_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Boolean");
                 return 0;
+            } else {
+                arg_jvalues[i].z = (*env)->CallBooleanMethod(env, arg, boolean_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, byte_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Byte");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Byte_class)) {
-                arg_jvalues[i].b = (*env)->CallByteMethod(env, arg, byte_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Byte_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Byte");
                 return 0;
+            } else {
+                arg_jvalues[i].b = (*env)->CallByteMethod(env, arg, byte_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, float_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Float");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Float_class)) {
-                arg_jvalues[i].f = (*env)->CallFloatMethod(env, arg, float_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Float_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Float");
                 return 0;
+            } else {
+                arg_jvalues[i].f = (*env)->CallFloatMethod(env, arg, float_value_methodID);
             }
         } else if ((*env)->IsSameObject(env, paramType, double_class)) {
             if (arg == NULL) {
                 throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Double");
                 return 0;
-            } else if ((*env)->IsSameObject(env, argType, Double_class)) {
-                arg_jvalues[i].d = (*env)->CallDoubleMethod(env, arg, double_value_methodID);
-            } else {
+            } else if (!(*env)->IsSameObject(env, argType, Double_class)) {
                 throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Double");
                 return 0;
+            } else {
+                arg_jvalues[i].d = (*env)->CallDoubleMethod(env, arg, double_value_methodID);
             }
         } else {
             // Arg does not need unboxing
