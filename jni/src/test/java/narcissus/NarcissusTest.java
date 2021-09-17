@@ -159,7 +159,7 @@ public class NarcissusTest {
 
     @Test
     public void checkNullPointerException() throws Exception {
-        Method dm = Narcissus.findMethod(Z.class, "_d");
+        Method dm = Narcissus.findMethod(Z.class, "d");
         assertThrows(NullPointerException.class, () -> {
             Narcissus.invokeDoubleMethod(null, dm);
         });
