@@ -8,12 +8,12 @@ Narcissus completely circumvents all of Java's class, method, and field reflecti
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
-**`Class<?> Narcissus.findClass(String className)`**
+* **`Class<?> Narcissus.findClass(String className)`**
 
 Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks.
 
-**`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
-**`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
+* **`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
+* **`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
 
 Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks.
 
