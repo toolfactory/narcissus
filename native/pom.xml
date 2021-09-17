@@ -10,7 +10,6 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>narcissus</groupId>
     <artifactId>narcissus-native</artifactId>
     <name>narcissus-native</name>
 
