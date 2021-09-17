@@ -37,6 +37,9 @@ jclass Double_class;
 jclass double_class;
 jmethodID double_value_methodID;
 
+jmethodID Method_getDeclaringClass_methodID;
+jmethodID Field_getDeclaringClass_methodID;
+
 // Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_init(JNIEnv *env, jclass ignored) {
     Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
@@ -70,6 +73,12 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_init(JNIEnv *env, jclass ignored
     Double_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Double"));
     double_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Double_class, (*env)->GetStaticFieldID(env, Double_class, "TYPE", "Ljava/lang/Class;")));
     double_value_methodID = (*env)->GetMethodID(env, Double_class, "doubleValue", "()D");
+    
+    jclass Method_class = (*env)->FindClass(env, "java/lang/reflect/Method");
+    jmethodID Method_getDeclaringClass_methodID = (*env)->GetMethodID(env, Method_class, "getDeclaringClass", "()Ljava/lang/Class;");
+    
+    jclass Field_class = (*env)->FindClass(env, "java/lang/reflect/Field");
+    jmethodID Field_getDeclaringClass_methodID = (*env)->GetMethodID(env, Field_class, "getDeclaringClass", "()Ljava/lang/Class;");
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -232,7 +241,7 @@ JNIEXPORT jobjectArray JNICALL Java_narcissus_Narcissus_getDeclaredFields(JNIEnv
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Field getters:
+// Object field getters:
 
 JNIEXPORT jint JNICALL Java_narcissus_Narcissus_getIntFieldVal(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     jfieldID fieldID = (*env)->FromReflectedField(env, field);
@@ -279,7 +288,7 @@ JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_getObjectFieldVal(JNIEnv *env
     return (*env)->GetObjectField(env, obj, fieldID);
 }
 
-// Field setters:
+// Object field setters:
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_setIntFieldVal(JNIEnv *env, jclass ignored, jobject obj, jobject field, jint val) {
     jfieldID fieldID = (*env)->FromReflectedField(env, field);
@@ -328,7 +337,103 @@ JNIEXPORT void JNICALL Java_narcissus_Narcissus_setObjectFieldVal(JNIEnv *env, j
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Call methods
+// Static field getters:
+
+JNIEXPORT jint JNICALL Java_narcissus_Narcissus_getStaticIntFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticIntField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_getStaticLongFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticLongField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_getStaticShortFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticShortField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_getStaticCharFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticCharField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_getStaticBooleanFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticBooleanField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_getStaticByteFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticByteField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_getStaticFloatFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticFloatField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_getStaticDoubleFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticDoubleField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_getStaticObjectFieldVal(JNIEnv *env, jclass ignored, jobject field) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    return (*env)->GetStaticObjectField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID);
+}
+
+// Static field setters:
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticIntFieldVal(JNIEnv *env, jclass ignored, jobject field, jint val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticIntField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticLongFieldVal(JNIEnv *env, jclass ignored, jobject field, jlong val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticLongField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticShortFieldVal(JNIEnv *env, jclass ignored, jobject field, jshort val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticShortField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticCharFieldVal(JNIEnv *env, jclass ignored, jobject field, jchar val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticCharField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticBooleanFieldVal(JNIEnv *env, jclass ignored, jobject field, jboolean val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticBooleanField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticByteFieldVal(JNIEnv *env, jclass ignored, jobject field, jbyte val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticByteField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticFloatFieldVal(JNIEnv *env, jclass ignored, jobject field, jfloat val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticFloatField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticDoubleFieldVal(JNIEnv *env, jclass ignored, jobject field, jdouble val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticDoubleField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_setStaticObjectFieldVal(JNIEnv *env, jclass ignored, jobject field, jobject val) {
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    (*env)->SetStaticObjectField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), fieldID, val);
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+// Call object methods
 
 JNIEXPORT void JNICALL Java_narcissus_Narcissus_callVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -430,5 +535,111 @@ JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callObjectMethod(JNIEnv *env,
     }
     jvalue arg_jvalues[num_args];
     return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallObjectMethodA(env, obj, methodID, arg_jvalues) : (jobject) NULL;
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+// Call static methods
+
+JNIEXPORT void JNICALL Java_narcissus_Narcissus_callStaticVoidMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        (*env)->CallStaticVoidMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    if (unbox(env, method, args, num_args, arg_jvalues)) {
+        (*env)->CallStaticVoidMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues);
+    }
+}
+
+JNIEXPORT jint JNICALL Java_narcissus_Narcissus_callStaticIntMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticIntMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticIntMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jint) 0;
+}
+
+JNIEXPORT jlong JNICALL Java_narcissus_Narcissus_callStaticLongMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticLongMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticLongMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jlong) 0;
+}
+
+JNIEXPORT jshort JNICALL Java_narcissus_Narcissus_callStaticShortMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticShortMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticShortMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jshort) 0;
+}
+
+JNIEXPORT jchar JNICALL Java_narcissus_Narcissus_callStaticCharMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticCharMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticCharMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jchar) 0;
+}
+
+JNIEXPORT jboolean JNICALL Java_narcissus_Narcissus_callStaticBooleanMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticBooleanMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticBooleanMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jboolean) 0;
+}
+
+JNIEXPORT jbyte JNICALL Java_narcissus_Narcissus_callStaticByteMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticByteMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticByteMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jbyte) 0;
+}
+
+JNIEXPORT jfloat JNICALL Java_narcissus_Narcissus_callStaticFloatMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticFloatMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticFloatMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jfloat) 0;
+}
+
+JNIEXPORT jdouble JNICALL Java_narcissus_Narcissus_callStaticDoubleMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticDoubleMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticDoubleMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jdouble) 0;
+}
+
+JNIEXPORT jobject JNICALL Java_narcissus_Narcissus_callStaticObjectMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
+    jsize num_args = (*env)->GetArrayLength(env, args);
+    if (num_args == 0) {
+        return (*env)->CallStaticObjectMethod(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID);
+    }
+    jvalue arg_jvalues[num_args];
+    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticObjectMethodA(env, (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID), methodID, arg_jvalues) : (jobject) NULL;
 }
 

@@ -135,6 +135,8 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
+    // Object field getters and setters
+    
     public static native int getIntFieldVal(Object object, Field field);
 
     public static native long getLongFieldVal(Object object, Field field);
@@ -153,7 +155,7 @@ public class Narcissus {
 
     public static native Object getObjectFieldVal(Object object, Field field);
 
-    /** Get a field value, boxing the value if necessary. */
+    /** Get an object field value, boxing the value if necessary. */
     public static Object getFieldVal(Object object, Field field) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
@@ -201,7 +203,7 @@ public class Narcissus {
 
     public static native void setObjectFieldVal(Object object, Field field, Object val);
 
-    /** Set a field value, unboxing the passed value if necessary. */
+    /** Set an object field value, unboxing the passed value if necessary. */
     public static void setFieldVal(Object object, Field field, Object val) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
@@ -233,6 +235,102 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
+    // Static field getters and setters
+    
+    public static native int getStaticIntFieldVal(Field field);
+
+    public static native long getStaticLongFieldVal(Field field);
+
+    public static native short getStaticShortFieldVal(Field field);
+
+    public static native char getStaticCharFieldVal(Field field);
+
+    public static native boolean getStaticBooleanFieldVal(Field field);
+
+    public static native byte getStaticByteFieldVal(Field field);
+
+    public static native float getStaticFloatFieldVal(Field field);
+
+    public static native double getStaticDoubleFieldVal(Field field);
+
+    public static native Object getStaticObjectFieldVal(Field field);
+
+    /** Get a static field value, boxing the value if necessary. */
+    public static Object getStaticFieldVal(Field field) {
+        if (field == null) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
+        Class<?> fieldType = field.getType();
+        if (fieldType == int.class) {
+            return getStaticIntFieldVal(field);
+        } else if (fieldType == long.class) {
+            return getStaticLongFieldVal(field);
+        } else if (fieldType == short.class) {
+            return getStaticShortFieldVal(field);
+        } else if (fieldType == char.class) {
+            return getStaticCharFieldVal(field);
+        } else if (fieldType == boolean.class) {
+            return getStaticBooleanFieldVal(field);
+        } else if (fieldType == byte.class) {
+            return getStaticByteFieldVal(field);
+        } else if (fieldType == float.class) {
+            return getStaticFloatFieldVal(field);
+        } else if (fieldType == double.class) {
+            return getStaticDoubleFieldVal(field);
+        } else {
+            return getStaticObjectFieldVal(field);
+        }
+    }
+
+    public static native void setStaticIntFieldVal(Field field, int val);
+
+    public static native void setStaticLongFieldVal(Field field, long val);
+
+    public static native void setStaticShortFieldVal(Field field, short val);
+
+    public static native void setStaticCharFieldVal(Field field, char val);
+
+    public static native void setStaticBooleanFieldVal(Field field, boolean val);
+
+    public static native void setStaticByteFieldVal(Field field, byte val);
+
+    public static native void setStaticFloatFieldVal(Field field, float val);
+
+    public static native void setStaticDoubleFieldVal(Field field, double val);
+
+    public static native void setStaticObjectFieldVal(Field field, Object val);
+
+    /** Set a static field value, unboxing the passed value if necessary. */
+    public static void setStaticFieldVal(Field field, Object val) {
+        if (field == null) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
+        Class<?> fieldType = field.getType();
+        if (fieldType == int.class) {
+            setStaticIntFieldVal(field, ((Integer) val).intValue());
+        } else if (fieldType == long.class) {
+            setStaticLongFieldVal(field, ((Long) val).longValue());
+        } else if (fieldType == short.class) {
+            setStaticShortFieldVal(field, ((Short) val).shortValue());
+        } else if (fieldType == char.class) {
+            setStaticCharFieldVal(field, ((Character) val).charValue());
+        } else if (fieldType == boolean.class) {
+            setStaticBooleanFieldVal(field, ((Boolean) val).booleanValue());
+        } else if (fieldType == byte.class) {
+            setStaticByteFieldVal(field, ((Byte) val).byteValue());
+        } else if (fieldType == float.class) {
+            setStaticFloatFieldVal(field, ((Float) val).floatValue());
+        } else if (fieldType == double.class) {
+            setStaticDoubleFieldVal(field, ((Double) val).doubleValue());
+        } else {
+            setStaticObjectFieldVal(field, val);
+        }
+    }
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    // Call object methods:
+    
     public static native void callVoidMethod(Object object, Method method, Object... args);
 
     public static native int callIntMethod(Object object, Method method, Object... args);
@@ -253,7 +351,7 @@ public class Narcissus {
 
     public static native Object callObjectMethod(Object object, Method method, Object... args);
 
-    /** Call a method, boxing the result if necessary. */
+    /** Call an object method, boxing the result if necessary. */
     public static Object callMethod(Object object, Method method, Object... args) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
@@ -285,4 +383,59 @@ public class Narcissus {
             return callObjectMethod(object, method, args);
         }
     }
+    
+    // -------------------------------------------------------------------------------------------------------------
+
+    // Call static methods:
+
+    public static native void callStaticVoidMethod(Method method, Object... args);
+
+    public static native int callStaticIntMethod(Method method, Object... args);
+
+    public static native long callStaticLongMethod(Method method, Object... args);
+
+    public static native short callStaticShortMethod(Method method, Object... args);
+
+    public static native char callStaticCharMethod(Method method, Object... args);
+
+    public static native boolean callStaticBooleanMethod(Method method, Object... args);
+
+    public static native byte callStaticByteMethod(Method method, Object... args);
+
+    public static native float callStaticFloatMethod(Method method, Object... args);
+
+    public static native double callStaticDoubleMethod(Method method, Object... args);
+
+    public static native Object callStaticObjectMethod(Method method, Object... args);
+
+    /** Call a static method, boxing the result if necessary. */
+    public static Object callStaticMethod(Method method, Object... args) {
+        if (method == null) {
+            throw new IllegalArgumentException("method cannot be null");
+        }
+        Class<?> returnType = method.getReturnType();
+        if (returnType == void.class) {
+            callStaticVoidMethod(method, args);
+            return null;
+        } else if (returnType == int.class) {
+            return callStaticIntMethod(method, args);
+        } else if (returnType == long.class) {
+            return callStaticLongMethod(method, args);
+        } else if (returnType == short.class) {
+            return callStaticShortMethod(method, args);
+        } else if (returnType == char.class) {
+            return callStaticCharMethod(method, args);
+        } else if (returnType == boolean.class) {
+            return callStaticBooleanMethod(method, args);
+        } else if (returnType == byte.class) {
+            return callStaticByteMethod(method, args);
+        } else if (returnType == float.class) {
+            return callStaticFloatMethod(method, args);
+        } else if (returnType == double.class) {
+            return callStaticDoubleMethod(method, args);
+        } else {
+            return callStaticObjectMethod(method, args);
+        }
+    }
+
 }
