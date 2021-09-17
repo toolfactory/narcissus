@@ -50,8 +50,8 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
   
     Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
-  * **`void setField(Object object, Field field, Object value)`**
   * **`Object getField(Object object, Field field)`**
+  * **`void setField(Object object, Field field, Object value)`**
   
     Get/set a non-static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
   
@@ -60,8 +60,8 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
     Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
-  * **`void setStaticField(Field field, Object value)`**
   * **`Object getStaticField(Field field)`**
+  * **`void setStaticField(Field field, Object value)`**
   
     Get/set a static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
 
