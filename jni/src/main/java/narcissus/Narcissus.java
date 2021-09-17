@@ -18,14 +18,10 @@ public class Narcissus {
      */
     public static final boolean libraryLoaded;
 
+    // Whether or not to print error to stderr if library could not be loaded.
     private static final boolean DEBUG = false;
 
-    /*
-     * Load and initialize the native library.
-     * 
-     * @throws IllegalArgumentException
-     *             if the native library could not be loaded or initialized.
-     */
+    // Load and initialize the native library.
     static {
         boolean loaded = false;
         try {
