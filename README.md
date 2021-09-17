@@ -50,10 +50,20 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
   
     Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
   
+  * **`void setField(Object object, Field field, Object value)`**
+  * **`Object getField(Object object, Field field)`**
+  
+    Get/set a non-static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
+  
   * **`<<T>> getStatic<<T>>Field(Field field)`**, e.g. `int getStaticIntField(Field field)`
   * **`void setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void setStaticIntField(Field field, int value)`
 
     Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
+  
+  * **`void setStaticField(Field field, Object value)`**
+  * **`Object getStaticField(Field field)`**
+  
+    Get/set a static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
 
 * Invoking methods
 
@@ -61,9 +71,17 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
   
     Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
 
+  * **`Object invokeMethod(Object object, Method method, Object... args)`**
+  
+    Invoke a non-static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
+
   * **`<<T>> invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int invokeStaticIntMethod(Method method, Object... args)`
   
     Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `Void`.
+
+  * **`Object invokeStaticMethod(Method method, Object... args)`**
+  
+    Invoke a static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
 
 ## Status
 
