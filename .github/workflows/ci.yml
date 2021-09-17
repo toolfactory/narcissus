@@ -10,12 +10,16 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }} ${{ matrix.architecture }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        java: [ '8', '11', '12', '13', '14', '15', '16' ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [7]
+        architecture: [x86, x64]
+        exclude:
+          - os: macos-latest
+            architecture: x86
     steps:
     - uses: actions/checkout@v2.3.4
     - name: Set up JDK
@@ -25,5 +29,15 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: print Java version
       run: java -version
+    - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
+      name: Set up C/C++ compiler
+      run: |
+        sudo apt update
+        sudo apt-get -y install g++-multilib
+    - if: startsWith(matrix.os, 'windows-latest') && startsWith(matrix.architecture, 'x86')
+      name: Set up C/C++ compiler
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        platform: ${{ matrix.architecture }}
     - name: Build with Maven
       run: ./mvnw --no-transfer-progress -B clean test
