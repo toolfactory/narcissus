@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+/**
+ * The Class LibraryLoader.
+ */
 public class LibraryLoader {
     /** The operating system type. */
     public static final OperatingSystem OS;
@@ -62,6 +65,12 @@ public class LibraryLoader {
         }
     }
 
+    /**
+     * Load library from jar.
+     *
+     * @param libraryResourcePath
+     *            the library resource path
+     */
     public static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
