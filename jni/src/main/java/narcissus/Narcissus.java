@@ -7,23 +7,25 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Narcissus.
  */
 public class Narcissus {
-    private static AtomicBoolean loaded = new AtomicBoolean(false);
-
     /**
-     * Load and initialize the native library. Call this once before calling any other Narcissus methods, otherwise
-     * you will get an {@link UnsatisfiedLinkError} when you try calling other methods.
+     * Whether or not the library was successfully loaded. If this value is false, you will get
+     * {@link UnsatisfiedLinkError} when you try calling methods in this class.
+     */
+    public static boolean libraryLoaded;
+
+    /*
+     * Load and initialize the native library.
      * 
      * @throws IllegalArgumentException
      *             if the native library could not be loaded or initialized.
      */
-    public static void init() throws IllegalArgumentException {
-        if (loaded.compareAndSet(false, true)) {
+    static {
+        try {
             final String libraryResourcePath;
             switch (LibraryLoader.OS) {
             case Linux:
@@ -42,12 +44,11 @@ public class Narcissus {
             default:
                 throw new IllegalArgumentException("No native library available for this operating system");
             }
-            try {
-                LibraryLoader.loadLibraryFromJar(libraryResourcePath);
-            } catch (Throwable t) {
-                throw new IllegalArgumentException("Could not load Narcissus native library " + libraryResourcePath,
-                        t);
-            }
+
+            LibraryLoader.loadLibraryFromJar(libraryResourcePath);
+
+        } catch (Throwable t) {
+            throw new IllegalArgumentException("Could not load Narcissus native library: " + t.getMessage());
         }
     }
 

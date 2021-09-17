@@ -7,15 +7,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class NarcissusTest {
-    @BeforeAll
-    public static void before() {
-        Narcissus.init();
-    }
-
     static class X {
         int triple(int x) {
             return x * 3;
