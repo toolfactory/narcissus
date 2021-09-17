@@ -4,6 +4,24 @@ Narcissus is a JNI native code library that provides a small subset of the Java 
 
 Narcissus completely circumvents all of Java's class, method, and field reflection visibility restrictions. This allows reflection code to keep working even now that strong encapsulation is being enforced in JDK 16+.
 
+## Usage
+
+The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
+
+**`Class<?> Narcissus.findClass(String className)`**
+
+Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks.
+
+**`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
+**`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
+
+Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks.
+
+
+## Status
+
+Narcissus works today; however, work is needed to port the build configuration to every major operating system and architecture. Please get in touch if you can help with this.
+
 ## Why do this?
 
 The JDK team has broken the Java ecosystem by enforcing strong encapsulation. They give two reasons in JEP 396 for doing this: security and maintainability.
@@ -38,14 +56,6 @@ The [JNI API](https://docs.oracle.com/en/java/javase/16/docs/specs/jni/functions
 Of course if you make use of JNI to bypass Java's security, and things break, you get to keep all the pieces:
 
 > Native code that bypasses source-language-level access checks may have undesirable effects on program execution. For example, an inconsistency may be created if a native method modifies a `final` field after a just-in-time (JIT) compiler has inlined accesses to the field. Similarly, native methods should not modify immutable objects such as fields in instances of `java.lang.String` or `java.lang.Integer`. Doing so may lead to breakage of invariants in the Java platform implementation. *(--[The Java Native Interface — Programmer’s Guide and Specification](https://github.com/iTimeTraveler/mybooks/blob/master/The%20Java%20Native%20Interface%20%E2%80%94%20Programmer%E2%80%99s%20Guide%20and%20Specification.pdf), section 10.9)*
-
-## Status
-
-Narcissus works today; however, work is needed to port the build configuration to every major operating system and architecture. Please get in touch if you can help with this.
-
-## Usage
-
-The API is all contained in [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
 ## Why "Narcissus"?
 
