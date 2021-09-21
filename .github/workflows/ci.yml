@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }} ${{ matrix.architecture }}
+    runs-on: (${{ matrix.os }} ${{ matrix.architecture }})
     strategy:
       fail-fast: false
       matrix:
