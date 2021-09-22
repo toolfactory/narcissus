@@ -39,4 +39,4 @@ jobs:
       with:
         platform: ${{ matrix.architecture }}
     - name: Build with Maven
-      run: mvn clean test package
+      run: mvn -B clean test package
