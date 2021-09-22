@@ -47,7 +47,7 @@ jobs:
     - if: startsWith(matrix.os, 'windows')
       name: Move compiled library
       run: |
-        move target\classes\lib .
+        move target\\classes\\lib .
     - if: !startsWith(matrix.os, 'windows')
       name: Move compiled library
       run: |
