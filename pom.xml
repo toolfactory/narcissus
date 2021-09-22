@@ -136,6 +136,7 @@
                     <linkerEndOptions>
                         <linkerEndOption>-fPIC</linkerEndOption>
                         <linkerEndOption>-shared</linkerEndOption>
+                        <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                         <linkerEndOption>${link.opt.1}</linkerEndOption>
                         <linkerEndOption>${link.opt.2}</linkerEndOption>
                     </linkerEndOptions>
