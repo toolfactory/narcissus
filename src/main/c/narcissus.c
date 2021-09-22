@@ -68,6 +68,10 @@ jmethodID Method_getModifiers_methodID;
 jmethodID Field_getDeclaringClass_methodID;
 jmethodID Field_getModifiers_methodID;
 
+jfieldID AccessibleObject_overrideFieldId;
+jfieldID Lookup_allowedModesFieldId;
+
+
 // Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     JNIEnv* env = NULL;
@@ -115,6 +119,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     Field_getDeclaringClass_methodID = (*env)->GetMethodID(env, Field_class, "getDeclaringClass", "()Ljava/lang/Class;");
     Field_getModifiers_methodID = (*env)->GetMethodID(env, Field_class, "getModifiers", "()I");
 
+    Lookup_allowedModesFieldId = (*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/invoke/MethodHandles$Lookup"), "allowedModes", "I");
+    AccessibleObject_overrideFieldId =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
+    
     return JNI_VERSION_1_1;
 }
 
@@ -356,6 +363,22 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
         return NULL;
     }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
+// Some methods required by jvm-driver
+
+JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setAllowedModes(JNIEnv* env, jclass ignored, jobject consulter, jint modes) {
+	(*env)->SetIntField(env, consulter, Lookup_allowedModesFieldId, modes);
+}
+
+JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setAccessible(JNIEnv* env, jclass ignored, jobject accessibleObject, jboolean flag) {
+	(*env)->SetBooleanField(env, accessibleObject, AccessibleObject_overrideFieldId, flag);
+}
+
+JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {
+	return (*env)->AllocObject(env, instanceType);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

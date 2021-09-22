@@ -26,6 +26,8 @@
  */
 package io.github.toolfactory.narcissus;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -110,6 +112,39 @@ public class Narcissus {
         return findClassInternal(
                 arrayDims.isEmpty() ? classNameInternal : arrayDims + 'L' + classNameInternal + ';');
     }
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Set the private field consulter.allowedModes to the value of modes.
+     *
+     * @param consulter
+     *            the consulter
+     * @param modes
+     *            the allowed modes to set.
+     */
+    public static native void setAllowedModes(MethodHandles.Lookup consulter, int modes);
+
+
+    /**
+     * Set the private field target.override to the value of flag.
+     *
+     * @param target
+     *            the target
+     * @param flag
+     *            the flag
+     */
+    public static native void setAccessible(AccessibleObject target, boolean flag);
+
+    
+    /**
+     * Allocate an object instance, without calling any constructor.
+     *
+     * @param cls
+     *            the class to instantiate
+     * @return the new object instance
+     */
+    public static native Object allocateInstance(Class<?> cls);
 
     // -------------------------------------------------------------------------------------------------------------
 
