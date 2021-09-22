@@ -41,8 +41,7 @@ jobs:
         platform: ${{ matrix.architecture }}
     - name: Make lib output dir
       run: |
-        ls
-        mkdir -p narcissus/jni/target/classes/lib
+        mkdir -p target/classes/lib
     - name: Build with Maven
       run: mvn -B clean test package
     - if: startsWith(matrix.os, 'windows')
