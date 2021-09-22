@@ -26,6 +26,7 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: 8
+        architecture: ${{ matrix.architecture }}
     - name: print Java version
       run: java -version
     - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
