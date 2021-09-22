@@ -68,13 +68,12 @@ public class LibraryLoader {
         }
 
         archBits = 64;
-        String osArch = System.getProperty("os.arch");
-        System.out.println("OS.ARCH: " + osArch);
-        if (osArch != null && (osArch.contains("86") || osArch.contains("32"))) {
+        final String dataModel = System.getProperty("sun.arch.data.model");
+        if (dataModel != null && dataModel.contains("32")) {
             archBits = 32;
         } else {
-            String dataModel = System.getProperty("sun.arch.data.model");
-            if (dataModel != null && dataModel.contains("32")) {
+            final String osArch = System.getProperty("os.arch");
+            if (osArch != null && ((osArch.contains("86") && !osArch.contains("64")) || osArch.contains("32"))) {
                 archBits = 32;
             }
         }
