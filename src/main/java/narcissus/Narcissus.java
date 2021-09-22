@@ -25,16 +25,17 @@ public class Narcissus {
     static {
         boolean loaded = false;
         try {
-            final String libraryResourcePath;
+            final String libraryResourcePrefix = "lib/libnarcissus";
+            final String libraryResourceSuffix;
             switch (LibraryLoader.OS) {
             case Linux:
-                libraryResourcePath = "lib/narcissus.so";
+                libraryResourceSuffix = "-linux-" + LibraryLoader.archBits + ".so";
                 break;
             case MacOSX:
-                libraryResourcePath = "lib/narcissus.dylib";
+                libraryResourceSuffix = "-macos-" + LibraryLoader.archBits + ".dylib";
                 break;
             case Windows:
-                libraryResourcePath = "lib/narcissus.dll";
+                libraryResourceSuffix = "-win-" + LibraryLoader.archBits + ".dll";
                 break;
             case BSD:
             case Solaris:
@@ -44,7 +45,7 @@ public class Narcissus {
                 throw new IllegalArgumentException("No native library available for this operating system");
             }
 
-            LibraryLoader.loadLibraryFromJar(libraryResourcePath);
+            LibraryLoader.loadLibraryFromJar(libraryResourcePrefix + libraryResourceSuffix);
             loaded = true;
 
         } catch (Throwable t) {
