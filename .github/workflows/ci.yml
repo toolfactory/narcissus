@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: (${{ matrix.os }} ${{ matrix.architecture }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +25,8 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
-        java-version: ${{ matrix.java }}
+        java-version: 7
+        architecture: ${{ matrix.architecture }}
     - name: print Java version
       run: java -version
     - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
