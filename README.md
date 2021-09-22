@@ -33,6 +33,10 @@ The API is defined as static methods of [Narcissus.java](https://github.com/luke
 
     Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all methods of the class and its superclasses.
 
+  * **`Constructor[] Narcissus.getDeclaredConstructors(Class<?> cls)`**
+
+    Equivalent to `cls.getDeclaredConstructors()`, but bypasses all security and visibility checks.
+
   * **`List<Constructor> Narcissus.enumerateConstructors(Class<?> cls)`**
 
     Equivalent to `cls.getDeclaredConstructors()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all constructors of the class and its superclasses.
