@@ -127,7 +127,7 @@ public class LibraryLoader {
             int dotIdx = filename.indexOf('.');
             String baseName = dotIdx < 0 ? filename : filename.substring(0, dotIdx);
             String suffix = dotIdx < 0 ? ".so" : filename.substring(dotIdx);
-            tempFile = File.createTempFile("lib_" + baseName + "_", suffix);
+            tempFile = File.createTempFile(baseName + "_", suffix);
 
             try {
                 if (tempFile.toPath().getFileSystem().supportedFileAttributeViews().contains("posix")) {
