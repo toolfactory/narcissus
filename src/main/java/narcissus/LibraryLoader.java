@@ -69,6 +69,7 @@ public class LibraryLoader {
 
         archBits = 64;
         String osArch = System.getProperty("os.arch");
+        System.out.println("OS.ARCH: " + osArch);
         if (osArch != null && (osArch.contains("86") || osArch.contains("32"))) {
             archBits = 32;
         } else {
