@@ -19,6 +19,8 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
+        <link.opt.1></link.opt.1>
+        <link.opt.2></link.opt.2>
     </properties>
 
     <profiles>
@@ -29,52 +31,11 @@
                     <family>mac</family>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                <?m2e execute ?>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>1.0-alpha-11</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <compilerProvider>generic</compilerProvider>
-                            <compilerExecutable>gcc</compilerExecutable>
-                            <linkerExecutable>gcc</linkerExecutable>
-                            <sources>
-                                <source>
-                                    <directory>${basedir}/src</directory>
-                                    <fileNames>
-                                        <fileName>narcissus.c</fileName>
-                                    </fileNames>
-                                </source>
-                            </sources>
-                            <compilerStartOptions>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/darwin/</compilerStartOption>
-                            </compilerStartOptions>
-                            <compilerEndOptions>
-                                <compilerEndOption>-fPIC</compilerEndOption>
-                                <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
-                            </compilerEndOptions>
-                            <linkerStartOptions>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/darwin/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
-                            </linkerStartOptions>
-                            <linkerEndOptions>
-                                <linkerStartOption>-Wl,--kill-at</linkerStartOption>
-                                <linkerEndOption>-fPIC</linkerEndOption>
-                                <linkerEndOption>-shared</linkerEndOption>
-                                <linkerEndOption>-static</linkerEndOption>
-                            </linkerEndOptions>
-                            <linkerFinalName>../../jni/target/classes/lib/lib/libnarcissus-macosx-${sun.arch.data.model}</linkerFinalName>
-                            <linkerFinalNameExt>dylib</linkerFinalNameExt>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <os.type>macos</os.type>
+                <os.dir>darwin</os.dir>
+                <lib.extn>dylib</lib.extn>
+            </properties>
         </profile>
         <profile>
             <id>unix</id>
@@ -84,51 +45,11 @@
                     <name>Linux</name>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                <?m2e execute ?>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>1.0-alpha-11</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <compilerProvider>generic</compilerProvider>
-                            <compilerExecutable>gcc</compilerExecutable>
-                            <linkerExecutable>gcc</linkerExecutable>
-                            <sources>
-                                <source>
-                                    <directory>${basedir}/src</directory>
-                                    <fileNames>
-                                        <fileName>narcissus.c</fileName>
-                                    </fileNames>
-                                </source>
-                            </sources>
-                            <compilerStartOptions>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
-                            </compilerStartOptions>
-                            <compilerEndOptions>
-                                <compilerEndOption>-fPIC</compilerEndOption>
-                                <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
-                            </compilerEndOptions>
-                            <linkerStartOptions>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/linux/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
-                            </linkerStartOptions>
-                            <linkerEndOptions>
-                                <linkerEndOption>-fPIC</linkerEndOption>
-                                <linkerEndOption>-shared</linkerEndOption>
-                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
-                            </linkerEndOptions>
-                            <linkerFinalName>../../jni/target/classes/lib/libnarcissus-linux-${sun.arch.data.model}</linkerFinalName>
-                            <linkerFinalNameExt>so</linkerFinalNameExt>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <os.type>linux</os.type>
+                <os.dir>linux</os.dir>
+                <lib.extn>so</lib.extn>
+            </properties>
         </profile>
         <profile>
             <id>windows</id>
@@ -137,52 +58,61 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                <?m2e execute ?>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>1.0-alpha-11</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <compilerProvider>generic</compilerProvider>
-                            <compilerExecutable>gcc</compilerExecutable>
-                            <linkerExecutable>gcc</linkerExecutable>
-                            <sources>
-                                <source>
-                                    <directory>${basedir}/src</directory>
-                                    <fileNames>
-                                        <fileName>narcissus.c</fileName>
-                                    </fileNames>
-                                </source>
-                            </sources>
-                            <compilerStartOptions>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
-                                <compilerStartOption>-I ${JAVA_HOME}/include/win32/</compilerStartOption>
-                            </compilerStartOptions>
-                            <compilerEndOptions>
-                                <compilerEndOption>-fPIC</compilerEndOption>
-                                <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
-                            </compilerEndOptions>
-                            <linkerStartOptions>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/include/win32/</linkerStartOption>
-                                <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
-                            </linkerStartOptions>
-                            <linkerEndOptions>
-                                <linkerStartOption>-Wl,--kill-at</linkerStartOption>
-                                <linkerEndOption>-fPIC</linkerEndOption>
-                                <linkerEndOption>-shared</linkerEndOption>
-                                <linkerEndOption>-static</linkerEndOption>
-                            </linkerEndOptions>
-                            <linkerFinalName>../../jni/target/classes/lib/libnarcissus-win-${sun.arch.data.model}</linkerFinalName>
-                            <linkerFinalNameExt>dll</linkerFinalNameExt>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <os.type>win</os.type>
+                <os.dir>win32</os.dir>
+                <lib.extn>dll</lib.extn>
+                <link.opt.1>-static</link.opt.1>
+                <link.opt.2>-Wl,--kill-at</link.opt.2>
+            </properties>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <?m2e execute ?>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>1.0-alpha-11</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <compilerProvider>generic</compilerProvider>
+                    <compilerExecutable>gcc</compilerExecutable>
+                    <linkerExecutable>gcc</linkerExecutable>
+                    <sources>
+                        <source>
+                            <directory>${basedir}/src</directory>
+                            <fileNames>
+                                <fileName>narcissus.c</fileName>
+                            </fileNames>
+                        </source>
+                    </sources>
+                    <compilerStartOptions>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/${os.dir}/</compilerStartOption>
+                    </compilerStartOptions>
+                    <compilerEndOptions>
+                        <compilerEndOption>-fPIC</compilerEndOption>
+                        <compilerEndOption>-std=c99</compilerEndOption>
+                        <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
+                    </compilerEndOptions>
+                    <linkerStartOptions>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/${os.dir}/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
+                    </linkerStartOptions>
+                    <linkerEndOptions>
+                        <linkerEndOption>-fPIC</linkerEndOption>
+                        <linkerEndOption>-shared</linkerEndOption>
+                        <linkerEndOption>${link.opt.1}</linkerEndOption>
+                        <linkerEndOption>${link.opt.2}</linkerEndOption>
+                    </linkerEndOptions>
+                    <linkerOutputDirectory>${project.basedir}/../lib</linkerOutputDirectory>
+                    <linkerFinalName>libnarcissus-${os.type}-${sun.arch.data.model}</linkerFinalName>
+                    <linkerFinalNameExt>${lib.extn}</linkerFinalNameExt>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

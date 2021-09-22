@@ -47,6 +47,7 @@
                     <target>7</target>
                     <testSource>8</testSource>
                     <testTarget>8</testTarget>
+                    <generatedSourcesDirectory>../lib</generatedSourcesDirectory>
                 </configuration>
                 <executions>
                     <execution>
