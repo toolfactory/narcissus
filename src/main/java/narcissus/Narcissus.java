@@ -32,7 +32,7 @@ public class Narcissus {
                 libraryResourceSuffix = "-linux-" + LibraryLoader.archBits + ".so";
                 break;
             case MacOSX:
-                libraryResourceSuffix = "-macos-" + LibraryLoader.archBits + ".dylib";
+                libraryResourceSuffix = "-darwin-" + LibraryLoader.archBits + ".dylib";
                 break;
             case Windows:
                 libraryResourceSuffix = "-win-" + LibraryLoader.archBits + ".dll";
