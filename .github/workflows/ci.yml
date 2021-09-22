@@ -44,3 +44,18 @@ jobs:
         mkdir -p narcissus/jni/target/classes/lib
     - name: Build with Maven
       run: mvn -B clean test package
+    - if: startsWith(matrix.os, 'windows')
+      name: Move compiled library
+      run: move target\classes\lib .
+    - if: !startsWith(matrix.os, 'windows')
+      name: Move compiled library
+      run: mv target/classes/lib .
+    - if: github.event_name == 'push' && contains(github.event.head_commit.message, 'narcissus.c')
+      name: Update compiled library
+      run: |
+        git config user.name "${{ github.event.head_commit.committer.name }}"
+        git config user.email "${{ github.event.head_commit.committer.email }}"
+        git pull
+        git add .
+        git commit -am "Update native library: ${{ matrix.os }}-${{ matrix.architecture }}"
+        git push
