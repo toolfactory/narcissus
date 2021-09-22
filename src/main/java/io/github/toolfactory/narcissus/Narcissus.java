@@ -76,7 +76,7 @@ public class Narcissus {
 
         } catch (Throwable t) {
             if (DEBUG) {
-                throw new IllegalArgumentException("Could not load Narcissus native library: " + t.getMessage());
+                System.err.println("Could not load Narcissus native library: " + t.getMessage());
             }
         }
         libraryLoaded = loaded;
