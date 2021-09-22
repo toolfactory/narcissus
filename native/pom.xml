@@ -123,7 +123,7 @@
                                 <linkerEndOption>-shared</linkerEndOption>
                                 <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                             </linkerEndOptions>
-                            <linkerFinalName>../../../../classes/lib/libnarcissus-linux-${sun.arch.data.model}</linkerFinalName>
+                            <linkerFinalName>../../../../classes/libnarcissus-linux-${sun.arch.data.model}</linkerFinalName>
                             <linkerFinalNameExt>so</linkerFinalNameExt>
                         </configuration>
                     </plugin>
@@ -177,7 +177,7 @@
                                 <linkerEndOption>-shared</linkerEndOption>
                                 <linkerEndOption>-static</linkerEndOption>
                             </linkerEndOptions>
-                            <linkerFinalName>../../../../classes/lib/libnarcissus-win-${sun.arch.data.model}</linkerFinalName>
+                            <linkerFinalName>../../../../classes/libnarcissus-win-${sun.arch.data.model}</linkerFinalName>
                             <linkerFinalNameExt>dll</linkerFinalNameExt>
                         </configuration>
                     </plugin>
