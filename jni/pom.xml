@@ -68,28 +68,6 @@
                 <version>3.0.0-M5</version>
             </plugin>
             <plugin>
-                <?m2e execute ?>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>
-                            process-test-resources
-                        </phase>
-                        <configuration>
-                            <target>
-                                <copy
-                                    file="${project.build.directory}/../../native/target/libnarcissus-*"
-                                    tofile="${project.build.directory}/classes/lib/" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>
