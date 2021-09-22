@@ -79,8 +79,8 @@
                         <configuration>
                             <target>
                                 <copy
-                                    file="${project.build.directory}/../../native/target/narcissus-native.so"
-                                    tofile="${project.build.directory}/classes/lib/narcissus.so" />
+                                    file="${project.build.directory}/../../native/target/libnarcissus-*"
+                                    tofile="${project.build.directory}/classes/lib/" />
                             </target>
                         </configuration>
                         <goals>
