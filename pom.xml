@@ -75,8 +75,22 @@
                 <os.type>win</os.type>
                 <os.dir>win32</os.dir>
                 <lib.extn>dll</lib.extn>
-                <link.opt.1>-static</link.opt.1>
-                <link.opt.2>-Wl,--kill-at</link.opt.2>
+                <link.opt.1>-Wl,--kill-at</link.opt.1>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>sun.arch.data.model</name>
+                    <value>32</value>
+                </property>
+            </activation>
+            <properties>
+                <link.opt.2>-static</link.opt.2>
             </properties>
         </profile>
     </profiles>
