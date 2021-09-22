@@ -19,7 +19,7 @@ public class Narcissus {
     public static final boolean libraryLoaded;
 
     // Whether or not to print error to stderr if library could not be loaded.
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     // Load and initialize the native library.
     static {
