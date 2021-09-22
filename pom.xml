@@ -116,7 +116,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <?m2e execute?>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
                 <version>1.0-alpha-11</version>
