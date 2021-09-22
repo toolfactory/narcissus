@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
-        java-version: 7
+        java-version: 8
     - name: print Java version
       run: java -version
     - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
@@ -39,4 +39,4 @@ jobs:
       with:
         platform: ${{ matrix.architecture }}
     - name: Build with Maven
-      run: mvn --no-transfer-progress -B clean test
+      run: mvn clean package
