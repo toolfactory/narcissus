@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package narcissus;
+package io.github.toolfactory.narcissus;
 
 import java.io.File;
 import java.io.FileNotFoundException;

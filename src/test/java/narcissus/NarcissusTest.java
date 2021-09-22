@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.toolfactory.narcissus.Narcissus;
+
 public class NarcissusTest {
     static class X {
         int triple(int x) {
