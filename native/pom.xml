@@ -56,7 +56,7 @@
                             <compilerEndOptions>
                                 <compilerEndOption>-fPIC</compilerEndOption>
                                 <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m{sun.arch.data.model}</compilerEndOption>
+                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                             </compilerEndOptions>
                             <linkerStartOptions>
                                 <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
@@ -111,7 +111,7 @@
                             <compilerEndOptions>
                                 <compilerEndOption>-fPIC</compilerEndOption>
                                 <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m{sun.arch.data.model}</compilerEndOption>
+                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                             </compilerEndOptions>
                             <linkerStartOptions>
                                 <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
@@ -121,7 +121,7 @@
                             <linkerEndOptions>
                                 <linkerEndOption>-fPIC</linkerEndOption>
                                 <linkerEndOption>-shared</linkerEndOption>
-                                <compilerEndOption>-m{sun.arch.data.model}</compilerEndOption>
+                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                             </linkerEndOptions>
                             <linkerFinalName>narcissus-linux-${sun.arch.data.model}</linkerFinalName>
                             <linkerFinalNameExt>so</linkerFinalNameExt>
@@ -164,7 +164,7 @@
                             <compilerEndOptions>
                                 <compilerEndOption>-fPIC</compilerEndOption>
                                 <compilerEndOption>-std=c99</compilerEndOption>
-                                <compilerEndOption>-m{sun.arch.data.model}</compilerEndOption>
+                                <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
                             </compilerEndOptions>
                             <linkerStartOptions>
                                 <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
