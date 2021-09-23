@@ -14,7 +14,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
- 
+
         <link.opt.1></link.opt.1>
         <link.opt.2></link.opt.2>
     </properties>
@@ -296,6 +296,24 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <source>8</source>
+                            <doclint>all</doclint>
+                            <show>public</show>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
