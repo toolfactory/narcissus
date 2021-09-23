@@ -220,7 +220,7 @@
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
-                                        <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                        <passphraseServerId>${gpg.keyname}</passphraseServerId> 
                                     </gpgArguments>
                                 </configuration>
                             </execution>
