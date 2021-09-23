@@ -460,11 +460,11 @@
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <arguments>-Dgpg.passphrase="${gpg.passphrase}"</arguments>
                     <!-- Update version number with each release -->
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <!-- <autoVersionSubmodules>true</autoVersionSubmodules> -->
                     <!-- Activate release profile -->
                     <!-- <releaseProfiles>release</releaseProfiles> -->
                     <!-- Work around bug where releaseProfiles tag doesn't actually work yet -->
-                    <arguments>-Prelease</arguments>
+                    <!-- <arguments>-Prelease</arguments> -->
                 </configuration>
                 <dependencies>
                     <dependency>
