@@ -2,14 +2,15 @@ package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 public class NarcissusTest {
     static class X {
@@ -182,8 +183,10 @@ public class NarcissusTest {
     @Test
     public void testCheckObjectClassDoesNotMatchDeclaringClass() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
-        assertThrows(IllegalArgumentException.class, () -> {
-            Narcissus.invokeDoubleMethod(new Y(), dm);
+        assertThrows(IllegalArgumentException.class, new Executable() {
+        	public void execute() {
+        		Narcissus.invokeDoubleMethod(new Y(), dm);
+        	}
         });
     }
 
@@ -199,14 +202,24 @@ public class NarcissusTest {
 
     @Test
     public void testEnumerateFields() throws Exception {
-        assertThat(Narcissus.enumerateFields(Y.class).stream().map(Field::getName).collect(Collectors.toList()))
+        assertThat(Narcissus.enumerateFields(Y.class).stream().map(new Function<Field, String> () {
+        	@Override
+        	public String apply(Field field) {
+        		return field.getName();
+        	}
+        }).collect(Collectors.toList()))
                 .containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f",
                         "_d");
     }
 
     @Test
     public void testEnumerateMethods() throws Exception {
-        assertThat(Narcissus.enumerateMethods(Z.class).stream().map(Method::getName).collect(Collectors.toList()))
+        assertThat(Narcissus.enumerateMethods(Z.class).stream().map(new Function<Method, String> () {
+        	@Override
+        	public String apply(Method method) {
+        		return method.getName();
+        	}
+        }).collect(Collectors.toList()))
                 .contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f", "_d");
     }
 }
