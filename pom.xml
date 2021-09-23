@@ -195,9 +195,6 @@
         <profile>
             <id>massive-test</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
                     <name>massive_test_mode</name>
                     <value>enabled</value>
