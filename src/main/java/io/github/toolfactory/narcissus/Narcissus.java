@@ -39,6 +39,14 @@ import java.util.List;
 /**
  * Narcissus.
  */
+/**
+ * @author luke
+ *
+ */
+/**
+ * @author luke
+ *
+ */
 public class Narcissus {
     /**
      * Whether or not the library was successfully loaded. If this value is false, you will get
@@ -115,6 +123,8 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
+    // A few methods required by the JVM driver
+    
     /**
      * Set the private field consulter.allowedModes to the value of modes.
      *
@@ -146,6 +156,14 @@ public class Narcissus {
      */
     public static native Object allocateInstance(Class<?> cls);
 
+    /**
+     * Throw a {@link Throwable}.
+     *
+     * @param throwable
+     *            the {@link Throwable}
+     */
+    public static native void throwThrowable(Throwable throwable);
+    
     // -------------------------------------------------------------------------------------------------------------
 
     /**
