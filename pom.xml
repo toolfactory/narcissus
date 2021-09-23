@@ -173,6 +173,21 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>copy-lib-dir</id>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <tasks>
+                                <!-- Copy lib/ dir to build directory so that lib/* is added to jar -->
+                                <copy todir="${project.build.directory}/classes/lib">
+                                    <fileset dir="lib" />
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -262,26 +277,6 @@
                         <additionalClasspathElement>${project.basedir}</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-lib-dir</id>
-                        <phase>prepare-package</phase>
-                        <configuration>
-                            <tasks>
-                                <!-- Copy lib/ dir to build directory so that lib/* is added to jar -->
-                                <copy todir="${project.build.directory}/classes/lib">
-                                    <fileset dir="lib" />
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
