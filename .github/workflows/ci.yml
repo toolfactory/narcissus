@@ -31,7 +31,10 @@ jobs:
           git config user.name "ToolFactory"
           git config user.email "tool.factory.heads@gmail.com"
           git pull
-          mvn -B -X -U release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+          mvn -B -X -U release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true \
+             -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" \
+             -Dgpg.keyname=${{ secrets.gpg_key_id }} \
+             -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
           git commit -am "Released new version" --allow-empty
           git push    
         env:
