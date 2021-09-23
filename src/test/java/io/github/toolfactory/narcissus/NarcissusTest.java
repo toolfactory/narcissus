@@ -2,6 +2,7 @@ package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -155,20 +156,26 @@ public class NarcissusTest {
     @Test
     public void testCheckNullPointerException() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
-        assertThrows(NullPointerException.class, () -> {
-            Narcissus.invokeDoubleMethod(null, dm);
+        assertThrows(NullPointerException.class, new Executable() {
+        	public void execute() {
+        		Narcissus.invokeDoubleMethod(null, dm);
+        	}
         });
         Method _dm = Narcissus.findMethod(Z.class, "_d");
-        assertThrows(NullPointerException.class, () -> {
-            Narcissus.invokeDoubleMethod(null, _dm);
+        assertThrows(NullPointerException.class, new Executable() {
+        	public void execute() {
+        		Narcissus.invokeDoubleMethod(null, _dm);
+        	}
         });
     }
 
     @Test
     public void testCheckStaticModifierException1() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
-        assertThrows(IllegalArgumentException.class, () -> {
-            Narcissus.invokeStaticDoubleMethod(dm);
+        assertThrows(IllegalArgumentException.class, new Executable() {
+        	public void execute() {
+        		Narcissus.invokeStaticDoubleMethod(dm);
+        	}
         });
     }
 
