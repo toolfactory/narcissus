@@ -8,6 +8,8 @@ on:
     branches:
       - main
 
+jobs:
+
   release:
     name: Release if requested
     runs-on: ubuntu-latest
