@@ -265,11 +265,12 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>${project_jdk_version}</source>
-                    <target>${project_jdk_version}</target>
+                    <source>7</source>
+                    <target>7</target>
                     <testSource>${project_jdk_version}</testSource>
                     <testTarget>${project_jdk_version}</testTarget>
                 </configuration>
+                <!-- 
                 <executions>
                     <execution>
                         <id>default-testCompile</id>
@@ -283,6 +284,7 @@
                         </configuration>
                     </execution>
                 </executions>
+                 -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
