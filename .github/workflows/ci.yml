@@ -45,15 +45,50 @@ jobs:
     - if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Update libraries')
       name: Push compiled library back to GitHub
       run: |
-        git config user.name "${{ github.event.head_commit.committer.name }}"
-        git config user.email "${{ github.event.head_commit.committer.email }}"
+        git config user.name "toolfactory"
+        git config user.email "tool.factory.heads@gmail.com"
         git pull
         git add .
         git commit -am "Update native library: ${{ matrix.os }}-${{ matrix.architecture }}" --allow-empty
         git push
-   
+
+        
+  build-and-test-with-Java-7-and-later:
+    name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
+#    needs: [build]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x86, x64]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        exclude:
+          - os: macOS-latest
+            architecture: x86
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "toolfactory"
+          git config user.email "tool.factory.heads@gmail.com"
+          git pull origin ${{github.ref}}  
+      - if: endsWith(matrix.java, '-ea') != true 
+        name: Build and test with final version JDK
+        run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file ./pom.xml
+      - if: endsWith(matrix.java, '18-ea') == true 
+        name: Build and test with early access version JDK
+        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./pom.xml
+        
+        
   release:
-    needs: [build]
+    needs: [build-and-test-with-Java-7-and-later]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')

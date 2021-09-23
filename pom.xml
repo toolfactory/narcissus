@@ -192,6 +192,26 @@
                 </plugins>
             </build>
         </profile>
+                <profile>
+            <!-- Disable native-maven-plugin when releasing -->
+            <!-- See: https://stackoverflow.com/a/39558669/3950982 -->
+            <id>test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile-native-lib</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <!-- GPG Signature on release -->
         <profile>
             <id>release-sign-artifacts</id>
