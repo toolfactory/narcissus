@@ -1,12 +1,9 @@
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>${revision}</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <properties>
         <revision>0.0.1-SNAPSHOT</revision>
@@ -15,8 +12,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
         <project_jdk_version>8</project_jdk_version>
-        <link.opt.1></link.opt.1>
-        <link.opt.2></link.opt.2>
+        <link.opt.1 />
+        <link.opt.2 />
 
         <assertj-core.version>3.21.0</assertj-core.version>
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
