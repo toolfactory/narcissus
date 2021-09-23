@@ -39,12 +39,10 @@ jobs:
       uses: egor-tensin/setup-mingw@v2
       with:
         platform: ${{ matrix.architecture }}
-    - name: Make lib output dir
-      run: |
-        mkdir -p target/classes/lib
-    - name: Build with Maven
+    - name: Compile, run tests, and build package with Maven
       run: mvn -B clean test package
-    - name: Push compiled library back to GitHub
+    - if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Update libraries')
+      name: Push compiled library back to GitHub
       run: |
         git config user.name "${{ github.event.head_commit.committer.name }}"
         git config user.email "${{ github.event.head_commit.committer.email }}"
@@ -57,7 +55,7 @@ jobs:
     needs: [build]
     name: Release if requested
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
+    if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
     steps:
       - uses: actions/checkout@v2.3.4
       - name: Set up JDK
