@@ -217,16 +217,8 @@
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
-                                        <passphraseServerId>${gpg.keyname}</passphraseServerId> 
                                     </gpgArguments>
                                 </configuration>
-                            </execution>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
                             </execution>
                         </executions>
                     </plugin>
