@@ -31,7 +31,7 @@ jobs:
           git config user.name "ToolFactory"
           git config user.email "tool.factory.heads@gmail.com"
           git pull
-          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true
+          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }}
           git commit -am "Released new version" --allow-empty
           git push    
         env:
