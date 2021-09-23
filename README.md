@@ -28,6 +28,8 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
 
     Find a field of a class by name, bypassing all security and visibility checks.
 
+  * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
+
 * Finding methods
   * **`Method[] Narcissus.getDeclaredMethods(Class<?> cls)`**
 
@@ -48,6 +50,8 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
   * **`Method Narcissus.findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)`**
 
     Find a method of a class by name and parameter types, bypassing all security and visibility checks.
+
+  * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of methods in the same class.
 
 * Getting/Setting fields
 
