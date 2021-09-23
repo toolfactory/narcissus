@@ -192,10 +192,17 @@
                 </plugins>
             </build>
         </profile>
-                <profile>
-            <!-- Disable native-maven-plugin when releasing -->
-            <!-- See: https://stackoverflow.com/a/39558669/3950982 -->
-            <id>test</id>
+        <profile>
+            <id>massive-test</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>massive_test_mode</name>
+                    <value>enabled</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
