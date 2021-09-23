@@ -105,7 +105,7 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <tasks>
-                                <!-- Holds the native library that is built, so it can be checked back into GitHub -->
+                                <!-- The lib/ dir holds the native library, and is checked back into GitHub -->
                                 <mkdir dir="lib" />
                             </tasks>
                         </configuration>
@@ -211,7 +211,7 @@
                         <phase>prepare-package</phase>
                         <configuration>
                             <tasks>
-                                <!-- Copy lib dir to build directory so lib/* is added to jar -->
+                                <!-- Copy lib dir to build directory so that lib/* is added to jar -->
                                 <copy todir="${project.build.directory}/classes/lib">
                                     <fileset dir="lib" />
                                 </copy>
