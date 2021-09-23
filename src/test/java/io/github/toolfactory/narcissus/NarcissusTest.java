@@ -18,7 +18,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void invokeIntMethodWithParam() throws Exception {
+    public void testInvokeIntMethodWithParam() throws Exception {
         Method triple = Narcissus.findMethod(X.class, "triple", int.class);
         assertThat(Narcissus.invokeIntMethod(new X(), triple, 5)).isEqualTo(15);
     }
@@ -139,7 +139,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void invokeMethods() throws Exception {
+    public void testInvokeMethods() throws Exception {
         Z z = new Z();
         for (Method m : Z.class.getDeclaredMethods()) {
             Method nm = Narcissus.findMethod(Z.class, m.getName());
@@ -153,7 +153,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void checkNullPointerException() throws Exception {
+    public void testCheckNullPointerException() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
         assertThrows(NullPointerException.class, () -> {
             Narcissus.invokeDoubleMethod(null, dm);
@@ -165,7 +165,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void checkStaticModifierException1() throws Exception {
+    public void testCheckStaticModifierException1() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
         assertThrows(IllegalArgumentException.class, () -> {
             Narcissus.invokeStaticDoubleMethod(dm);
@@ -173,7 +173,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void checkObjectClassDoesNotMatchDeclaringClass() throws Exception {
+    public void testCheckObjectClassDoesNotMatchDeclaringClass() throws Exception {
         Method dm = Narcissus.findMethod(Z.class, "d");
         assertThrows(IllegalArgumentException.class, () -> {
             Narcissus.invokeDoubleMethod(new Y(), dm);
@@ -181,7 +181,7 @@ public class NarcissusTest {
     }
 
     @Test
-    public void findClass() throws Exception {
+    public void testFindClass() throws Exception {
         Class<?> cls = Narcissus.findClass(Y.class.getName());
         assertThat(cls).isNotNull();
         assertThat(cls.getName()).isEqualTo(Y.class.getName());
@@ -191,14 +191,14 @@ public class NarcissusTest {
     }
 
     @Test
-    public void enumerateFields() throws Exception {
+    public void testEnumerateFields() throws Exception {
         assertThat(Narcissus.enumerateFields(Y.class).stream().map(Field::getName).collect(Collectors.toList()))
                 .containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f",
                         "_d");
     }
 
     @Test
-    public void enumerateMethods() throws Exception {
+    public void testEnumerateMethods() throws Exception {
         assertThat(Narcissus.enumerateMethods(Z.class).stream().map(Method::getName).collect(Collectors.toList()))
                 .contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z", "_f", "_d");
     }
