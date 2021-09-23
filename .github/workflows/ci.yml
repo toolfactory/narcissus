@@ -47,15 +47,15 @@ jobs:
       run: |
         git config user.name "toolfactory"
         git config user.email "tool.factory.heads@gmail.com"
-        git pull
+        git pull origin ${{github.ref}}
         git add .
         git commit -am "Update native library: ${{ matrix.os }}-${{ matrix.architecture }}" --allow-empty
         git push
 
         
-  build-and-test-with-Java-7-and-later:
-    name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
-#    needs: [build]
+  test-with-Java-7-and-later:
+    name: Testing on ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }}
+    needs: [build]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -88,7 +88,7 @@ jobs:
         
         
   release:
-    needs: [build-and-test-with-Java-7-and-later]
+    needs: [test-with-Java-7-and-later]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
@@ -97,7 +97,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 15
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
@@ -108,7 +108,7 @@ jobs:
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
           git config user.name "toolfactory"
           git config user.email "tool.factory.heads@gmail.com"
-          git pull
+          git pull origin ${{github.ref}}
           mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true \
              -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" \
              -Dgpg.keyname=${{ secrets.gpg_key_id }} \
