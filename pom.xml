@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Narcissus</name>
@@ -16,12 +19,11 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
-        <project_jdk_version>8</project_jdk_version>
         <link.opt.1 />
         <link.opt.2 />
 
         <assertj-core.version>3.21.0</assertj-core.version>
-        <junit-jupiter.version>5.7.0</junit-jupiter.version>
+        <junit.version>4.13.2</junit.version>
 
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -102,9 +104,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -285,7 +287,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>     
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -347,22 +349,7 @@
                     <encoding>UTF-8</encoding>
                     <source>7</source>
                     <target>7</target>
-                    <testSource>${project_jdk_version}</testSource>
-                    <testTarget>${project_jdk_version}</testTarget>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <source>${project_jdk_version}</source>
-                            <target>${project_jdk_version}</target>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
