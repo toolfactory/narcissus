@@ -9,7 +9,6 @@ on:
       - main
 
   release:
-    needs: [build]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
