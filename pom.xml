@@ -17,6 +17,19 @@
  		<project_jdk_version>8</project_jdk_version>
         <link.opt.1></link.opt.1>
         <link.opt.2></link.opt.2>
+        
+        <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+		<maven-scm-provider-gitexe.version>1.9.5</maven-scm-provider-gitexe.version>
+		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
 
     <licenses>
@@ -270,7 +283,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <additionalClasspathElements>
                         <!-- Allow test classes to find the native library in ${project.basedir}/lib/ -->
