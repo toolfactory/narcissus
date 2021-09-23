@@ -14,7 +14,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
- 
+ 		<project_jdk_version>8</project_jdk_version>
         <link.opt.1></link.opt.1>
         <link.opt.2></link.opt.2>
     </properties>
@@ -250,8 +250,8 @@
                     <encoding>UTF-8</encoding>
                     <source>7</source>
                     <target>7</target>
-                    <testSource>8</testSource>
-                    <testTarget>8</testTarget>
+                    <testSource>${project_jdk_version}</testSource>
+                    <testTarget>${project_jdk_version}</testTarget>
                 </configuration>
                 <executions>
                     <execution>
@@ -261,8 +261,8 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <source>8</source>
-                            <target>8</target>
+                            <source>${project_jdk_version}</source>
+                            <target>${project_jdk_version}</target>
                         </configuration>
                     </execution>
                 </executions>
@@ -304,15 +304,9 @@
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <source>8</source>
+                    <source>${project_jdk_version}</source>
                     <doclint>all</doclint>
                     <show>public</show>
-                    <excludes>
-                        <exclude>**/*.class</exclude>
-                        <exclude>**/*.so</exclude>
-                        <exclude>**/*.dylib</exclude>
-                        <exclude>**/*.dll</exclude>
-                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -330,7 +324,7 @@
                 <version>3.3.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>8</source>
+                    <source>${project_jdk_version}</source>
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <doclint>all</doclint>
                     <show>public</show>
