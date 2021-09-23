@@ -10,7 +10,7 @@
 
     <properties>
         <revision>0.0.1-SNAPSHOT</revision>
- 
+
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
@@ -390,6 +390,10 @@
                     <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
                     <!-- Update version number with each release -->
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <!-- Activate release profile -->
+                    <releaseProfiles>release</releaseProfiles>
+                    <!-- Work around bug where releaseProfiles tag doesn't actually work yet -->
+                    <arguments>-Prelease</arguments>
                 </configuration>
                 <dependencies>
                     <dependency>
