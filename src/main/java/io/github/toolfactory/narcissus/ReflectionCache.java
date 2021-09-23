@@ -51,16 +51,14 @@ public class ReflectionCache {
      *            the class to instantiate.
      */
     public ReflectionCache(Class<?> cls) {
-        List<Method> methods = Narcissus.enumerateMethods(cls);
-        for (Method method : methods) {
+        for (Method method : Narcissus.enumerateMethods(cls)) {
             List<Method> methodsForName = methodNameToMethods.get(method.getName());
             if (methodsForName == null) {
                 methodNameToMethods.put(method.getName(), methodsForName = new ArrayList<>());
             }
             methodsForName.add(method);
         }
-        List<Field> fields = Narcissus.enumerateFields(cls);
-        for (Field field : fields) {
+        for (Field field : Narcissus.enumerateFields(cls)) {
             fieldNameToField.put(field.getName(), field);
         }
     }
