@@ -96,7 +96,7 @@
     <scm>
         <connection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</connection>
         <developerConnection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</developerConnection>
-        <url>https://github.com/toolfactory/jvm-narcissus</url>
+        <url>https://github.com/toolfactory/narcissus</url>
         <tag>narcissus-0.0.12</tag>
     </scm>
 
