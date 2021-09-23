@@ -6,7 +6,7 @@
 
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <revision>0.0.1-SNAPSHOT</revision>
