@@ -4,7 +4,7 @@
     <name>Narcissus</name>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
@@ -456,7 +456,7 @@
                     <localCheckout>true</localCheckout>
                     <pushChanges>true</pushChanges>
                     <mavenExecutorId>forked-path</mavenExecutorId>
-                    <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+                    <arguments>-Dgpg.passphrase="${gpg.passphrase}"</arguments>
                     <!-- Update version number with each release -->
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <!-- Activate release profile -->
