@@ -19,6 +19,66 @@
         <link.opt.2></link.opt.2>
     </properties>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/toolfactory/narcissus/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>ToolFactory</name>
+        <url>https://github.com/toolfactory</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Luke Hutchison</name>
+            <email>tool.factory.heads@gmail.com</email>
+            <organization>ToolFactory</organization>
+            <organizationUrl>https://github.com/toolfactory</organizationUrl>
+            <roles>
+                <role>Administrator</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Roberto Gentili</name>
+            <id>roberto.gentili</id>
+            <email>tool.factory.heads@gmail.com</email>
+            <organization>ToolFactory</organization>
+            <organizationUrl>https://github.com/toolfactory</organizationUrl>
+            <roles>
+                <role>Administrator</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>https://github.com/toolfactory/narcissus/issues</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</connection>
+        <developerConnection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</developerConnection>
+        <url>https://github.com/toolfactory/jvm-narcissus</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <packaging>jar</packaging>
 
     <dependencies>
