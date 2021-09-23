@@ -11,7 +11,6 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Update libraries')
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +41,8 @@ jobs:
         platform: ${{ matrix.architecture }}
     - name: Compile, run tests, and build package with Maven
       run: mvn -B clean test package
-    - name: Push compiled library back to GitHub
+    - if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Update libraries')
+      name: Push compiled library back to GitHub
       run: |
         git config user.name "${{ github.event.head_commit.committer.name }}"
         git config user.email "${{ github.event.head_commit.committer.email }}"
