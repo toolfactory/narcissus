@@ -262,6 +262,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -315,6 +316,7 @@
                     </execution>
                 </executions>
             </plugin>
+             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -460,7 +462,7 @@
                     <!-- Update version number with each release -->
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <!-- Activate release profile -->
-                    <releaseProfiles>release</releaseProfiles>
+                    <!-- <releaseProfiles>release</releaseProfiles> -->
                     <!-- Work around bug where releaseProfiles tag doesn't actually work yet -->
                     <arguments>-Prelease</arguments>
                 </configuration>
