@@ -8,6 +8,8 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
+Note: You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
+
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
 
