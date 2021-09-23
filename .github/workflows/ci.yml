@@ -28,7 +28,7 @@ jobs:
         run: |
           export GPG_TTY=$(tty)
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
-          git config user.name "ToolFactory"
+          git config user.name "toolfactory"
           git config user.email "tool.factory.heads@gmail.com"
           git pull
           mvn -B -X -U release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true \
