@@ -177,7 +177,6 @@
                     <target>7</target>
                     <testSource>8</testSource>
                     <testTarget>8</testTarget>
-                    <generatedSourcesDirectory>../lib</generatedSourcesDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -205,11 +204,36 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-lib-dir</id>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <tasks>
+                                <!-- Copy lib dir to build directory so lib/* is added to jar -->
+                                <copy todir="${project.build.directory}/classes/lib">
+                                    <fileset dir="lib" />
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.basedir}/lib/**</directory>
+                        </fileSet>
+                    </fileSets>
                 </configuration>
                 <executions>
                     <execution>
