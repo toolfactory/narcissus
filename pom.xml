@@ -365,7 +365,7 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <built-by>Burningwave</built-by>
+                            <built-by>ToolFactory</built-by>
                             <Bundle-Category>Utilities</Bundle-Category>
                             <Bundle-License>http://opensource.org/licenses/MIT</Bundle-License>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
