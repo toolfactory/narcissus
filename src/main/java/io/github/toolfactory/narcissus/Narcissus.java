@@ -38,14 +38,8 @@ import java.util.List;
 
 /**
  * Narcissus.
- */
-/**
- * @author luke
- *
- */
-/**
- * @author luke
- *
+ * 
+ * @author Luke Hutchison
  */
 public class Narcissus {
     /**
