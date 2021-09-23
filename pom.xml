@@ -331,6 +331,7 @@
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <source>8</source>
+                    <detectJavaApiLink>false</detectJavaApiLink>
                     <doclint>all</doclint>
                     <show>public</show>
                 </configuration>
