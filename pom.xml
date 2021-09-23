@@ -198,7 +198,7 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <additionalClasspathElements>
-                        <!-- Allow test classes to find the native library in ${project.basedir}/lib -->
+                        <!-- Allow test classes to find the native library in ${project.basedir}/lib/ -->
                         <additionalClasspathElement>${project.basedir}</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
@@ -211,7 +211,7 @@
                         <phase>prepare-package</phase>
                         <configuration>
                             <tasks>
-                                <!-- Copy lib dir to build directory so that lib/* is added to jar -->
+                                <!-- Copy lib/ dir to build directory so that lib/* is added to jar -->
                                 <copy todir="${project.build.directory}/classes/lib">
                                     <fileset dir="lib" />
                                 </copy>
