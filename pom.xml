@@ -261,8 +261,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- 
+            </plugin>     
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -316,7 +315,6 @@
                     </execution>
                 </executions>
             </plugin>
-             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
