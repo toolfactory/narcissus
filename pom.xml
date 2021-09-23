@@ -301,23 +301,15 @@
                 <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <forceCreation>true</forceCreation>
-                    <excludes>
-                        <exclude>META-INF/maven/</exclude>
-                        <exclude>**/*.c</exclude>
-                    </excludes>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifestEntries>
-                            <built-by>Burningwave</built-by>
-                        </manifestEntries>
-                    </archive>
                     <archive>
                         <forced>true</forced>
+                        <addMavenDescriptor>false</addMavenDescriptor>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
+                            <built-by>Burningwave</built-by>
                             <Bundle-Category>Utilities</Bundle-Category>
                             <Bundle-License>http://opensource.org/licenses/MIT</Bundle-License>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
