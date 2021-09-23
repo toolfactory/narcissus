@@ -157,12 +157,12 @@ public class Narcissus {
     public static native Object allocateInstance(Class<?> cls);
 
     /**
-     * Throw a {@link Throwable}.
+     * Throw a {@link Throwable} without requiring a throws declaration.
      *
      * @param throwable
-     *            the {@link Throwable}
+     *            the {@link Throwable} to throw
      */
-    public static native void throwThrowable(Throwable throwable);
+    public static native void sneakyThrow(Throwable throwable);
     
     // -------------------------------------------------------------------------------------------------------------
 

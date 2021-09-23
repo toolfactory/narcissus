@@ -381,7 +381,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocat
 	return (*env)->AllocObject(env, instanceType);
 }
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_throwThrowable(JNIEnv* env, jclass ignored, jthrowable throwable) {
+JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThrow(JNIEnv* env, jclass ignored, jthrowable throwable) {
 	(*env)->Throw(env, throwable);
 }
 
