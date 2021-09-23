@@ -31,7 +31,7 @@ jobs:
           git config user.name "ToolFactory"
           git config user.email "tool.factory.heads@gmail.com"
           git pull
-          mvn -B clean test package
+          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true
           git commit -am "Released new version" --allow-empty
           git push    
         env:
