@@ -44,15 +44,7 @@ jobs:
         mkdir -p target/classes/lib
     - name: Build with Maven
       run: mvn -B clean test package
-    - if: startsWith(matrix.os, 'windows')
-      name: Move compiled library
-      run: move target/classes/lib .
-      shell: pwsh
-    - if: "!startsWith(matrix.os, 'windows')"
-      name: Move compiled library
-      run: mv target/classes/lib .
-    - if: github.event_name == 'push' && contains(github.event.head_commit.message, 'narcissus.c')
-      name: Update compiled library
+    - name: Push compiled library back to GitHub
       run: |
         git config user.name "${{ github.event.head_commit.committer.name }}"
         git config user.email "${{ github.event.head_commit.committer.email }}"
