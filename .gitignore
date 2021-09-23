@@ -10,7 +10,6 @@ release.properties
 target/
 bin/
 tmp/
-lib/
 *.tmp
 *.bak
 *~
