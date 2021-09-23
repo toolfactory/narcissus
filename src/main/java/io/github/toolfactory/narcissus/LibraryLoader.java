@@ -37,7 +37,7 @@ import java.util.Locale;
 /**
  * The Class LibraryLoader.
  */
-public class LibraryLoader {
+class LibraryLoader {
     /** The operating system type. */
     public static final OperatingSystem OS;
 
@@ -45,7 +45,7 @@ public class LibraryLoader {
     public static int archBits;
 
     /** The operating system type. */
-    public enum OperatingSystem {
+    enum OperatingSystem {
         /** Windows. */
         Windows,
 
@@ -111,7 +111,7 @@ public class LibraryLoader {
      * @param libraryResourcePath
      *            the library resource path
      */
-    public static void loadLibraryFromJar(String libraryResourcePath) {
+    static void loadLibraryFromJar(String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
         InputStream inputSream = null;
