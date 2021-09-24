@@ -17,7 +17,6 @@ on:
 
 jobs:
   release:
-    needs: [test-with-Java-7-and-later]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
