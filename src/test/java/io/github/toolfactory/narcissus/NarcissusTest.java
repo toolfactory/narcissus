@@ -207,14 +207,18 @@ public class NarcissusTest {
         }).collect(Collectors.toList())).contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c",
                 "_b", "_z", "_f", "_d");
     }
-    
+
     static class A {
         int x;
+
+        int y() {
+            return x + 1;
+        }
     }
-    
+
     static class B extends A {
     }
-    
+
     @Test
     public void testInheritedField() throws Exception {
         Field ax = Narcissus.findField(A.class, "x");
@@ -227,5 +231,19 @@ public class NarcissusTest {
         B b = new B();
         b.x = 5;
         assertThat(Narcissus.getIntField(b, bx)).isEqualTo(b.x);
+    }
+
+    @Test
+    public void testInheritedMethod() throws Exception {
+        Method ay = Narcissus.findMethod(A.class, "y");
+        assertThat(ay).isNotNull();
+        Method by = Narcissus.findMethod(B.class, "y");
+        assertThat(by).isNotNull();
+        A a = new A();
+        a.x = 3;
+        assertThat(Narcissus.invokeIntMethod(a, ay)).isEqualTo(a.x + 1);
+        B b = new B();
+        b.x = 5;
+        assertThat(Narcissus.invokeIntMethod(b, by)).isEqualTo(b.x + 1);
     }
 }
