@@ -192,7 +192,7 @@ bool checkMethodStaticModifier(JNIEnv* env, jobject method, bool expectStatic) {
 }
 
 bool checkFieldReceiver(JNIEnv* env, jobject obj, jobject field) {
-    if (!(*env)->IsSameObject(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID))) {
+    if (!(*env)->IsAssignableFrom(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID))) {
         throwIllegalArgumentException(env, "Object class does not match declaring class of field");
         return false;
     } else {
@@ -201,7 +201,7 @@ bool checkFieldReceiver(JNIEnv* env, jobject obj, jobject field) {
 }
 
 bool checkMethodReceiver(JNIEnv* env, jobject obj, jobject method) {
-    if (!(*env)->IsSameObject(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID))) {
+    if (!(*env)->IsAssignableFrom(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID))) {
         throwIllegalArgumentException(env, "Object class does not match declaring class of method");
         return false;
     } else {
