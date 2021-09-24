@@ -19,7 +19,7 @@
         <link.opt.1 />
         <link.opt.2 />
 
-        <assertj-core.version>3.21.0</assertj-core.version>
+        <assertj-core.version>2.9.1</assertj-core.version>
         <junit.version>4.13.2</junit.version> 
 
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
