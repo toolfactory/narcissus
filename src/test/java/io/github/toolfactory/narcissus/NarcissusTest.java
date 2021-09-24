@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -188,24 +188,22 @@ public class NarcissusTest {
 
     @Test
     public void testEnumerateFields() throws Exception {
-        assertThat(Narcissus.enumerateFields(Y.class).stream().map(new Function<Field, String>() {
-            @Override
-            public String apply(Field field) {
-                return field.getName();
-            }
-        }).collect(Collectors.toList())).containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s",
-                "_c", "_b", "_z", "_f", "_d");
+        List<String> fieldNames = new ArrayList<>();
+        for (Field field : Narcissus.enumerateFields(Y.class)) {
+            fieldNames.add(field.getName());
+        }
+        assertThat(fieldNames).containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b",
+                "_z", "_f", "_d");
     }
 
     @Test
     public void testEnumerateMethods() throws Exception {
-        assertThat(Narcissus.enumerateMethods(Z.class).stream().map(new Function<Method, String>() {
-            @Override
-            public String apply(Method method) {
-                return method.getName();
-            }
-        }).collect(Collectors.toList())).contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c",
-                "_b", "_z", "_f", "_d");
+        List<String> methodNames = new ArrayList<>();
+        for (Method method : Narcissus.enumerateMethods(Z.class)) {
+            methodNames.add(method.getName());
+        }
+        assertThat(methodNames).contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z",
+                "_f", "_d");
     }
 
     static class A {
