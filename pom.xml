@@ -11,8 +11,6 @@
     <url>https://github.com/toolfactory/narcissus</url>
 
     <properties>
-        <revision>0.0.1-SNAPSHOT</revision>
-
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locales>en_US</project.build.locales>
