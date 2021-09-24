@@ -64,7 +64,11 @@ public class ReflectionCache {
     }
 
     /**
-     * Instantiate a new reflection cache for a class.
+     * Instantiate a new reflection cache for a named class.
+     * 
+     * <p>
+     * Finds the class by name (e.g. {@code "com.xyz.MyClass"}) using the current classloader or the system
+     * classloader. Finds array classes if the class name is of the form {@code "com.xyz.MyClass[][]"}.
      *
      * @param className
      *            the name of the class to instantiate.
