@@ -54,6 +54,7 @@ jobs:
       run: |
         git config user.name "toolfactory"
         git config user.email "tool.factory.heads@gmail.com"
+        git config pull.rebase false
         git pull origin ${{github.ref}}
         git add .
         git commit -am "Update native library: ${{ matrix.os }}-${{ matrix.architecture }}" --allow-empty
@@ -85,6 +86,7 @@ jobs:
         run: |
           git config user.name "toolfactory"
           git config user.email "tool.factory.heads@gmail.com"
+          git config pull.rebase false
           git pull origin ${{github.ref}}  
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
@@ -115,6 +117,7 @@ jobs:
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
           git config user.name "toolfactory"
           git config user.email "tool.factory.heads@gmail.com"
+          git config pull.rebase false
           git pull origin ${{github.ref}}
           mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true \
              -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" \
