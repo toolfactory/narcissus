@@ -244,4 +244,22 @@ public class NarcissusTest {
         b.x = 5;
         assertThat(Narcissus.invokeIntMethod(b, by)).isEqualTo(b.x + 1);
     }
+
+    static class C {
+        A a;
+        B b;
+    }
+
+    @Test
+    public void testAssignFieldSubtype() throws Exception {
+        C c = new C();
+        Narcissus.setField(c, Narcissus.findField(C.class, "a"), new B());
+        assertThat(c.a instanceof B);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAssignFieldSupertype() throws Exception {
+        C c = new C();
+        Narcissus.setField(c, Narcissus.findField(C.class, "b"), new A());
+    }
 }

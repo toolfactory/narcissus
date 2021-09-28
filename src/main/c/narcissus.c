@@ -65,8 +65,10 @@ jmethodID double_value_methodID;
 
 jmethodID Method_getDeclaringClass_methodID;
 jmethodID Method_getModifiers_methodID;
+
 jmethodID Field_getDeclaringClass_methodID;
 jmethodID Field_getModifiers_methodID;
+jmethodID Field_getType_methodID;
 
 jfieldID AccessibleObject_overrideFieldId;
 jfieldID Lookup_allowedModesFieldId;
@@ -118,6 +120,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     jclass Field_class = (*env)->FindClass(env, "java/lang/reflect/Field");
     Field_getDeclaringClass_methodID = (*env)->GetMethodID(env, Field_class, "getDeclaringClass", "()Ljava/lang/Class;");
     Field_getModifiers_methodID = (*env)->GetMethodID(env, Field_class, "getModifiers", "()I");
+    Field_getType_methodID = (*env)->GetMethodID(env, Field_class, "getType", "()Ljava/lang/Class;");
 
     Lookup_allowedModesFieldId = (*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/invoke/MethodHandles$Lookup"), "allowedModes", "I");
     AccessibleObject_overrideFieldId =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
@@ -203,6 +206,15 @@ bool checkFieldReceiver(JNIEnv* env, jobject obj, jobject field) {
 bool checkMethodReceiver(JNIEnv* env, jobject obj, jobject method) {
     if (!(*env)->IsAssignableFrom(env, (*env)->GetObjectClass(env, obj), (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID))) {
         throwIllegalArgumentException(env, "Object class does not match declaring class of method");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool checkFieldValType(JNIEnv* env, jobject field, jobject val) {
+    if (val != NULL && !(*env)->IsAssignableFrom(env, (*env)->GetObjectClass(env, val), (*env)->CallObjectMethod(env, field, Field_getType_methodID))) {
+        throwIllegalArgumentException(env, "Value cannot be assigned to a field of this type");
         return false;
     } else {
         return true;
@@ -477,7 +489,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setDoubleF
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jobject val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field) || !checkFieldValType(env, field, val)) { return; }
     (*env)->SetObjectField(env, obj, (*env)->FromReflectedField(env, field), val);
 }
 
@@ -573,7 +585,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticD
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticObjectField(JNIEnv *env, jclass ignored, jobject field, jobject val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
+    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true) || !checkFieldValType(env, field, val)) { return; }
     (*env)->SetStaticObjectField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
 }
 
