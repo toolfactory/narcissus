@@ -37,6 +37,8 @@ bool thrown(JNIEnv* env) {
 
 // Prelookup of frequently-used classes and methods:
 
+jclass Class_class;
+
 jclass Integer_class;
 jclass int_class;
 jmethodID int_value_methodID;
@@ -86,6 +88,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_1) != JNI_OK) {
         return -1;
     }
+
+    Class_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Class"));
+    if (thrown(env)) { return -1; }
 
     Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
     if (thrown(env)) { return -1; }
@@ -171,6 +176,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     JNIEnv* env = NULL;
     (*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_1);
 
+    (*env)->DeleteGlobalRef(env, Class_class);
+    
     (*env)->DeleteGlobalRef(env, Integer_class);
     (*env)->DeleteGlobalRef(env, int_class);
 
@@ -432,9 +439,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findCla
 // Get declared methods without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
-    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
-    if (thrown(env)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
+    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
     if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
@@ -442,9 +447,7 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
 // Get declared constructors without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
-    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
-    if (thrown(env)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
+    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
     if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
@@ -452,9 +455,7 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
 // Get declared fields without any visibility checks
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
-    const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
-    if (thrown(env)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
+    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
     if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
