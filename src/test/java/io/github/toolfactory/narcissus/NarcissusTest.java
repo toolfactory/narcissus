@@ -282,4 +282,19 @@ public class NarcissusTest {
     public void testCallWithParamSupertype() throws Exception {
         Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identB", B.class), new A());
     }
+
+    static class D {
+        static {
+            Integer.parseInt("x");
+        }
+
+        static int d = 2;
+    }
+
+    @Test(expected = ExceptionInInitializerError.class)
+    public void testExceptionInStaticInitializer() throws Exception {
+        Class<?> dCls = Class.forName(NarcissusTest.class.getName() + "$" + "D", false,
+                Thread.currentThread().getContextClassLoader());
+        assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2); // (2)
+    }
 }
