@@ -278,10 +278,37 @@ public class Narcissus {
      */
     public static Method findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)
             throws NoSuchMethodException {
+        // Iterate from class to its superclasses, and find initial interfaces to start traversing from
+        // (borrows code from enumerateMethods, but terminates as soon as method is found)
+        final Set<Class<?>> visited = new HashSet<>();
+        final LinkedList<Class<?>> interfaceQueue = new LinkedList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.getDeclaredMethods(c)) {
-                if (method.getName().equals(methodName) && Arrays.equals(paramTypes, method.getParameterTypes())) {
-                    return method;
+            for (Method m : getDeclaredMethods(c)) {
+                if (m.getName().equals(methodName) && Arrays.equals(paramTypes, m.getParameterTypes())) {
+                    return m;
+                }
+            }
+            // Find interfaces and superinterfaces implemented by this class or its superclasses
+            if (c.isInterface() && visited.add(c)) {
+                interfaceQueue.add(c);
+            }
+            for (final Class<?> iface : c.getInterfaces()) {
+                if (visited.add(iface)) {
+                    interfaceQueue.add(iface);
+                }
+            }
+        }
+        // Traverse through interfaces looking for default methods
+        while (!interfaceQueue.isEmpty()) {
+            final Class<?> iface = interfaceQueue.remove();
+            for (Method m : getDeclaredMethods(iface)) {
+                if (m.getName().equals(methodName) && Arrays.equals(paramTypes, m.getParameterTypes())) {
+                    return m;
+                }
+            }
+            for (final Class<?> superIface : iface.getInterfaces()) {
+                if (visited.add(superIface)) {
+                    interfaceQueue.add(superIface);
                 }
             }
         }
@@ -1199,5 +1226,4 @@ public class Narcissus {
             return invokeStaticObjectMethod(method, args);
         }
     }
-
 }
