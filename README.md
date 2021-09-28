@@ -13,12 +13,12 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
 
-    Equivalent to `Class.forName(String className)`, but bypasses all security and visibility checks. Finds array classes if the class name is of the form `"com.xyz.MyClass[][]"`.
+    Equivalent to `Class.forName(String className)`. Finds array classes if the class name is of the form `"com.xyz.MyClass[][]"`.
 
 * Finding fields
   * **`Field[] Narcissus.getDeclaredFields(Class<?> cls)`**
 
-    Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks.
+    Equivalent to `cls.getDeclaredFields()`.
 
   * **`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
 
@@ -26,30 +26,30 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
 
   * **`Field Narcissus.findField(Class<?> cls, String fieldName)`**
 
-    Find a field of a class by name, bypassing all security and visibility checks.
+    Find a field of a class by name.
 
   * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
 
 * Finding methods
   * **`Method[] Narcissus.getDeclaredMethods(Class<?> cls)`**
 
-    Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks.
+    Equivalent to `cls.getDeclaredMethods()`.
 
   * **`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
 
     Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all methods of the class and its superclasses.
 
-  * **`Constructor[] Narcissus.getDeclaredConstructors(Class<?> cls)`**
-
-    Equivalent to `cls.getDeclaredConstructors()`, but bypasses all security and visibility checks.
-
-  * **`List<Constructor> Narcissus.enumerateConstructors(Class<?> cls)`**
-
-    Equivalent to `cls.getDeclaredConstructors()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all constructors of the class and its superclasses.
-
   * **`Method Narcissus.findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)`**
 
-    Find a method of a class by name and parameter types, bypassing all security and visibility checks.
+    Find a method of a class by name and parameter types.
+
+  * **`Constructor[] Narcissus.getDeclaredConstructors(Class<?> cls)`**
+
+    Equivalent to `cls.getDeclaredConstructors()`.
+
+  * **`List<Constructor> Narcissus.findConstructor(Class<?> cls, Class<?>... paramTypes)`**
+
+    Find the constructor with the required parameter types.
 
   * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of methods in the same class.
 
@@ -59,43 +59,43 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
   
     **`void Narcissus.set<<T>>Field(Object object, Field field, <<T>> value)`**, e.g. `void Narcissus.setIntField(Object object, Field field, int value)`
   
-    Get/set a non-static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
+    Get/set a non-static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
   
   * **`Object Narcissus.getField(Object object, Field field)`**
   
     **`void Narcissus.setField(Object object, Field field, Object value)`**
   
-    Get/set a non-static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
+    Get/set a non-static field value. Automatically boxes/unboxes values if the field is primitive-typed.
   
   * **`<<T>> Narcissus.getStatic<<T>>Field(Field field)`**, e.g. `int Narcissus.getStaticIntField(Field field)`
   
     **`void Narcissus.setStatic<<T>>Field(Field field, <<T>> value)`**, e.g. `void Narcissus.setStaticIntField(Field field, int value)`
 
-    Get/set a static field value, for a field of type `<<T>>`, bypassing all security and visibility checks. For non-primitive-typed fields, `<<T>>` is `Object`.
+    Get/set a static field value, for a field of type `<<T>>`. For non-primitive-typed fields, `<<T>>` is `Object`.
   
   * **`Object Narcissus.getStaticField(Field field)`**
   
     **`void Narcissus.setStaticField(Field field, Object value)`**
   
-    Get/set a static field value, bypassing all security and visibility checks. Automatically boxes/unboxes values if the field is primitive-typed.
+    Get/set a static field value. Automatically boxes/unboxes values if the field is primitive-typed.
 
 * Invoking methods
 
   * **`<<T>> Narcissus.invoke<<T>>Method(Object object, Method method, Object... args)`**, e.g. `int Narcissus.invokeIntMethod(Object object, Method method, Object... args)`
   
-    Invoke a non-static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
+    Invoke a non-static method which returns type `<<T>>`. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
   * **`Object Narcissus.invokeMethod(Object object, Method method, Object... args)`**
   
-    Invoke a non-static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
+    Invoke a non-static method. Automatically boxes the return type, if the method returns a primitive type.
 
   * **`<<T>> Narcissus.invokeStatic<<T>>Method(Method method, Object... args)`**, e.g. `int Narcissus.invokeStaticIntMethod(Method method, Object... args)`
   
-    Invoke a static method which returns type `<<T>>`, bypassing all security and visibility checks. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
+    Invoke a static method which returns type `<<T>>`. For methods with non-primitive return type, `<<T>>` is `Object`. For methods that do not return a value, `<<T>>` is `void`.
 
   * **`Object Narcissus.invokeStaticMethod(Method method, Object... args)`**
   
-    Invoke a static method, bypassing all security and visibility checks. Automatically boxes the return type, if the method returns a primitive type.
+    Invoke a static method. Automatically boxes the return type, if the method returns a primitive type.
 
 ## Status
 

@@ -221,24 +221,6 @@ public class Narcissus {
         return methodOrder;
     }
 
-    /**
-     * Enumerate all constructors in the given class, ignoring visibility and bypassing security checks. Also
-     * iterates up through superclasses, to collect all constructors of the class and its superclasses.
-     *
-     * @param cls
-     *            the class
-     * @return a list of {@link Constructor} objects representing all constructors declared by the class
-     */
-    public static List<Constructor<?>> enumerateConstructors(Class<?> cls) {
-        List<Constructor<?>> constructors = new ArrayList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Constructor<?> constructor : Narcissus.getDeclaredConstructors(c)) {
-                constructors.add(constructor);
-            }
-        }
-        return constructors;
-    }
-
     // -------------------------------------------------------------------------------------------------------------
 
     /**
@@ -264,7 +246,8 @@ public class Narcissus {
     }
 
     /**
-     * Find a method by name in the given class, ignoring visibility and bypassing security checks.
+     * Find a method by name and parameter types in the given class, ignoring visibility and bypassing security
+     * checks.
      *
      * @param cls
      *            the class
@@ -313,6 +296,27 @@ public class Narcissus {
             }
         }
         throw new NoSuchMethodException(methodName);
+    }
+
+    /**
+     * Find a constructor by parameter types in the given class, ignoring visibility and bypassing security checks.
+     *
+     * @param cls
+     *            the class
+     * @param paramTypes
+     *            the parameter types of the constructor.
+     * @return the {@link Method}
+     * @throws NoSuchMethodException
+     *             if the class does not contain a constructor of the given name
+     */
+    public static Constructor<?> findConstructor(Class<?> cls, Class<?>... paramTypes)
+            throws NoSuchMethodException {
+        for (Constructor<?> c : getDeclaredConstructors(cls)) {
+            if (Arrays.equals(paramTypes, c.getParameterTypes())) {
+                return c;
+            }
+        }
+        throw new NoSuchMethodException(cls.getName());
     }
 
     // -------------------------------------------------------------------------------------------------------------
