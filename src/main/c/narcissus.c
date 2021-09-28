@@ -29,6 +29,12 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
+bool thrown(JNIEnv* env) {
+    return (*env)->ExceptionOccurred(env);
+}
+
+// -----------------------------------------------------------------------------------------------------------------
+
 // Prelookup of frequently-used classes and methods:
 
 jclass Integer_class;
@@ -82,48 +88,81 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 
     Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
+    if (thrown(env)) { return -1; }
     int_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Integer_class, (*env)->GetStaticFieldID(env, Integer_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     int_value_methodID = (*env)->GetMethodID(env, Integer_class, "intValue", "()I");
+    if (thrown(env)) { return -1; }
 
     Long_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Long"));
+    if (thrown(env)) { return -1; }
     long_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Long_class, (*env)->GetStaticFieldID(env, Long_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     long_value_methodID = (*env)->GetMethodID(env, Long_class, "longValue", "()J");
+    if (thrown(env)) { return -1; }
 
     Short_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Short"));
+    if (thrown(env)) { return -1; }
     short_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Short_class, (*env)->GetStaticFieldID(env, Short_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     short_value_methodID = (*env)->GetMethodID(env, Short_class, "shortValue", "()S");
+    if (thrown(env)) { return -1; }
 
     Character_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Character"));
+    if (thrown(env)) { return -1; }
     char_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Character_class, (*env)->GetStaticFieldID(env, Character_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     char_value_methodID = (*env)->GetMethodID(env, Character_class, "charValue", "()C");
+    if (thrown(env)) { return -1; }
 
     Boolean_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Boolean"));
+    if (thrown(env)) { return -1; }
     boolean_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Boolean_class, (*env)->GetStaticFieldID(env, Boolean_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     boolean_value_methodID = (*env)->GetMethodID(env, Boolean_class, "booleanValue", "()Z");
+    if (thrown(env)) { return -1; }
 
     Byte_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Byte"));
+    if (thrown(env)) { return -1; }
     byte_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Byte_class, (*env)->GetStaticFieldID(env, Byte_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     byte_value_methodID = (*env)->GetMethodID(env, Byte_class, "byteValue", "()B");
+    if (thrown(env)) { return -1; }
 
     Float_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Float"));
+    if (thrown(env)) { return -1; }
     float_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Float_class, (*env)->GetStaticFieldID(env, Float_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     float_value_methodID = (*env)->GetMethodID(env, Float_class, "floatValue", "()F");
+    if (thrown(env)) { return -1; }
 
     Double_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Double"));
+    if (thrown(env)) { return -1; }
     double_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Double_class, (*env)->GetStaticFieldID(env, Double_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
     double_value_methodID = (*env)->GetMethodID(env, Double_class, "doubleValue", "()D");
+    if (thrown(env)) { return -1; }
     
     jclass Method_class = (*env)->FindClass(env, "java/lang/reflect/Method");
+    if (thrown(env)) { return -1; }
     Method_getDeclaringClass_methodID = (*env)->GetMethodID(env, Method_class, "getDeclaringClass", "()Ljava/lang/Class;");
+    if (thrown(env)) { return -1; }
     Method_getModifiers_methodID = (*env)->GetMethodID(env, Method_class, "getModifiers", "()I");
+    if (thrown(env)) { return -1; }
     
     jclass Field_class = (*env)->FindClass(env, "java/lang/reflect/Field");
+    if (thrown(env)) { return -1; }
     Field_getDeclaringClass_methodID = (*env)->GetMethodID(env, Field_class, "getDeclaringClass", "()Ljava/lang/Class;");
+    if (thrown(env)) { return -1; }
     Field_getModifiers_methodID = (*env)->GetMethodID(env, Field_class, "getModifiers", "()I");
+    if (thrown(env)) { return -1; }
     Field_getType_methodID = (*env)->GetMethodID(env, Field_class, "getType", "()Ljava/lang/Class;");
+    if (thrown(env)) { return -1; }
 
     Lookup_allowedModesFieldId = (*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/invoke/MethodHandles$Lookup"), "allowedModes", "I");
+    if (thrown(env)) { return -1; }
     AccessibleObject_overrideFieldId =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
+    if (thrown(env)) { return -1; }
     
     return JNI_VERSION_1_1;
 }
@@ -158,6 +197,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
+
+// Utility functions
 
 void throwIllegalArgumentException(JNIEnv* env, char* msg) {
     (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/IllegalArgumentException"), msg);
@@ -227,9 +268,13 @@ bool checkFieldValType(JNIEnv* env, jobject field, jobject val) {
 int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue* arg_jvalues) {
     // Get parameter types of method
     jclass methodClass = (*env)->GetObjectClass(env, method);
+    if (thrown(env)) { return 0; }
     jmethodID getParameterTypesMethodID = (*env)->GetMethodID(env, methodClass, "getParameterTypes", "()[Ljava/lang/Class;");
+    if (thrown(env)) { return 0; }
     jobject parameterTypes = (*env)->CallObjectMethod(env, method, getParameterTypesMethodID);
+    if (thrown(env)) { return 0; }
     jsize num_params = (*env)->GetArrayLength(env, parameterTypes);
+    if (thrown(env)) { return 0; }
 
     // Check arg arity
     if (num_args != num_params) {
@@ -240,8 +285,11 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
     // Unbox args
     for (jsize i = 0; i < num_args; i++) {
         jobject paramType = (*env)->GetObjectArrayElement(env, parameterTypes, i);
+        if (thrown(env)) { return 0; }
         jobject arg = (*env)->GetObjectArrayElement(env, args, i);
+        if (thrown(env)) { return 0; }
         jclass argType = arg == NULL ? (jclass) NULL : (*env)->GetObjectClass(env, arg);
+        if (thrown(env)) { return 0; }
 
         if ((*env)->IsSameObject(env, paramType, int_class)) {
             if (arg == NULL) {
@@ -332,6 +380,7 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
                 arg_jvalues[i].l = arg;
             }
         }
+        if (thrown(env)) { return 0; }
     }
     return 1;
 }
@@ -342,6 +391,7 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findClassInternal(JNIEnv *env, jclass ignored, jstring class_name_internal) {
     if (argIsNull(env, class_name_internal)) { return NULL; }
     const char* class_name_internal_chars = (*env)->GetStringUTFChars(env, class_name_internal, NULL);
+    if (!class_name_internal_chars || thrown(env)) { return NULL; }
     jclass class_ref = (*env)->FindClass(env, class_name_internal_chars);
     (*env)->ReleaseStringUTFChars(env, class_name_internal, class_name_internal_chars);
     return class_ref;
@@ -353,10 +403,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findCla
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
+    if (thrown(env)) { return NULL; }
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
-    if (methodID == 0) {
-        return NULL;
-    }
+    if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
 
@@ -364,10 +413,9 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
+    if (thrown(env)) { return NULL; }
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
-    if (methodID == 0) {
-        return NULL;
-    }
+    if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
 
@@ -375,10 +423,9 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
 JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
     if (argIsNull(env, cls)) { return NULL; }
     const jclass clsDescriptor = (*env)->GetObjectClass(env, cls); // Class -> Class.class
+    if (thrown(env)) { return NULL; }
     const jmethodID methodID = (*env)->GetMethodID(env, clsDescriptor, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
-    if (methodID == 0) {
-        return NULL;
-    }
+    if (methodID == 0 || thrown(env)) { return NULL; }
     return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
 }
 
@@ -408,94 +455,130 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThro
 
 JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jint) 0; }
-    return (*env)->GetIntField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jint) 0; }
+    return (*env)->GetIntField(env, obj, fieldID);
 }
 
 JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jlong) 0; }
-    return (*env)->GetLongField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jlong) 0; }
+    return (*env)->GetLongField(env, obj, fieldID);
 }
 
 JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jshort) 0; }
-    return (*env)->GetShortField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jshort) 0; }
+    return (*env)->GetShortField(env, obj, fieldID);
 }
 
 JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jchar) 0; }
-    return (*env)->GetCharField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jchar) 0; }
+    return (*env)->GetCharField(env, obj, fieldID);
 }
 
 JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jboolean) 0; }
-    return (*env)->GetBooleanField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jboolean) 0; }
+    return (*env)->GetBooleanField(env, obj, fieldID);
 }
 
 JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jbyte) 0; }
-    return (*env)->GetByteField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jbyte) 0; }
+    return (*env)->GetByteField(env, obj, fieldID);
 }
 
 JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jfloat) 0; }
-    return (*env)->GetFloatField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jfloat) 0; }
+    return (*env)->GetFloatField(env, obj, fieldID);
 }
 
 JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jdouble) 0; }
-    return (*env)->GetDoubleField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jdouble) 0; }
+    return (*env)->GetDoubleField(env, obj, fieldID);
 }
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return NULL; }
-    return (*env)->GetObjectField(env, obj, (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return NULL; }
+    return (*env)->GetObjectField(env, obj, fieldID);
 }
 
 // Object field setters:
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jint val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetIntField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetIntField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jlong val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetLongField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetLongField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jshort val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetShortField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetShortField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jchar val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetCharField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetCharField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jboolean val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetBooleanField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetBooleanField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jbyte val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetByteField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetByteField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jfloat val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    (*env)->SetFloatField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetFloatField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jdouble val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-   (*env)->SetDoubleField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetDoubleField(env, obj, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jobject val) {
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field) || !checkFieldValType(env, field, val)) { return; }
-    (*env)->SetObjectField(env, obj, (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    (*env)->SetObjectField(env, obj, fieldID, val);
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -504,94 +587,166 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setObjectF
 
 JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticIntField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jint) 0; }
-    return (*env)->GetStaticIntField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jint) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jint) 0; }
+    return (*env)->GetStaticIntField(env, cls, fieldID);
 }
 
 JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticLongField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jlong) 0; }
-    return (*env)->GetStaticLongField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jlong) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jlong) 0; }
+    return (*env)->GetStaticLongField(env, cls, fieldID);
 }
 
 JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticShortField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jshort) 0; }
-    return (*env)->GetStaticShortField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jshort) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jshort) 0; }
+    return (*env)->GetStaticShortField(env, cls, fieldID);
 }
 
 JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticCharField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jchar) 0; }
-    return (*env)->GetStaticCharField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jchar) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jchar) 0; }
+    return (*env)->GetStaticCharField(env, cls, fieldID);
 }
 
 JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticBooleanField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jboolean) 0; }
-    return (*env)->GetStaticBooleanField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jboolean) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jboolean) 0; }
+    return (*env)->GetStaticBooleanField(env, cls, fieldID);
 }
 
 JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticByteField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jbyte) 0; }
-    return (*env)->GetStaticByteField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jbyte) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jbyte) 0; }
+    return (*env)->GetStaticByteField(env, cls, fieldID);
 }
 
 JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticFloatField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jfloat) 0; }
-    return (*env)->GetStaticFloatField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jfloat) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jfloat) 0; }
+    return (*env)->GetStaticFloatField(env, cls, fieldID);
 }
 
 JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticDoubleField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jdouble) 0; }
-    return (*env)->GetStaticDoubleField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return (jdouble) 0; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return (jdouble) 0; }
+    return (*env)->GetStaticDoubleField(env, cls, fieldID);
 }
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticObjectField(JNIEnv *env, jclass ignored, jobject field) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return NULL; }
-    return (*env)->GetStaticObjectField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field));
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return NULL; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return NULL; }
+    return (*env)->GetStaticObjectField(env, cls, fieldID);
 }
 
 // Static field setters:
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticIntField(JNIEnv *env, jclass ignored, jobject field, jint val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticIntField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticIntField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticLongField(JNIEnv *env, jclass ignored, jobject field, jlong val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticLongField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticLongField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticShortField(JNIEnv *env, jclass ignored, jobject field, jshort val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticShortField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticShortField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticCharField(JNIEnv *env, jclass ignored, jobject field, jchar val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticCharField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticCharField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticBooleanField(JNIEnv *env, jclass ignored, jobject field, jboolean val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticBooleanField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticBooleanField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticByteField(JNIEnv *env, jclass ignored, jobject field, jbyte val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticByteField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticByteField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticFloatField(JNIEnv *env, jclass ignored, jobject field, jfloat val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticFloatField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticFloatField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticDoubleField(JNIEnv *env, jclass ignored, jobject field, jdouble val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    (*env)->SetStaticDoubleField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticDoubleField(env, cls, fieldID, val);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticObjectField(JNIEnv *env, jclass ignored, jobject field, jobject val) {
     if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true) || !checkFieldValType(env, field, val)) { return; }
-    (*env)->SetStaticObjectField(env, (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID), (*env)->FromReflectedField(env, field), val);
+    jfieldID fieldID = (*env)->FromReflectedField(env, field);
+    if (thrown(env)) { return; }
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
+    if (thrown(env)) { return; }
+    (*env)->SetStaticObjectField(env, cls, fieldID, val);
 }
 
 // -----------------------------------------------------------------------------------------------------------------
