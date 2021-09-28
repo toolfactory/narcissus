@@ -34,7 +34,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Narcissus.
@@ -184,14 +187,38 @@ public class Narcissus {
      *            the class
      * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
      */
-    public static List<Method> enumerateMethods(Class<?> cls) {
-        List<Method> methods = new ArrayList<>();
+    public static List<Method> enumerateMethods(final Class<?> cls) {
+        // Iterate from class to its superclasses, and find initial interfaces to start traversing from
+        final List<Method> methodOrder = new ArrayList<>();
+        final Set<Class<?>> visited = new HashSet<>();
+        final LinkedList<Class<?>> interfaceQueue = new LinkedList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method method : Narcissus.getDeclaredMethods(c)) {
-                methods.add(method);
+            for (Method m : getDeclaredMethods(c)) {
+                methodOrder.add(m);
+            }
+            // Find interfaces and superinterfaces implemented by this class or its superclasses
+            if (c.isInterface() && visited.add(c)) {
+                interfaceQueue.add(c);
+            }
+            for (final Class<?> iface : c.getInterfaces()) {
+                if (visited.add(iface)) {
+                    interfaceQueue.add(iface);
+                }
             }
         }
-        return methods;
+        // Traverse through interfaces looking for default methods
+        while (!interfaceQueue.isEmpty()) {
+            final Class<?> iface = interfaceQueue.remove();
+            for (Method m : getDeclaredMethods(iface)) {
+                methodOrder.add(m);
+            }
+            for (final Class<?> superIface : iface.getInterfaces()) {
+                if (visited.add(superIface)) {
+                    interfaceQueue.add(superIface);
+                }
+            }
+        }
+        return methodOrder;
     }
 
     /**
