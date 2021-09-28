@@ -297,4 +297,31 @@ public class NarcissusTest {
                 Thread.currentThread().getContextClassLoader());
         assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2);
     }
+
+    static interface E {
+        int x();
+
+        default int y() {
+            return 1;
+        }
+    }
+
+    static class F implements E {
+        @Override
+        public int x() {
+            return 2;
+        }
+
+        @Override
+        public int y() {
+            return 3;
+        }
+    }
+
+    @Test
+    public void testDefaultMethod() throws Exception {
+        for (Method m : Narcissus.enumerateMethods(F.class)) {
+            System.out.println(m.getName());
+        }
+    }
 }
