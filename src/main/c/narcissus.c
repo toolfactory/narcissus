@@ -324,8 +324,13 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
                 arg_jvalues[i].d = (*env)->CallDoubleMethod(env, arg, double_value_methodID);
             }
         } else {
-            // Arg does not need unboxing
-            arg_jvalues[i].l = arg;
+            // Arg does not need unboxing, but we need to check if it is assignable from the parameter type
+            if (arg != NULL && !(*env)->IsAssignableFrom(env, argType, paramType)) {
+                throwIllegalArgumentException(env, "Tried to invoke function with arg of incompatible type");
+                return 0;
+            } else {
+                arg_jvalues[i].l = arg;
+            }
         }
     }
     return 1;

@@ -248,6 +248,14 @@ public class NarcissusTest {
     static class C {
         A a;
         B b;
+
+        static A identA(A aVal) {
+            return aVal;
+        }
+
+        static B identB(B bVal) {
+            return bVal;
+        }
     }
 
     @Test
@@ -261,5 +269,17 @@ public class NarcissusTest {
     public void testAssignFieldSupertype() throws Exception {
         C c = new C();
         Narcissus.setField(c, Narcissus.findField(C.class, "b"), new A());
+    }
+
+    @Test
+    public void testCallWithParamSubtype() throws Exception {
+        A retVal = (A) Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identA", A.class),
+                new B());
+        assertThat(retVal instanceof B);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCallWithParamSupertype() throws Exception {
+        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identB", B.class), new A());
     }
 }
