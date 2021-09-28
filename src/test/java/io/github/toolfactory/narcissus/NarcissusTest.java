@@ -295,6 +295,6 @@ public class NarcissusTest {
     public void testExceptionInStaticInitializer() throws Exception {
         Class<?> dCls = Class.forName(NarcissusTest.class.getName() + "$" + "D", false,
                 Thread.currentThread().getContextClassLoader());
-        assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2); // (2)
+        assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2);
     }
 }
