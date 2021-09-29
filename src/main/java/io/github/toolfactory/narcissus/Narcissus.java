@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Narcissus.
@@ -81,7 +82,7 @@ public class Narcissus {
             LibraryLoader.loadLibraryFromJar(libraryResourcePrefix + libraryResourceSuffix);
             loaded = true;
 
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             if (DEBUG) {
                 System.err.println("Could not load Narcissus native library: " + t.getMessage());
             }
@@ -104,7 +105,7 @@ public class Narcissus {
      *            the class name
      * @return the class reference
      */
-    public static Class<?> findClass(String className) {
+    public static Class<?> findClass(final String className) {
         if (className == null) {
             throw new IllegalArgumentException("Class name cannot be null");
         }
@@ -169,32 +170,38 @@ public class Narcissus {
      *            the class
      * @return a list of {@link Field} objects representing all fields declared by the class or a superclass.
      */
-    public static List<Field> enumerateFields(Class<?> cls) {
-        List<Field> fields = new ArrayList<>();
+    public static List<Field> enumerateFields(final Class<?> cls) {
+        final List<Field> fields = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.getDeclaredFields(c)) {
+            for (final Field field : Narcissus.getDeclaredFields(c)) {
                 fields.add(field);
             }
         }
         return fields;
     }
 
+    /** Iterator applied to each method of a class and its superclasses/interfaces. */
+    private static interface MethodIterator {
+        /** @return true to stop iterating, or false to continue iterating */
+        boolean foundMethod(Method m);
+    }
+
     /**
-     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks. Also iterates up
-     * through superclasses, to collect all methods of the class and its superclasses.
+     * Iterate through all methods in the given class, ignoring visibility and bypassing security checks. Also
+     * iterates up through superclasses, to collect all methods of the class and its superclasses.
      *
      * @param cls
      *            the class
-     * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
      */
-    public static List<Method> enumerateMethods(final Class<?> cls) {
+    private static void forAllMethods(final Class<?> cls, final MethodIterator methodIter) {
         // Iterate from class to its superclasses, and find initial interfaces to start traversing from
-        final List<Method> methodOrder = new ArrayList<>();
         final Set<Class<?>> visited = new HashSet<>();
         final LinkedList<Class<?>> interfaceQueue = new LinkedList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method m : getDeclaredMethods(c)) {
-                methodOrder.add(m);
+            for (final Method m : getDeclaredMethods(c)) {
+                if (methodIter.foundMethod(m)) {
+                    return;
+                }
             }
             // Find interfaces and superinterfaces implemented by this class or its superclasses
             if (c.isInterface() && visited.add(c)) {
@@ -209,8 +216,10 @@ public class Narcissus {
         // Traverse through interfaces looking for default methods
         while (!interfaceQueue.isEmpty()) {
             final Class<?> iface = interfaceQueue.remove();
-            for (Method m : getDeclaredMethods(iface)) {
-                methodOrder.add(m);
+            for (final Method m : getDeclaredMethods(iface)) {
+                if (methodIter.foundMethod(m)) {
+                    return;
+                }
             }
             for (final Class<?> superIface : iface.getInterfaces()) {
                 if (visited.add(superIface)) {
@@ -218,6 +227,25 @@ public class Narcissus {
                 }
             }
         }
+    }
+
+    /**
+     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks. Also iterates up
+     * through superclasses, to collect all methods of the class and its superclasses.
+     *
+     * @param cls
+     *            the class
+     * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
+     */
+    public static List<Method> enumerateMethods(final Class<?> cls) {
+        final List<Method> methodOrder = new ArrayList<>();
+        forAllMethods(cls, new MethodIterator() {
+            @Override
+            public boolean foundMethod(final Method m) {
+                methodOrder.add(m);
+                return false;
+            }
+        });
         return methodOrder;
     }
 
@@ -234,9 +262,9 @@ public class Narcissus {
      * @throws NoSuchFieldException
      *             if the class does not contain a field of the given name
      */
-    public static Field findField(Class<?> cls, String fieldName) throws NoSuchFieldException {
+    public static Field findField(final Class<?> cls, final String fieldName) throws NoSuchFieldException {
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Field field : Narcissus.getDeclaredFields(c)) {
+            for (final Field field : Narcissus.getDeclaredFields(c)) {
                 if (field.getName().equals(fieldName)) {
                     return field;
                 }
@@ -259,43 +287,25 @@ public class Narcissus {
      * @throws NoSuchMethodException
      *             if the class does not contain a method of the given name
      */
-    public static Method findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)
+    public static Method findMethod(final Class<?> cls, final String methodName, final Class<?>... paramTypes)
             throws NoSuchMethodException {
-        // Iterate from class to its superclasses, and find initial interfaces to start traversing from
-        // (borrows code from enumerateMethods, but terminates as soon as method is found)
-        final Set<Class<?>> visited = new HashSet<>();
-        final LinkedList<Class<?>> interfaceQueue = new LinkedList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (Method m : getDeclaredMethods(c)) {
+        final AtomicReference<Method> method = new AtomicReference<>();
+        forAllMethods(cls, new MethodIterator() {
+            @Override
+            public boolean foundMethod(final Method m) {
                 if (m.getName().equals(methodName) && Arrays.equals(paramTypes, m.getParameterTypes())) {
-                    return m;
+                    method.set(m);
+                    return true;
                 }
+                return false;
             }
-            // Find interfaces and superinterfaces implemented by this class or its superclasses
-            if (c.isInterface() && visited.add(c)) {
-                interfaceQueue.add(c);
-            }
-            for (final Class<?> iface : c.getInterfaces()) {
-                if (visited.add(iface)) {
-                    interfaceQueue.add(iface);
-                }
-            }
+        });
+        final Method m = method.get();
+        if (m != null) {
+            return m;
+        } else {
+            throw new NoSuchMethodException(methodName);
         }
-        // Traverse through interfaces looking for default methods
-        while (!interfaceQueue.isEmpty()) {
-            final Class<?> iface = interfaceQueue.remove();
-            for (Method m : getDeclaredMethods(iface)) {
-                if (m.getName().equals(methodName) && Arrays.equals(paramTypes, m.getParameterTypes())) {
-                    return m;
-                }
-            }
-            for (final Class<?> superIface : iface.getInterfaces()) {
-                if (visited.add(superIface)) {
-                    interfaceQueue.add(superIface);
-                }
-            }
-        }
-        throw new NoSuchMethodException(methodName);
     }
 
     /**
@@ -309,9 +319,9 @@ public class Narcissus {
      * @throws NoSuchMethodException
      *             if the class does not contain a constructor of the given name
      */
-    public static Constructor<?> findConstructor(Class<?> cls, Class<?>... paramTypes)
+    public static Constructor<?> findConstructor(final Class<?> cls, final Class<?>... paramTypes)
             throws NoSuchMethodException {
-        for (Constructor<?> c : getDeclaredConstructors(cls)) {
+        for (final Constructor<?> c : getDeclaredConstructors(cls)) {
             if (Arrays.equals(paramTypes, c.getParameterTypes())) {
                 return c;
             }
@@ -463,7 +473,7 @@ public class Narcissus {
      *            the non-static field
      * @return the value of the field
      */
-    public static Object getField(Object object, Field field) {
+    public static Object getField(final Object object, final Field field) {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null");
         }
@@ -473,7 +483,7 @@ public class Narcissus {
         if (Modifier.isStatic(field.getModifiers())) {
             throw new IllegalArgumentException("field is static, call getStaticField() instead");
         }
-        Class<?> fieldType = field.getType();
+        final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
             return getIntField(object, field);
         } else if (fieldType == long.class) {
@@ -614,7 +624,7 @@ public class Narcissus {
      * @param val
      *            the value to set
      */
-    public static void setField(Object object, Field field, Object val) {
+    public static void setField(final Object object, final Field field, final Object val) {
         if (object == null) {
             throw new NullPointerException("object cannot be null");
         }
@@ -624,7 +634,7 @@ public class Narcissus {
         if (Modifier.isStatic(field.getModifiers())) {
             throw new IllegalArgumentException("field is static, call setStaticField() instead");
         }
-        Class<?> fieldType = field.getType();
+        final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
             setIntField(object, field, ((Integer) val).intValue());
         } else if (fieldType == long.class) {
@@ -739,14 +749,14 @@ public class Narcissus {
      *            the static field
      * @return the static field
      */
-    public static Object getStaticField(Field field) {
+    public static Object getStaticField(final Field field) {
         if (field == null) {
             throw new NullPointerException("field cannot be null");
         }
         if (!Modifier.isStatic(field.getModifiers())) {
             throw new IllegalArgumentException("field is not static, call getField() instead");
         }
-        Class<?> fieldType = field.getType();
+        final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
             return getStaticIntField(field);
         } else if (fieldType == long.class) {
@@ -867,14 +877,14 @@ public class Narcissus {
      * @param val
      *            the value to set
      */
-    public static void setStaticField(Field field, Object val) {
+    public static void setStaticField(final Field field, final Object val) {
         if (field == null) {
             throw new NullPointerException("field cannot be null");
         }
         if (!Modifier.isStatic(field.getModifiers())) {
             throw new IllegalArgumentException("field is not static, call setField() instead");
         }
-        Class<?> fieldType = field.getType();
+        final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
             setStaticIntField(field, ((Integer) val).intValue());
         } else if (fieldType == long.class) {
@@ -1041,7 +1051,7 @@ public class Narcissus {
      *            the method arguments (or {@code new Object[0]} if there are no args)
      * @return the return value (possibly a boxed value)
      */
-    public static Object invokeMethod(Object object, Method method, Object... args) {
+    public static Object invokeMethod(final Object object, final Method method, final Object... args) {
         if (object == null) {
             throw new NullPointerException("object cannot be null");
         }
@@ -1051,7 +1061,7 @@ public class Narcissus {
         if (Modifier.isStatic(method.getModifiers())) {
             throw new IllegalArgumentException("method is static, call invokeStaticMethod() instead");
         }
-        Class<?> returnType = method.getReturnType();
+        final Class<?> returnType = method.getReturnType();
         if (returnType == void.class) {
             invokeVoidMethod(object, method, args);
             return null;
@@ -1199,14 +1209,14 @@ public class Narcissus {
      *            the method arguments (or {@code new Object[0]} if there are no args)
      * @return the return value (possibly a boxed value)
      */
-    public static Object invokeStaticMethod(Method method, Object... args) {
+    public static Object invokeStaticMethod(final Method method, final Object... args) {
         if (method == null) {
             throw new NullPointerException("method cannot be null");
         }
         if (!Modifier.isStatic(method.getModifiers())) {
             throw new IllegalArgumentException("method is not static, call invokeMethod() instead");
         }
-        Class<?> returnType = method.getReturnType();
+        final Class<?> returnType = method.getReturnType();
         if (returnType == void.class) {
             invokeStaticVoidMethod(method, args);
             return null;
