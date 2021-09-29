@@ -12,14 +12,14 @@ import org.junit.Test;
 
 public class NarcissusTest {
     static class X {
-        int triple(int x) {
+        int triple(final int x) {
             return x * 3;
         }
     }
 
     @Test
     public void testInvokeIntMethodWithParam() throws Exception {
-        Method triple = Narcissus.findMethod(X.class, "triple", int.class);
+        final Method triple = Narcissus.findMethod(X.class, "triple", int.class);
         assertThat(Narcissus.invokeIntMethod(new X(), triple, 5)).isEqualTo(15);
     }
 
@@ -45,9 +45,9 @@ public class NarcissusTest {
 
     @Test
     public void testFieldGetters() throws Exception {
-        Y y = new Y();
-        for (Field f : Y.class.getDeclaredFields()) {
-            Field nf = Narcissus.findField(Y.class, f.getName());
+        final Y y = new Y();
+        for (final Field f : Y.class.getDeclaredFields()) {
+            final Field nf = Narcissus.findField(Y.class, f.getName());
             assertThat(nf).isEqualTo(f);
             if (Modifier.isStatic(f.getModifiers())) {
                 assertThat(Narcissus.getStaticField(nf)).isEqualTo(f.get(null));
@@ -59,14 +59,14 @@ public class NarcissusTest {
 
     @Test
     public void testFieldSetters() throws Exception {
-        Y y = new Y();
+        final Y y = new Y();
 
-        Field i = Narcissus.findField(Y.class, "i");
+        final Field i = Narcissus.findField(Y.class, "i");
         assertThat(Narcissus.getField(y, i)).isEqualTo(1);
         Narcissus.setField(y, i, 2);
         assertThat(Narcissus.getField(y, i)).isEqualTo(2);
 
-        Field _i = Narcissus.findField(Y.class, "_i");
+        final Field _i = Narcissus.findField(Y.class, "_i");
         assertThat(Narcissus.getStaticField(_i)).isEqualTo(1);
         Narcissus.setStaticField(_i, 2);
         assertThat(Narcissus.getStaticField(_i)).isEqualTo(2);
@@ -140,9 +140,9 @@ public class NarcissusTest {
 
     @Test
     public void testInvokeMethods() throws Exception {
-        Z z = new Z();
-        for (Method m : Z.class.getDeclaredMethods()) {
-            Method nm = Narcissus.findMethod(Z.class, m.getName());
+        final Z z = new Z();
+        for (final Method m : Z.class.getDeclaredMethods()) {
+            final Method nm = Narcissus.findMethod(Z.class, m.getName());
             assertThat(nm).isEqualTo(m);
             if (Modifier.isStatic(m.getModifiers())) {
                 assertThat(Narcissus.invokeStaticMethod(nm)).isEqualTo(m.invoke(null));
@@ -154,42 +154,42 @@ public class NarcissusTest {
 
     @Test(expected = NullPointerException.class)
     public void testCheckNullPointerExceptionNonStatic() throws Exception {
-        Method dm = Narcissus.findMethod(Z.class, "d");
+        final Method dm = Narcissus.findMethod(Z.class, "d");
         Narcissus.invokeDoubleMethod(null, dm);
     }
 
     @Test(expected = NullPointerException.class)
     public void testCheckNullPointerExceptionStatic() throws Exception {
-        Method _dm = Narcissus.findMethod(Z.class, "_d");
+        final Method _dm = Narcissus.findMethod(Z.class, "_d");
         Narcissus.invokeDoubleMethod(null, _dm);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCheckStaticModifierException1() throws Exception {
-        Method dm = Narcissus.findMethod(Z.class, "d");
+        final Method dm = Narcissus.findMethod(Z.class, "d");
         Narcissus.invokeStaticDoubleMethod(dm);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCheckObjectClassDoesNotMatchDeclaringClass() throws Exception {
-        Method dm = Narcissus.findMethod(Z.class, "d");
+        final Method dm = Narcissus.findMethod(Z.class, "d");
         Narcissus.invokeDoubleMethod(new Y(), dm);
     }
 
     @Test
     public void testFindClass() throws Exception {
-        Class<?> cls = Narcissus.findClass(Y.class.getName());
+        final Class<?> cls = Narcissus.findClass(Y.class.getName());
         assertThat(cls).isNotNull();
         assertThat(cls.getName()).isEqualTo(Y.class.getName());
-        Class<?> arrCls = Narcissus.findClass(Y.class.getName() + "[]");
+        final Class<?> arrCls = Narcissus.findClass(Y.class.getName() + "[]");
         assertThat(arrCls).isNotNull();
         assertThat(arrCls.getName()).isEqualTo("[L" + Y.class.getName() + ";");
     }
 
     @Test
     public void testEnumerateFields() throws Exception {
-        List<String> fieldNames = new ArrayList<>();
-        for (Field field : Narcissus.enumerateFields(Y.class)) {
+        final List<String> fieldNames = new ArrayList<>();
+        for (final Field field : Narcissus.enumerateFields(Y.class)) {
             fieldNames.add(field.getName());
         }
         assertThat(fieldNames).containsOnly("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b",
@@ -198,8 +198,8 @@ public class NarcissusTest {
 
     @Test
     public void testEnumerateMethods() throws Exception {
-        List<String> methodNames = new ArrayList<>();
-        for (Method method : Narcissus.enumerateMethods(Z.class)) {
+        final List<String> methodNames = new ArrayList<>();
+        for (final Method method : Narcissus.enumerateMethods(Z.class)) {
             methodNames.add(method.getName());
         }
         assertThat(methodNames).contains("i", "j", "s", "c", "b", "z", "f", "d", "_i", "_j", "_s", "_c", "_b", "_z",
@@ -219,28 +219,28 @@ public class NarcissusTest {
 
     @Test
     public void testInheritedField() throws Exception {
-        Field ax = Narcissus.findField(A.class, "x");
+        final Field ax = Narcissus.findField(A.class, "x");
         assertThat(ax).isNotNull();
-        Field bx = Narcissus.findField(B.class, "x");
+        final Field bx = Narcissus.findField(B.class, "x");
         assertThat(bx).isNotNull();
-        A a = new A();
+        final A a = new A();
         a.x = 3;
         assertThat(Narcissus.getIntField(a, ax)).isEqualTo(a.x);
-        B b = new B();
+        final B b = new B();
         b.x = 5;
         assertThat(Narcissus.getIntField(b, bx)).isEqualTo(b.x);
     }
 
     @Test
     public void testInheritedMethod() throws Exception {
-        Method ay = Narcissus.findMethod(A.class, "y");
+        final Method ay = Narcissus.findMethod(A.class, "y");
         assertThat(ay).isNotNull();
-        Method by = Narcissus.findMethod(B.class, "y");
+        final Method by = Narcissus.findMethod(B.class, "y");
         assertThat(by).isNotNull();
-        A a = new A();
+        final A a = new A();
         a.x = 3;
         assertThat(Narcissus.invokeIntMethod(a, ay)).isEqualTo(a.x + 1);
-        B b = new B();
+        final B b = new B();
         b.x = 5;
         assertThat(Narcissus.invokeIntMethod(b, by)).isEqualTo(b.x + 1);
     }
@@ -249,31 +249,31 @@ public class NarcissusTest {
         A a;
         B b;
 
-        static A identA(A aVal) {
+        static A identA(final A aVal) {
             return aVal;
         }
 
-        static B identB(B bVal) {
+        static B identB(final B bVal) {
             return bVal;
         }
     }
 
     @Test
     public void testAssignFieldSubtype() throws Exception {
-        C c = new C();
+        final C c = new C();
         Narcissus.setField(c, Narcissus.findField(C.class, "a"), new B());
         assertThat(c.a instanceof B);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testAssignFieldSupertype() throws Exception {
-        C c = new C();
+        final C c = new C();
         Narcissus.setField(c, Narcissus.findField(C.class, "b"), new A());
     }
 
     @Test
     public void testCallWithParamSubtype() throws Exception {
-        A retVal = (A) Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identA", A.class),
+        final A retVal = (A) Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identA", A.class),
                 new B());
         assertThat(retVal instanceof B);
     }
@@ -293,7 +293,7 @@ public class NarcissusTest {
 
     @Test(expected = ExceptionInInitializerError.class)
     public void testExceptionInStaticInitializer() throws Exception {
-        Class<?> dCls = Class.forName(NarcissusTest.class.getName() + "$" + "D", false,
+        final Class<?> dCls = Class.forName(NarcissusTest.class.getName() + "$" + "D", false,
                 Thread.currentThread().getContextClassLoader());
         assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2);
     }

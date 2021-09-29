@@ -41,8 +41,8 @@ import java.util.Map;
  * @author Luke Hutchison
  */
 public class ReflectionCache {
-    private Map<String, List<Method>> methodNameToMethods = new HashMap<>();
-    private Map<String, Field> fieldNameToField = new HashMap<>();
+    private final Map<String, List<Method>> methodNameToMethods = new HashMap<>();
+    private final Map<String, Field> fieldNameToField = new HashMap<>();
 
     /**
      * Instantiate a new reflection cache for a class.
@@ -50,15 +50,15 @@ public class ReflectionCache {
      * @param cls
      *            the class to instantiate.
      */
-    public ReflectionCache(Class<?> cls) {
-        for (Method method : Narcissus.enumerateMethods(cls)) {
+    public ReflectionCache(final Class<?> cls) {
+        for (final Method method : Narcissus.enumerateMethods(cls)) {
             List<Method> methodsForName = methodNameToMethods.get(method.getName());
             if (methodsForName == null) {
                 methodNameToMethods.put(method.getName(), methodsForName = new ArrayList<>());
             }
             methodsForName.add(method);
         }
-        for (Field field : Narcissus.enumerateFields(cls)) {
+        for (final Field field : Narcissus.enumerateFields(cls)) {
             fieldNameToField.put(field.getName(), field);
         }
     }
@@ -73,7 +73,7 @@ public class ReflectionCache {
      * @param className
      *            the name of the class to instantiate.
      */
-    public ReflectionCache(String className) {
+    public ReflectionCache(final String className) {
         this(Narcissus.findClass(className));
     }
 
@@ -85,7 +85,7 @@ public class ReflectionCache {
      * @return The {@link Field} object for the requested field name, or null if no such field was found in the
      *         class.
      */
-    public Field getField(String fieldName) {
+    public Field getField(final String fieldName) {
         return fieldNameToField.get(fieldName);
     }
 
@@ -98,7 +98,7 @@ public class ReflectionCache {
      * @return A list of {@link Method} objects for methods of the requested method name, or null if no such method
      *         was found in the class.
      */
-    public List<Method> getMethods(String methodName) {
+    public List<Method> getMethods(final String methodName) {
         return methodNameToMethods.get(methodName);
     }
 
@@ -111,10 +111,10 @@ public class ReflectionCache {
      *            The types of the parameters of the method. For primitive-typed parameters, use e.g. Integer.TYPE.
      * @return The {@link Method} object for the matching method, or null if no such method was found in the class.
      */
-    public Method getMethod(String methodName, Class<?>... paramTypes) {
-        List<Method> methods = getMethods(methodName);
+    public Method getMethod(final String methodName, final Class<?>... paramTypes) {
+        final List<Method> methods = getMethods(methodName);
         if (methods != null) {
-            for (Method method : methods) {
+            for (final Method method : methods) {
                 if (Arrays.equals(method.getParameterTypes(), paramTypes)) {
                     return method;
                 }

@@ -111,7 +111,7 @@ class LibraryLoader {
      * @param libraryResourcePath
      *            the library resource path
      */
-    static void loadLibraryFromJar(String libraryResourcePath) {
+    static void loadLibraryFromJar(final String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
         InputStream inputSream = null;
@@ -123,22 +123,22 @@ class LibraryLoader {
             }
 
             // Extract library to temp file
-            String filename = libraryResourcePath.substring(libraryResourcePath.lastIndexOf('/') + 1);
-            int dotIdx = filename.indexOf('.');
-            String baseName = dotIdx < 0 ? filename : filename.substring(0, dotIdx);
-            String suffix = dotIdx < 0 ? ".so" : filename.substring(dotIdx);
+            final String filename = libraryResourcePath.substring(libraryResourcePath.lastIndexOf('/') + 1);
+            final int dotIdx = filename.indexOf('.');
+            final String baseName = dotIdx < 0 ? filename : filename.substring(0, dotIdx);
+            final String suffix = dotIdx < 0 ? ".so" : filename.substring(dotIdx);
             tempFile = File.createTempFile(baseName + "_", suffix);
 
             try {
                 if (tempFile.toPath().getFileSystem().supportedFileAttributeViews().contains("posix")) {
                     tempFileIsPosix = true;
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // Ignore
             }
 
-            byte[] buffer = new byte[8192];
-            OutputStream os = new FileOutputStream(tempFile);
+            final byte[] buffer = new byte[8192];
+            final OutputStream os = new FileOutputStream(tempFile);
             try {
                 for (int readBytes; (readBytes = inputSream.read(buffer)) != -1;) {
                     os.write(buffer, 0, readBytes);
@@ -150,13 +150,13 @@ class LibraryLoader {
             // Load the library
             System.load(tempFile.getAbsolutePath());
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException("Could not load library " + libraryResourcePath + " : " + e);
         } finally {
             if (inputSream != null) {
                 try {
                     inputSream.close();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     // Ignore
                 }
             }
