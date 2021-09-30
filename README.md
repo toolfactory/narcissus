@@ -8,7 +8,9 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
-For each of the methods listed below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all security and visibility checks, and circumvents module encapsulation.
+For each of the methods listed below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all visibility/accessibility checks, ignores security manager restrictions, and circumvents module encapsulation.
+
+**Note:** You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
 
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
@@ -27,8 +29,6 @@ For each of the methods listed below, in contrast to the equivalent in the Java 
   * **`Field Narcissus.findField(Class<?> cls, String fieldName)`**
 
     Find a field of a class by name.
-
-  * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
 
 * Finding methods
   * **`Method[] Narcissus.getDeclaredMethods(Class<?> cls)`**
@@ -50,8 +50,6 @@ For each of the methods listed below, in contrast to the equivalent in the Java 
   * **`List<Constructor> Narcissus.findConstructor(Class<?> cls, Class<?>... paramTypes)`**
 
     Find the constructor with the required parameter types.
-
-  * You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of methods in the same class.
 
 * Getting/Setting fields
 
@@ -97,10 +95,7 @@ For each of the methods listed below, in contrast to the equivalent in the Java 
   
     Invoke a static method. Automatically boxes the return type, if the method returns a primitive type.
 
-### Usage considerations
-
-1. You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
-2. You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
+You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
 
 ## Status
 
