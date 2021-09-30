@@ -434,7 +434,7 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
     }
     if (is_varargs) {
         // Unbox varargs, if varargs_elt_type is primitive
-#define TRY_UNBOX_VARARGS(_prim_type, _Prim_type, _Boxed_type, _jvalue_field) \
+#define TRY_UNBOX_VARARGS(_prim_type, _Prim_type, _Boxed_type) \
         if ((*env)->IsSameObject(env, varargs_elt_type, _prim_type ## _class)) { \
             j ## _prim_type ## Array arr = (*env)->New ## _Prim_type ## Array(env, num_varargs_args); \
             arg_jvalues[num_non_varargs_params].l = arr; \
@@ -459,14 +459,14 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
             } \
             (*env)->Release ## _Prim_type ## ArrayElements(env, arr, elts, 0); \
         }
-        TRY_UNBOX_VARARGS(int, Int, Integer, i)
-        else TRY_UNBOX_VARARGS(long, Long, Long, j)
-        else TRY_UNBOX_VARARGS(short, Short, Short, s)
-        else TRY_UNBOX_VARARGS(char, Char, Character, c)
-        else TRY_UNBOX_VARARGS(boolean, Boolean, Boolean, z)
-        else TRY_UNBOX_VARARGS(byte, Byte, Byte, b)
-        else TRY_UNBOX_VARARGS(float, Float, Float, f)
-        else TRY_UNBOX_VARARGS(double, Double, Double, d)
+        TRY_UNBOX_VARARGS(int, Int, Integer)
+        else TRY_UNBOX_VARARGS(long, Long, Long)
+        else TRY_UNBOX_VARARGS(short, Short, Short)
+        else TRY_UNBOX_VARARGS(char, Char, Character)
+        else TRY_UNBOX_VARARGS(boolean, Boolean, Boolean)
+        else TRY_UNBOX_VARARGS(byte, Byte, Byte)
+        else TRY_UNBOX_VARARGS(float, Float, Float)
+        else TRY_UNBOX_VARARGS(double, Double, Double)
         else {
             // varargs_elt_type is non-primitive -- check if each element of remaining args is assignable from varargs element type
             jobjectArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewObjectArray(env, num_varargs_args, varargs_elt_type, NULL);
