@@ -26,6 +26,7 @@
  */
 #include <jni.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -103,10 +104,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     Class_getComponentType_methodID = (*env)->GetMethodID(env, Class_class, "getComponentType", "()Ljava/lang/Class;");
     if (thrown(env)) { return -1; }
 
-    jclass Void_class = (*env)->FindClass(env, "java/lang/Integer");
+    jclass Void_class = (*env)->FindClass(env, "java/lang/Void");
     if (thrown(env)) { return -1; }
     void_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Void_class, (*env)->GetStaticFieldID(env, Void_class, "TYPE", "Ljava/lang/Class;")));
     if (thrown(env)) { return -1; }
+    
     Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
     if (thrown(env)) { return -1; }
     int_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Integer_class, (*env)->GetStaticFieldID(env, Integer_class, "TYPE", "Ljava/lang/Class;")));
@@ -230,6 +232,13 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 
 // Utility functions
 
+void printClassName(JNIEnv* env, jclass cls) {
+    jstring strObj = (jstring) (*env)->CallObjectMethod(env, cls, (*env)->GetMethodID(env, Class_class, "getName", "()Ljava/lang/String;"));
+    const char* str = (*env)->GetStringUTFChars(env, strObj, NULL);
+    printf("%s\n", str);
+    (*env)->ReleaseStringUTFChars(env, strObj, str);
+}
+
 void throwIllegalArgumentException(JNIEnv* env, char* msg) {
     jclass cls = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
     if (cls) {
@@ -306,13 +315,38 @@ bool checkMethodReceiver(JNIEnv* env, jobject obj, jobject method) {
     return true;
 }
 
-bool checkMethodReturnType(JNIEnv* env, jobject method, jclass primitive_class) {
+bool checkPrimitiveMethodReturnType(JNIEnv* env, jobject method, jclass primitive_class) {
     jclass return_type = (*env)->CallObjectMethod(env, method, Method_getReturnType_methodID);
     if (thrown(env)) { return false; }
     jboolean is_correct_return_type = (*env)->IsSameObject(env, return_type, primitive_class);
     if (thrown(env)) { return false; }
     if (!is_correct_return_type) {
         throwIllegalArgumentException(env, "Return type of method does not match primitive method invocation type");
+        return false;
+    }
+    return true;
+}
+
+bool checkMethodReturnTypeNotVoidOrPrimitive(JNIEnv* env, jobject method) {
+    jclass return_type = (*env)->CallObjectMethod(env, method, Method_getReturnType_methodID);
+    if (thrown(env)) { return false; }
+    jboolean is_void_return_type = (*env)->IsSameObject(env, return_type, void_class);
+    if (thrown(env)) { return false; }
+    if (is_void_return_type) {
+        throwIllegalArgumentException(env, "Return type of method is void, but tried to invoke as method with Object return type");
+        return false;
+    }
+    jboolean is_primitive_return_type = (*env)->IsSameObject(env, return_type, int_class)
+            || (*env)->IsSameObject(env, return_type, long_class)
+            || (*env)->IsSameObject(env, return_type, short_class)
+            || (*env)->IsSameObject(env, return_type, char_class)
+            || (*env)->IsSameObject(env, return_type, boolean_class)
+            || (*env)->IsSameObject(env, return_type, byte_class)
+            || (*env)->IsSameObject(env, return_type, float_class)
+            || (*env)->IsSameObject(env, return_type, double_class);
+    if (thrown(env)) { return false; }
+    if (is_primitive_return_type) {
+        throwIllegalArgumentException(env, "Return type of method is of primitive type, but tried to invoke as method with Object return type");
         return false;
     }
     return true;
@@ -1007,7 +1041,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticO
 // Invoke non-static methods
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, void_class)) { return; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, void_class)) { return; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1019,7 +1053,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeVoid
 }
 
 JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, int_class)) { return (jint) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, int_class)) { return (jint) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jint) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1029,7 +1063,7 @@ JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeIntM
 }
 
 JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, long_class)) { return (jlong) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, long_class)) { return (jlong) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jlong) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1039,7 +1073,7 @@ JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeLon
 }
 
 JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, short_class)) { return (jshort) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, short_class)) { return (jshort) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jshort) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1049,7 +1083,7 @@ JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSh
 }
 
 JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, char_class)) { return (jchar) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, char_class)) { return (jchar) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jchar) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1059,7 +1093,7 @@ JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeCha
 }
 
 JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, boolean_class)) { return (jboolean) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, boolean_class)) { return (jboolean) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jboolean) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1069,7 +1103,7 @@ JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invoke
 }
 
 JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, byte_class)) { return (jbyte) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, byte_class)) { return (jbyte) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jbyte) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1079,7 +1113,7 @@ JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeByt
 }
 
 JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, float_class)) { return (jfloat) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, float_class)) { return (jfloat) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jfloat) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1089,7 +1123,7 @@ JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeFl
 }
 
 JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnType(env, method, double_class)) { return (jdouble) 0; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, double_class)) { return (jdouble) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return (jdouble) 0; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1099,7 +1133,7 @@ JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeD
 }
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method)) { return NULL; }
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnTypeNotVoidOrPrimitive(env, method)) { return NULL; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
     if (thrown(env)) { return NULL; }
     jsize num_args = (*env)->GetArrayLength(env, args);
@@ -1113,7 +1147,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeO
 // Invoke static methods
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticVoidMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, void_class)) { return; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1127,7 +1161,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStat
 }
 
 JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticIntMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jint) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, int_class)) { return (jint) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jint) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1139,7 +1173,7 @@ JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStat
 }
 
 JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticLongMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jlong) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, long_class)) { return (jlong) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jlong) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1151,7 +1185,7 @@ JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSta
 }
 
 JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticShortMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jshort) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, short_class)) { return (jshort) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jshort) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1163,7 +1197,7 @@ JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSt
 }
 
 JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticCharMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jchar) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, char_class)) { return (jchar) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jchar) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1175,7 +1209,7 @@ JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSta
 }
 
 JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticBooleanMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jboolean) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, boolean_class)) { return (jboolean) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jboolean) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1187,7 +1221,7 @@ JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invoke
 }
 
 JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticByteMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jbyte) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, byte_class)) { return (jbyte) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jbyte) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1199,7 +1233,7 @@ JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSta
 }
 
 JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticFloatMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jfloat) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, float_class)) { return (jfloat) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jfloat) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1211,7 +1245,7 @@ JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeSt
 }
 
 JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticDoubleMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return (jdouble) 0; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, double_class)) { return (jdouble) 0; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return (jdouble) 0; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);
@@ -1223,7 +1257,7 @@ JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeS
 }
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticObjectMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true)) { return NULL; }
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkMethodReturnTypeNotVoidOrPrimitive(env, method)) { return NULL; }
     jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
     if (thrown(env)) { return NULL; }
     jmethodID methodID = (*env)->FromReflectedMethod(env, method);

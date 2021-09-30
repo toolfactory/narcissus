@@ -326,8 +326,9 @@ public class NarcissusTest {
             }
             return result;
         }
-        
-        static void x() {}
+
+        static void x() {
+        }
     }
 
     @Test
@@ -344,11 +345,27 @@ public class NarcissusTest {
                         .isEqualTo("xy12");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongMethodReturnType1() throws NoSuchMethodException {
+        final Method method = Narcissus.findMethod(E.class, "x", String.class);
+        Narcissus.invokeStaticObjectMethod(method, "5");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongMethodReturnType2() throws NoSuchMethodException {
+        final Method method = Narcissus.findMethod(E.class, "x");
+        Narcissus.invokeStaticObjectMethod(method, "5");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongMethodReturnType3() throws NoSuchMethodException {
+        final Method method = Narcissus.findMethod(E.class, "x", String.class, Object[].class);
+        Narcissus.invokeStaticIntMethod(method, "5");
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMethodReturnTypeMismatch() throws NoSuchMethodException {
-//        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x", String.class), "5");
-        System.out.println(Narcissus.findMethod(E.class, "x").getReturnType() == Void.TYPE);
-
+        final Method method = Narcissus.findMethod(E.class, "x", int[].class);
+        Narcissus.invokeStaticLongMethod(method, 5);
     }
 }
