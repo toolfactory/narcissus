@@ -405,72 +405,27 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
         if (thrown(env)) { return 0; }
         jclass arg_type = arg == NULL ? (jclass) NULL : (*env)->GetObjectClass(env, arg);
         if (thrown(env)) { return 0; }
-        if ((*env)->IsSameObject(env, param_type, int_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Integer");
-            } else if (!(*env)->IsSameObject(env, arg_type, Integer_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Integer");
-            } else {
-                arg_jvalues[i].i = (*env)->CallIntMethod(env, arg, Integer_intValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, long_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Long");
-            } else if (!(*env)->IsSameObject(env, arg_type, Long_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Long");
-            } else {
-                arg_jvalues[i].j = (*env)->CallLongMethod(env, arg, Long_longValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, short_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Short");
-            } else if (!(*env)->IsSameObject(env, arg_type, Short_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Short");
-            } else {
-                arg_jvalues[i].s = (*env)->CallShortMethod(env, arg, Short_shortValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, char_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Character");
-            } else if (!(*env)->IsSameObject(env, arg_type, Character_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Character");
-            } else {
-                arg_jvalues[i].c = (*env)->CallCharMethod(env, arg, Character_charValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, boolean_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Boolean");
-            } else if (!(*env)->IsSameObject(env, arg_type, Boolean_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Boolean");
-            } else {
-                arg_jvalues[i].z = (*env)->CallBooleanMethod(env, arg, Boolean_booleanValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, byte_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Byte");
-            } else if (!(*env)->IsSameObject(env, arg_type, Byte_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Byte");
-            } else {
-                arg_jvalues[i].b = (*env)->CallByteMethod(env, arg, Byte_byteValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, float_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Float");
-            } else if (!(*env)->IsSameObject(env, arg_type, Float_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Float");
-            } else {
-                arg_jvalues[i].f = (*env)->CallFloatMethod(env, arg, Float_floatValue_methodID);
-            }
-        } else if ((*env)->IsSameObject(env, param_type, double_class)) {
-            if (arg == NULL) {
-                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected Double");
-            } else if (!(*env)->IsSameObject(env, arg_type, Double_class)) {
-                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected Double");
-            } else {
-                arg_jvalues[i].d = (*env)->CallDoubleMethod(env, arg, Double_doubleValue_methodID);
-            }
-        } else {
-            // Arg does not need unboxing, but we need to check if it is assignable from the parameter type
+
+#define TRY_UNBOX_ARG(_prim_type, _Prim_type, _Boxed_type, _jvalue_field) \
+        if ((*env)->IsSameObject(env, param_type, _prim_type ## _class)) { \
+            if (arg == NULL) { \
+                throwIllegalArgumentException(env, "Tried to unbox a null argument; expected " #_Boxed_type); \
+            } else if (!(*env)->IsSameObject(env, arg_type, _Boxed_type ## _class)) { \
+                throwIllegalArgumentException(env, "Tried to unbox arg of wrong type; expected " #_Boxed_type); \
+            } else { \
+                arg_jvalues[i]._jvalue_field = (*env)->Call ## _Prim_type ## Method(env, arg, _Boxed_type ## _ ## _prim_type ## Value_methodID); \
+            } \
+        }
+        TRY_UNBOX_ARG(int, Int, Integer, i)
+        else TRY_UNBOX_ARG(long, Long, Long, j)
+        else TRY_UNBOX_ARG(short, Short, Short, s)
+        else TRY_UNBOX_ARG(char, Char, Character, c)
+        else TRY_UNBOX_ARG(boolean, Boolean, Boolean, z)
+        else TRY_UNBOX_ARG(byte, Byte, Byte, b)
+        else TRY_UNBOX_ARG(float, Float, Float, f)
+        else TRY_UNBOX_ARG(double, Double, Double, d)
+        else {
+            // Parameter type is not primitive -- check if arg is assignable from the parameter type
             if (arg != NULL && !(*env)->IsAssignableFrom(env, arg_type, param_type)) {
                 throwIllegalArgumentException(env, "Tried to invoke function with arg of incompatible type");
             } else {
@@ -481,184 +436,41 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
     }
     if (is_varargs) {
         // Unbox varargs, if varargs_elt_type is primitive
-        if ((*env)->IsSameObject(env, varargs_elt_type, int_class)) {
-            jintArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewIntArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jint *elts = (*env)->GetIntArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Integer_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallIntMethod(env, arg, Integer_intValue_methodID);
-                }
-            }
-            (*env)->ReleaseIntArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, long_class)) {
-            jlongArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewLongArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jlong *elts = (*env)->GetLongArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Long_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallLongMethod(env, arg, Long_longValue_methodID);
-                }
-            }
-            (*env)->ReleaseLongArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, short_class)) {
-            jshortArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewShortArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jshort *elts = (*env)->GetShortArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Short_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallShortMethod(env, arg, Short_shortValue_methodID);
-                }
-            }
-            (*env)->ReleaseShortArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, char_class)) {
-            jcharArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewCharArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jchar *elts = (*env)->GetCharArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Character_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallCharMethod(env, arg, Character_charValue_methodID);
-                }
-            }
-            (*env)->ReleaseCharArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, boolean_class)) {
-            jbooleanArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewBooleanArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jboolean *elts = (*env)->GetBooleanArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Boolean_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallBooleanMethod(env, arg, Boolean_booleanValue_methodID);
-                }
-            }
-            (*env)->ReleaseBooleanArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, byte_class)) {
-            jbyteArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewByteArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jbyte *elts = (*env)->GetByteArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Byte_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallByteMethod(env, arg, Byte_byteValue_methodID);
-                }
-            }
-            (*env)->ReleaseByteArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, float_class)) {
-            jfloatArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewFloatArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jfloat *elts = (*env)->GetFloatArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Float_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallFloatMethod(env, arg, Float_floatValue_methodID);
-                }
-            }
-            (*env)->ReleaseFloatArrayElements(env, arr, elts, 0);
-        } else if ((*env)->IsSameObject(env, varargs_elt_type, double_class)) {
-            jdoubleArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewDoubleArray(env, num_varargs_args);
-            if (thrown(env)) { return 0; }
-            jdouble *elts = (*env)->GetDoubleArrayElements(env, arr, NULL);
-            if (!elts) { return 0; }
-            for (jsize i = 0; i < num_varargs_args; i++) {
-                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params);
-                if (thrown(env)) { return 0; }
-                if (arg == NULL) {
-                    throwIllegalArgumentException(env, "Tried to unbox a null argument");
-                    return 0;
-                }
-                jclass arg_type = (*env)->GetObjectClass(env, arg);
-                if (thrown(env)) { return 0; }
-                if (!(*env)->IsSameObject(env, arg_type, Double_class)) {
-                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type");
-                    return 0;
-                } else {
-                    elts[i] = (*env)->CallDoubleMethod(env, arg, Double_doubleValue_methodID);
-                }
-            }
-            (*env)->ReleaseDoubleArrayElements(env, arr, elts, 0);
-        } else {
-            // varargs_elt_type is non-primitive
+#define TRY_UNBOX_VARARGS(_prim_type, _Prim_type, _Boxed_type, _jvalue_field) \
+        if ((*env)->IsSameObject(env, varargs_elt_type, _prim_type ## _class)) { \
+            j ## _prim_type ## Array arr = (*env)->New ## _Prim_type ## Array(env, num_varargs_args); \
+            arg_jvalues[num_non_varargs_params].l = arr; \
+            if (thrown(env)) { return 0; } \
+            j ## _prim_type *elts = (*env)->Get ## _Prim_type ## ArrayElements(env, arr, NULL); \
+            if (!elts) { return 0; } \
+            for (jsize i = 0; i < num_varargs_args; i++) { \
+                jobject arg = (*env)->GetObjectArrayElement(env, args, i + num_non_varargs_params); \
+                if (thrown(env)) { return 0; } \
+                if (arg == NULL) { \
+                    throwIllegalArgumentException(env, "Tried to unbox a null argument"); \
+                    return 0; \
+                } \
+                jclass arg_type = (*env)->GetObjectClass(env, arg); \
+                if (thrown(env)) { return 0; } \
+                if (!(*env)->IsSameObject(env, arg_type, _Boxed_type ## _class)) { \
+                    throwIllegalArgumentException(env, "Tried to unbox arg of wrong type"); \
+                    return 0; \
+                } else { \
+                    elts[i] = (*env)->Call ## _Prim_type ## Method(env, arg, _Boxed_type ## _ ## _prim_type ## Value_methodID); \
+                } \
+            } \
+            (*env)->Release ## _Prim_type ## ArrayElements(env, arr, elts, 0); \
+        }
+        TRY_UNBOX_VARARGS(int, Int, Integer, i)
+        else TRY_UNBOX_VARARGS(long, Long, Long, j)
+        else TRY_UNBOX_VARARGS(short, Short, Short, s)
+        else TRY_UNBOX_VARARGS(char, Char, Character, c)
+        else TRY_UNBOX_VARARGS(boolean, Boolean, Boolean, z)
+        else TRY_UNBOX_VARARGS(byte, Byte, Byte, b)
+        else TRY_UNBOX_VARARGS(float, Float, Float, f)
+        else TRY_UNBOX_VARARGS(double, Double, Double, d)
+        else {
+            // varargs_elt_type is non-primitive -- check if each element of remaining args is assignable from varargs element type
             jobjectArray arr = arg_jvalues[num_non_varargs_params].l = (*env)->NewObjectArray(env, num_varargs_args, varargs_elt_type, NULL);
             if (thrown(env)) { return 0; }
             for (jsize i = 0; i < num_varargs_args; i++) {
@@ -738,533 +550,203 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThro
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Object field getters:
+// Non-static field getters:
 
-JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jint) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jint) 0; }
-    return (*env)->GetIntField(env, obj, fieldID);
+#define FIELD_GETTER(_prim_type, _Prim_type) \
+JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_get ## _Prim_type ## Field(JNIEnv *env, jclass ignored, jobject obj, jobject field) { \
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (j ## _prim_type) 0; } \
+    jfieldID fieldID = (*env)->FromReflectedField(env, field); \
+    if (thrown(env)) { return (jint) 0; } \
+    return (*env)->Get ## _Prim_type ## Field(env, obj, fieldID); \
 }
 
-JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jlong) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jlong) 0; }
-    return (*env)->GetLongField(env, obj, fieldID);
+FIELD_GETTER(int, Int)
+
+FIELD_GETTER(long, Long)
+
+FIELD_GETTER(short, Short)
+
+FIELD_GETTER(char, Char)
+
+FIELD_GETTER(boolean, Boolean)
+
+FIELD_GETTER(byte, Byte)
+
+FIELD_GETTER(float, Float)
+
+FIELD_GETTER(double, Double)
+
+FIELD_GETTER(object, Object)
+
+// Non-static field setters:
+
+#define FIELD_SETTER(_prim_type, _Prim_type, _extra_check) \
+JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_set ## _Prim_type ## Field(JNIEnv *env, jclass ignored, jobject obj, jobject field, j ## _prim_type val) { \
+    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field) _extra_check) { return; } \
+    jfieldID fieldID = (*env)->FromReflectedField(env, field); \
+    if (thrown(env)) { return; } \
+    (*env)->Set ## _Prim_type ## Field(env, obj, fieldID, val); \
 }
 
-JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jshort) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jshort) 0; }
-    return (*env)->GetShortField(env, obj, fieldID);
-}
+FIELD_SETTER(int, Int, )
 
-JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jchar) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jchar) 0; }
-    return (*env)->GetCharField(env, obj, fieldID);
-}
+FIELD_SETTER(long, Long, )
 
-JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jboolean) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jboolean) 0; }
-    return (*env)->GetBooleanField(env, obj, fieldID);
-}
+FIELD_SETTER(short, Short, )
 
-JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jbyte) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jbyte) 0; }
-    return (*env)->GetByteField(env, obj, fieldID);
-}
+FIELD_SETTER(char, Char, )
 
-JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jfloat) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jfloat) 0; }
-    return (*env)->GetFloatField(env, obj, fieldID);
-}
+FIELD_SETTER(boolean, Boolean, )
 
-JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (jdouble) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jdouble) 0; }
-    return (*env)->GetDoubleField(env, obj, fieldID);
-}
+FIELD_SETTER(byte, Byte, )
 
-JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return NULL; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return NULL; }
-    return (*env)->GetObjectField(env, obj, fieldID);
-}
+FIELD_SETTER(float, Float, )
 
-// Object field setters:
+FIELD_SETTER(double, Double, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setIntField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jint val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetIntField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setLongField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jlong val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetLongField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setShortField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jshort val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetShortField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setCharField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jchar val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetCharField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setBooleanField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jboolean val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetBooleanField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setByteField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jbyte val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetByteField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setFloatField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jfloat val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetFloatField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setDoubleField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jdouble val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetDoubleField(env, obj, fieldID, val);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setObjectField(JNIEnv *env, jclass ignored, jobject obj, jobject field, jobject val) {
-    if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field) || !checkFieldValType(env, field, val)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    (*env)->SetObjectField(env, obj, fieldID, val);
-}
+FIELD_SETTER(object, Object, || !checkFieldValType(env, field, val) )
 
 // -----------------------------------------------------------------------------------------------------------------
 
 // Static field getters:
 
-JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticIntField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jint) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jint) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jint) 0; }
-    return (*env)->GetStaticIntField(env, cls, fieldID);
+#define STATIC_FIELD_GETTER(_prim_type, _Prim_type) \
+JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStatic ## _Prim_type ## Field(JNIEnv *env, jclass ignored, jobject field) { \
+    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (j ## _prim_type) 0; } \
+    jfieldID fieldID = (*env)->FromReflectedField(env, field); \
+    if (thrown(env)) { return (j ## _prim_type) 0; } \
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID); \
+    if (thrown(env)) { return (j ## _prim_type) 0; } \
+    return (*env)->GetStatic ## _Prim_type ## Field(env, cls, fieldID); \
 }
 
-JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticLongField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jlong) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jlong) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jlong) 0; }
-    return (*env)->GetStaticLongField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(int, Int)
 
-JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticShortField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jshort) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jshort) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jshort) 0; }
-    return (*env)->GetStaticShortField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(long, Long)
 
-JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticCharField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jchar) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jchar) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jchar) 0; }
-    return (*env)->GetStaticCharField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(short, Short)
 
-JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticBooleanField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jboolean) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jboolean) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jboolean) 0; }
-    return (*env)->GetStaticBooleanField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(char, Char)
 
-JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticByteField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jbyte) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jbyte) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jbyte) 0; }
-    return (*env)->GetStaticByteField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(boolean, Boolean)
 
-JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticFloatField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jfloat) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jfloat) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jfloat) 0; }
-    return (*env)->GetStaticFloatField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(byte, Byte)
 
-JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticDoubleField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return (jdouble) 0; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return (jdouble) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jdouble) 0; }
-    return (*env)->GetStaticDoubleField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(float, Float)
 
-JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getStaticObjectField(JNIEnv *env, jclass ignored, jobject field) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return NULL; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return NULL; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return NULL; }
-    return (*env)->GetStaticObjectField(env, cls, fieldID);
-}
+STATIC_FIELD_GETTER(double, Double)
+
+STATIC_FIELD_GETTER(object, Object)
 
 // Static field setters:
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticIntField(JNIEnv *env, jclass ignored, jobject field, jint val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticIntField(env, cls, fieldID, val);
+#define STATIC_FIELD_SETTER(_prim_type, _Prim_type, _extra_check) \
+JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStatic ## _Prim_type ## Field(JNIEnv *env, jclass ignored, jobject field, j ## _prim_type val) { \
+    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true) _extra_check) { return; } \
+    jfieldID fieldID = (*env)->FromReflectedField(env, field); \
+    if (thrown(env)) { return; } \
+    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID); \
+    if (thrown(env)) { return; } \
+    (*env)->SetStatic ## _Prim_type ## Field(env, cls, fieldID, val); \
 }
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticLongField(JNIEnv *env, jclass ignored, jobject field, jlong val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticLongField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(int, Int, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticShortField(JNIEnv *env, jclass ignored, jobject field, jshort val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticShortField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(long, Long, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticCharField(JNIEnv *env, jclass ignored, jobject field, jchar val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticCharField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(short, Short, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticBooleanField(JNIEnv *env, jclass ignored, jobject field, jboolean val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticBooleanField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(char, Char, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticByteField(JNIEnv *env, jclass ignored, jobject field, jbyte val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticByteField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(boolean, Boolean, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticFloatField(JNIEnv *env, jclass ignored, jobject field, jfloat val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticFloatField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(byte, Byte, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticDoubleField(JNIEnv *env, jclass ignored, jobject field, jdouble val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticDoubleField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(float, Float, )
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStaticObjectField(JNIEnv *env, jclass ignored, jobject field, jobject val) {
-    if (argIsNull(env, field) || !checkFieldStaticModifier(env, field, true) || !checkFieldValType(env, field, val)) { return; }
-    jfieldID fieldID = (*env)->FromReflectedField(env, field);
-    if (thrown(env)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    (*env)->SetStaticObjectField(env, cls, fieldID, val);
-}
+STATIC_FIELD_SETTER(double, Double, )
+
+STATIC_FIELD_SETTER(object, Object, || !checkFieldValType(env, field, val) )
 
 // -----------------------------------------------------------------------------------------------------------------
 
 // Invoke non-static methods
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeVoidMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, void_class)) { return; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (unbox(env, method, args, num_args, arg_jvalues)) {
-        (*env)->CallVoidMethodA(env, obj, methodID, arg_jvalues);
-    }
+#define INVOKE_METHOD(_jni_ret_type, _prim_type, _Prim_type, _assign, _assign_return, _err_return, _extra_check) \
+JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invoke ## _Prim_type ## Method(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) { \
+    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) _extra_check) { return _err_return; } \
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method); \
+    if (thrown(env)) { return _err_return; } \
+    jsize num_args = (*env)->GetArrayLength(env, args); \
+    if (thrown(env)) { return _err_return; } \
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args]; \
+    if (unbox(env, method, args, num_args, arg_jvalues)) { \
+        _assign (*env)->Call ## _Prim_type ## MethodA(env, obj, methodID, arg_jvalues); \
+        return _assign_return; \
+    } else {\
+        return _err_return; \
+    } \
 }
 
-JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeIntMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, int_class)) { return (jint) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jint) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jint) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallIntMethodA(env, obj, methodID, arg_jvalues) : (jint) 0;
-}
+INVOKE_METHOD(void, void, Void, , , , || !checkPrimitiveMethodReturnType(env, method, void_class) )
 
-JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeLongMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, long_class)) { return (jlong) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jlong) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jlong) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallLongMethodA(env, obj, methodID, arg_jvalues) : (jlong) 0;
-}
+INVOKE_METHOD(jint, int, Int, jint return_val = , return_val, (jint) 0, || !checkPrimitiveMethodReturnType(env, method, int_class) )
 
-JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeShortMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, short_class)) { return (jshort) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jshort) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jshort) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallShortMethodA(env, obj, methodID, arg_jvalues) : (jshort) 0;
-}
+INVOKE_METHOD(jlong, long, Long, jlong return_val = , return_val, (jlong) 0, || !checkPrimitiveMethodReturnType(env, method, long_class) )
 
-JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeCharMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, char_class)) { return (jchar) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jchar) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jchar) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallCharMethodA(env, obj, methodID, arg_jvalues) : (jchar) 0;
-}
+INVOKE_METHOD(jshort, short, Short, jshort return_val = , return_val, (jshort) 0, || !checkPrimitiveMethodReturnType(env, method, short_class) )
 
-JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeBooleanMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, boolean_class)) { return (jboolean) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jboolean) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jboolean) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallBooleanMethodA(env, obj, methodID, arg_jvalues) : (jboolean) 0;
-}
+INVOKE_METHOD(jchar, char, Char, jchar return_val = , return_val, (jchar) 0, || !checkPrimitiveMethodReturnType(env, method, char_class) )
 
-JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeByteMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, byte_class)) { return (jbyte) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jbyte) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jbyte) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallByteMethodA(env, obj, methodID, arg_jvalues) : (jbyte) 0;
-}
+INVOKE_METHOD(jboolean, boolean, Boolean, jboolean return_val = , return_val, (jboolean) 0, || !checkPrimitiveMethodReturnType(env, method, boolean_class) )
 
-JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeFloatMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, float_class)) { return (jfloat) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jfloat) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jfloat) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallFloatMethodA(env, obj, methodID, arg_jvalues) : (jfloat) 0;
-}
+INVOKE_METHOD(jbyte, byte, Byte, jbyte return_val = , return_val, (jbyte) 0, || !checkPrimitiveMethodReturnType(env, method, byte_class) )
 
-JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeDoubleMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkPrimitiveMethodReturnType(env, method, double_class)) { return (jdouble) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jdouble) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jdouble) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallDoubleMethodA(env, obj, methodID, arg_jvalues) : (jdouble) 0;
-}
+INVOKE_METHOD(jfloat, float, Float, jfloat return_val = , return_val, (jfloat) 0, || !checkPrimitiveMethodReturnType(env, method, float_class) )
 
-JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeObjectMethod(JNIEnv *env, jclass ignored, jobject obj, jobject method, jobjectArray args) {
-    if (argIsNull(env, obj) || argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, false) || !checkMethodReceiver(env, obj, method) || !checkMethodReturnTypeNotVoidOrPrimitive(env, method)) { return NULL; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return NULL; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return NULL; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallObjectMethodA(env, obj, methodID, arg_jvalues) : (jobject) NULL;
-}
+INVOKE_METHOD(jdouble, double, Double, jdouble return_val = , return_val, (jdouble) 0, || !checkPrimitiveMethodReturnType(env, method, double_class) )
+
+INVOKE_METHOD(jobject, object, Object, jobject return_val = , return_val, NULL, || !checkMethodReturnTypeNotVoidOrPrimitive(env, method) )
 
 // -----------------------------------------------------------------------------------------------------------------
 
 // Invoke static methods
 
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticVoidMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, void_class)) { return; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    if (unbox(env, method, args, num_args, arg_jvalues)) {
-        (*env)->CallStaticVoidMethodA(env, cls, methodID, arg_jvalues);
-    }
+#define INVOKE_STATIC_METHOD(_jni_ret_type, _prim_type, _Prim_type, _assign, _assign_return, _err_return, _extra_check) \
+JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStatic ## _Prim_type ## Method(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) { \
+    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) _extra_check) { return _err_return; } \
+    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID); \
+    if (thrown(env)) { return _err_return; } \
+    jmethodID methodID = (*env)->FromReflectedMethod(env, method); \
+    if (thrown(env)) { return _err_return; } \
+    jsize num_args = (*env)->GetArrayLength(env, args); \
+    if (thrown(env)) { return _err_return; } \
+    jvalue arg_jvalues[num_args == 0 ? 1 : num_args]; \
+    if (unbox(env, method, args, num_args, arg_jvalues)) { \
+        _assign (*env)->CallStatic ## _Prim_type ## MethodA(env, cls, methodID, arg_jvalues); \
+        return _assign_return; \
+    } else { \
+        return _err_return; \
+    } \
 }
 
-JNIEXPORT jint JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticIntMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, int_class)) { return (jint) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jint) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jint) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jint) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticIntMethodA(env, cls, methodID, arg_jvalues) : (jint) 0;
-}
+INVOKE_STATIC_METHOD(void, void, Void, , , , || !checkPrimitiveMethodReturnType(env, method, void_class) )
 
-JNIEXPORT jlong JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticLongMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, long_class)) { return (jlong) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jlong) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jlong) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jlong) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticLongMethodA(env, cls, methodID, arg_jvalues) : (jlong) 0;
-}
+INVOKE_STATIC_METHOD(jint, int, Int, jint return_val = , return_val, (jint) 0, || !checkPrimitiveMethodReturnType(env, method, int_class) )
 
-JNIEXPORT jshort JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticShortMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, short_class)) { return (jshort) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jshort) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jshort) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jshort) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticShortMethodA(env, cls, methodID, arg_jvalues) : (jshort) 0;
-}
+INVOKE_STATIC_METHOD(jlong, long, Long, jlong return_val = , return_val, (jlong) 0, || !checkPrimitiveMethodReturnType(env, method, long_class) )
 
-JNIEXPORT jchar JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticCharMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, char_class)) { return (jchar) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jchar) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jchar) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jchar) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticCharMethodA(env, cls, methodID, arg_jvalues) : (jchar) 0;
-}
+INVOKE_STATIC_METHOD(jshort, short, Short, jshort return_val = , return_val, (jshort) 0, || !checkPrimitiveMethodReturnType(env, method, short_class) )
 
-JNIEXPORT jboolean JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticBooleanMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, boolean_class)) { return (jboolean) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jboolean) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jboolean) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jboolean) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticBooleanMethodA(env, cls, methodID, arg_jvalues) : (jboolean) 0;
-}
+INVOKE_STATIC_METHOD(jchar, char, Char, jchar return_val = , return_val, (jchar) 0, || !checkPrimitiveMethodReturnType(env, method, char_class) )
 
-JNIEXPORT jbyte JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticByteMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, byte_class)) { return (jbyte) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jbyte) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jbyte) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jbyte) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticByteMethodA(env, cls, methodID, arg_jvalues) : (jbyte) 0;
-}
+INVOKE_STATIC_METHOD(jboolean, boolean, Boolean, jboolean return_val = , return_val, (jboolean) 0, || !checkPrimitiveMethodReturnType(env, method, boolean_class) )
 
-JNIEXPORT jfloat JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticFloatMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, float_class)) { return (jfloat) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jfloat) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jfloat) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jfloat) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticFloatMethodA(env, cls, methodID, arg_jvalues) : (jfloat) 0;
-}
+INVOKE_STATIC_METHOD(jbyte, byte, Byte, jbyte return_val = , return_val, (jbyte) 0, || !checkPrimitiveMethodReturnType(env, method, byte_class) )
 
-JNIEXPORT jdouble JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticDoubleMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkPrimitiveMethodReturnType(env, method, double_class)) { return (jdouble) 0; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return (jdouble) 0; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return (jdouble) 0; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return (jdouble) 0; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticDoubleMethodA(env, cls, methodID, arg_jvalues) : (jdouble) 0;
-}
+INVOKE_STATIC_METHOD(jfloat, float, Float, jfloat return_val = , return_val, (jfloat) 0, || !checkPrimitiveMethodReturnType(env, method, float_class) )
 
-JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_invokeStaticObjectMethod(JNIEnv *env, jclass ignored, jobject method, jobjectArray args) {
-    if (argIsNull(env, method) || argIsNull(env, args) || !checkMethodStaticModifier(env, method, true) || !checkMethodReturnTypeNotVoidOrPrimitive(env, method)) { return NULL; }
-    jclass cls = (*env)->CallObjectMethod(env, method, Method_getDeclaringClass_methodID);
-    if (thrown(env)) { return NULL; }
-    jmethodID methodID = (*env)->FromReflectedMethod(env, method);
-    if (thrown(env)) { return NULL; }
-    jsize num_args = (*env)->GetArrayLength(env, args);
-    if (thrown(env)) { return NULL; }
-    jvalue arg_jvalues[num_args == 0 ? 1 : num_args];
-    return unbox(env, method, args, num_args, arg_jvalues) ? (*env)->CallStaticObjectMethodA(env, cls, methodID, arg_jvalues) : (jobject) NULL;
-}
+INVOKE_STATIC_METHOD(jdouble, double, Double, jdouble return_val = , return_val, (jdouble) 0, || !checkPrimitiveMethodReturnType(env, method, double_class) )
+
+INVOKE_STATIC_METHOD(jobject, object, Object, jobject return_val = , return_val, NULL, || !checkMethodReturnTypeNotVoidOrPrimitive(env, method) )
 
