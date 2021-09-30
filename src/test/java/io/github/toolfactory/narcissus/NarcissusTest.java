@@ -297,4 +297,49 @@ public class NarcissusTest {
                 Thread.currentThread().getContextClassLoader());
         assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2);
     }
+
+    static class E {
+        static int x(String y) {
+            return Integer.parseInt(y);
+        }
+
+        static int x(String... ys) {
+            int tot = 0;
+            for (String y : ys) {
+                tot += Integer.parseInt(y);
+            }
+            return tot;
+        }
+
+        static int x(int... ys) {
+            int tot = 0;
+            for (int y : ys) {
+                tot += y;
+            }
+            return tot;
+        }
+
+        static String x(String y0, Object... ys) {
+            String result = y0;
+            for (Object y : ys) {
+                result += "" + y;
+            }
+            return result;
+        }
+    }
+
+    @Test
+    public void testVarargs() throws NoSuchMethodException {
+        assertThat(Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String.class), "5"))
+                .isEqualTo(5);
+        assertThat(
+                Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String[].class), "1", "2", "3"))
+                        .isEqualTo(6);
+        assertThat(Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", int[].class), 2, 3, 4))
+                .isEqualTo(9);
+        assertThat((String) Narcissus.invokeStaticObjectMethod(
+                Narcissus.findMethod(E.class, "x", String.class, Object[].class), "x", "y", 1, 2))
+                        .isEqualTo("xy12");
+    }
+
 }
