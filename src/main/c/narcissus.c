@@ -559,21 +559,13 @@ JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus
 }
 
 FIELD_GETTER(int, Int)
-
 FIELD_GETTER(long, Long)
-
 FIELD_GETTER(short, Short)
-
 FIELD_GETTER(char, Char)
-
 FIELD_GETTER(boolean, Boolean)
-
 FIELD_GETTER(byte, Byte)
-
 FIELD_GETTER(float, Float)
-
 FIELD_GETTER(double, Double)
-
 FIELD_GETTER(object, Object)
 
 // Non-static field setters:
@@ -587,21 +579,13 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_set ## _Pr
 }
 
 FIELD_SETTER(int, Int, )
-
 FIELD_SETTER(long, Long, )
-
 FIELD_SETTER(short, Short, )
-
 FIELD_SETTER(char, Char, )
-
 FIELD_SETTER(boolean, Boolean, )
-
 FIELD_SETTER(byte, Byte, )
-
 FIELD_SETTER(float, Float, )
-
 FIELD_SETTER(double, Double, )
-
 FIELD_SETTER(object, Object, || !checkFieldValType(env, field, val) )
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -619,21 +603,13 @@ JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus
 }
 
 STATIC_FIELD_GETTER(int, Int)
-
 STATIC_FIELD_GETTER(long, Long)
-
 STATIC_FIELD_GETTER(short, Short)
-
 STATIC_FIELD_GETTER(char, Char)
-
 STATIC_FIELD_GETTER(boolean, Boolean)
-
 STATIC_FIELD_GETTER(byte, Byte)
-
 STATIC_FIELD_GETTER(float, Float)
-
 STATIC_FIELD_GETTER(double, Double)
-
 STATIC_FIELD_GETTER(object, Object)
 
 // Static field setters:
@@ -649,21 +625,13 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStatic 
 }
 
 STATIC_FIELD_SETTER(int, Int, )
-
 STATIC_FIELD_SETTER(long, Long, )
-
 STATIC_FIELD_SETTER(short, Short, )
-
 STATIC_FIELD_SETTER(char, Char, )
-
 STATIC_FIELD_SETTER(boolean, Boolean, )
-
 STATIC_FIELD_SETTER(byte, Byte, )
-
 STATIC_FIELD_SETTER(float, Float, )
-
 STATIC_FIELD_SETTER(double, Double, )
-
 STATIC_FIELD_SETTER(object, Object, || !checkFieldValType(env, field, val) )
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -687,23 +655,14 @@ JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_i
 }
 
 INVOKE_METHOD(void, void, Void, , , , || !checkPrimitiveMethodReturnType(env, method, void_class) )
-
 INVOKE_METHOD(jint, int, Int, jint return_val = , return_val, (jint) 0, || !checkPrimitiveMethodReturnType(env, method, int_class) )
-
 INVOKE_METHOD(jlong, long, Long, jlong return_val = , return_val, (jlong) 0, || !checkPrimitiveMethodReturnType(env, method, long_class) )
-
 INVOKE_METHOD(jshort, short, Short, jshort return_val = , return_val, (jshort) 0, || !checkPrimitiveMethodReturnType(env, method, short_class) )
-
 INVOKE_METHOD(jchar, char, Char, jchar return_val = , return_val, (jchar) 0, || !checkPrimitiveMethodReturnType(env, method, char_class) )
-
 INVOKE_METHOD(jboolean, boolean, Boolean, jboolean return_val = , return_val, (jboolean) 0, || !checkPrimitiveMethodReturnType(env, method, boolean_class) )
-
 INVOKE_METHOD(jbyte, byte, Byte, jbyte return_val = , return_val, (jbyte) 0, || !checkPrimitiveMethodReturnType(env, method, byte_class) )
-
 INVOKE_METHOD(jfloat, float, Float, jfloat return_val = , return_val, (jfloat) 0, || !checkPrimitiveMethodReturnType(env, method, float_class) )
-
 INVOKE_METHOD(jdouble, double, Double, jdouble return_val = , return_val, (jdouble) 0, || !checkPrimitiveMethodReturnType(env, method, double_class) )
-
 INVOKE_METHOD(jobject, object, Object, jobject return_val = , return_val, NULL, || !checkMethodReturnTypeNotVoidOrPrimitive(env, method) )
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -729,22 +688,13 @@ JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_i
 }
 
 INVOKE_STATIC_METHOD(void, void, Void, , , , || !checkPrimitiveMethodReturnType(env, method, void_class) )
-
 INVOKE_STATIC_METHOD(jint, int, Int, jint return_val = , return_val, (jint) 0, || !checkPrimitiveMethodReturnType(env, method, int_class) )
-
 INVOKE_STATIC_METHOD(jlong, long, Long, jlong return_val = , return_val, (jlong) 0, || !checkPrimitiveMethodReturnType(env, method, long_class) )
-
 INVOKE_STATIC_METHOD(jshort, short, Short, jshort return_val = , return_val, (jshort) 0, || !checkPrimitiveMethodReturnType(env, method, short_class) )
-
 INVOKE_STATIC_METHOD(jchar, char, Char, jchar return_val = , return_val, (jchar) 0, || !checkPrimitiveMethodReturnType(env, method, char_class) )
-
 INVOKE_STATIC_METHOD(jboolean, boolean, Boolean, jboolean return_val = , return_val, (jboolean) 0, || !checkPrimitiveMethodReturnType(env, method, boolean_class) )
-
 INVOKE_STATIC_METHOD(jbyte, byte, Byte, jbyte return_val = , return_val, (jbyte) 0, || !checkPrimitiveMethodReturnType(env, method, byte_class) )
-
 INVOKE_STATIC_METHOD(jfloat, float, Float, jfloat return_val = , return_val, (jfloat) 0, || !checkPrimitiveMethodReturnType(env, method, float_class) )
-
 INVOKE_STATIC_METHOD(jdouble, double, Double, jdouble return_val = , return_val, (jdouble) 0, || !checkPrimitiveMethodReturnType(env, method, double_class) )
-
 INVOKE_STATIC_METHOD(jobject, object, Object, jobject return_val = , return_val, NULL, || !checkMethodReturnTypeNotVoidOrPrimitive(env, method) )
 
