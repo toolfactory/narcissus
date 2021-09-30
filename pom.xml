@@ -305,6 +305,7 @@
                         <compilerStartOption>-I ${JAVA_HOME}/include/${os.dir}/</compilerStartOption>
                     </compilerStartOptions>
                     <compilerEndOptions>
+                        <compilerEndOption>-Wall</compilerEndOption>
                         <compilerEndOption>-fPIC</compilerEndOption>
                         <compilerEndOption>-std=c99</compilerEndOption>
                         <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>

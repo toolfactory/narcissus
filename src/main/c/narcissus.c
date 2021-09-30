@@ -109,28 +109,62 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     void_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Void_class, (*env)->GetStaticFieldID(env, Void_class, "TYPE", "Ljava/lang/Class;")));
     if (thrown(env)) { return -1; }
     
-#define FIND_PRIMITIVE(_prim_type, _Prim_type, _Prim_sig_type, _Boxed_type) \
-    jclass _Boxed_type ## _boxed_type = (*env)->FindClass(env, "java/lang/" ## #_Boxed_type); \
-    if (thrown(env)) { return -1; } \
-    _Boxed_type ## _class = (*env)->NewGlobalRef(env, _Boxed_type ## _boxed_type); \
-    if (thrown(env)) { return -1; } \
-    jfieldID _Boxed_type ## _TYPE_fieldID = (*env)->GetStaticFieldID(env, _Boxed_type ## _class, "TYPE", "Ljava/lang/Class;"); \
-    if (thrown(env)) { return -1; } \
-    jclass _Boxed_type ## _unboxed_type = (*env)->GetStaticObjectField(env, _Boxed_type ## _class, _Boxed_type ## _TYPE_fieldID); \
-    if (thrown(env)) { return -1; } \
-    _prim_type ## _class = (*env)->NewGlobalRef(env, _Boxed_type ## _unboxed_type); \
-    if (thrown(env)) { return -1; } \
-    _Boxed_type ## _ ## _prim_type ## Value_methodID = (*env)->GetMethodID(env, _Boxed_type ## _class, #_prim_type "Value", "()" #_Prim_sig_type); \
+    Integer_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Integer"));
     if (thrown(env)) { return -1; }
-    FIND_PRIMITIVE(int, Int, I, Integer)
-    FIND_PRIMITIVE(long, Long, L, Long)
-    FIND_PRIMITIVE(short, Short, S, Short)
-    FIND_PRIMITIVE(char, Char, C, Character)
-    FIND_PRIMITIVE(byte, Byte, B, Byte)
-    FIND_PRIMITIVE(boolean, Boolean, Z, Boolean)
-    FIND_PRIMITIVE(float, Float, F, Float)
-    FIND_PRIMITIVE(double, Double, D, Double)
+    int_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Integer_class, (*env)->GetStaticFieldID(env, Integer_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Integer_intValue_methodID = (*env)->GetMethodID(env, Integer_class, "intValue", "()I");
+    if (thrown(env)) { return -1; }
 
+    Long_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Long"));
+    if (thrown(env)) { return -1; }
+    long_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Long_class, (*env)->GetStaticFieldID(env, Long_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Long_longValue_methodID = (*env)->GetMethodID(env, Long_class, "longValue", "()J");
+    if (thrown(env)) { return -1; }
+
+    Short_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Short"));
+    if (thrown(env)) { return -1; }
+    short_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Short_class, (*env)->GetStaticFieldID(env, Short_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Short_shortValue_methodID = (*env)->GetMethodID(env, Short_class, "shortValue", "()S");
+    if (thrown(env)) { return -1; }
+
+    Character_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Character"));
+    if (thrown(env)) { return -1; }
+    char_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Character_class, (*env)->GetStaticFieldID(env, Character_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Character_charValue_methodID = (*env)->GetMethodID(env, Character_class, "charValue", "()C");
+    if (thrown(env)) { return -1; }
+
+    Boolean_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Boolean"));
+    if (thrown(env)) { return -1; }
+    boolean_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Boolean_class, (*env)->GetStaticFieldID(env, Boolean_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Boolean_booleanValue_methodID = (*env)->GetMethodID(env, Boolean_class, "booleanValue", "()Z");
+    if (thrown(env)) { return -1; }
+
+    Byte_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Byte"));
+    if (thrown(env)) { return -1; }
+    byte_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Byte_class, (*env)->GetStaticFieldID(env, Byte_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Byte_byteValue_methodID = (*env)->GetMethodID(env, Byte_class, "byteValue", "()B");
+    if (thrown(env)) { return -1; }
+
+    Float_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Float"));
+    if (thrown(env)) { return -1; }
+    float_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Float_class, (*env)->GetStaticFieldID(env, Float_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Float_floatValue_methodID = (*env)->GetMethodID(env, Float_class, "floatValue", "()F");
+    if (thrown(env)) { return -1; }
+
+    Double_class = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "java/lang/Double"));
+    if (thrown(env)) { return -1; }
+    double_class = (*env)->NewGlobalRef(env, (*env)->GetStaticObjectField(env, Double_class, (*env)->GetStaticFieldID(env, Double_class, "TYPE", "Ljava/lang/Class;")));
+    if (thrown(env)) { return -1; }
+    Double_doubleValue_methodID = (*env)->GetMethodID(env, Double_class, "doubleValue", "()D");
+    if (thrown(env)) { return -1; }
+    
     jclass Method_class = (*env)->FindClass(env, "java/lang/reflect/Method");
     if (thrown(env)) { return -1; }
     Method_getDeclaringClass_methodID = (*env)->GetMethodID(env, Method_class, "getDeclaringClass", "()Ljava/lang/Class;");
@@ -339,8 +373,6 @@ bool checkFieldValType(JNIEnv* env, jobject field, jobject val) {
 // Unbox a jobjectArray of method invocation args into a jvalue array. Returns 0 if an exception was thrown, or 1 if unboxing succeeded.
 int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue* arg_jvalues) {
     // Get parameter types of method
-    jclass methodClass = (*env)->GetObjectClass(env, method);
-    if (thrown(env)) { return 0; }
     jobject parameterTypes = (*env)->CallObjectMethod(env, method, Method_getParameterTypes_methodID);
     if (thrown(env)) { return 0; }
     jsize num_params = (*env)->GetArrayLength(env, parameterTypes);
