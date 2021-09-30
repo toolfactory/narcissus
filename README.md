@@ -4,6 +4,8 @@ Narcissus is a JNI native code library that provides a small subset of the Java 
 
 Narcissus works on JDK 7+, however it is most useful for suppressing reflective access warnings in JDK 9-15, and for circumventing strong encapsulation for JDK 16+, in order to keep legacy software running (for example, when legacy software depends upon `setAccessible` to access a needed private field of a class in some library).
 
+**Obviously eventually the security loopholes exploited by Narcissus will be closed by the JDK team. Please submit patches to your upstream libraries to get them to publicly expose useful internals that you rely on, so that your software can keep working in future.**
+
 ## Usage
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
