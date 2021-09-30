@@ -8,7 +8,7 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
-For each of the listed methods below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all security and visibility checks, and circumvents module encapsulation.
+For each of the methods listed below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all security and visibility checks, and circumvents module encapsulation.
 
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
