@@ -8,7 +8,7 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
-Note: You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
+For each of the listed methods below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all security and visibility checks, and circumvents module encapsulation.
 
 * Finding classes
   * **`Class<?> Narcissus.findClass(String className)`**
@@ -22,7 +22,7 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
 
   * **`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
 
-    Equivalent to `cls.getDeclaredFields()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all fields of the class and its superclasses.
+    Equivalent to `cls.getDeclaredFields()`, but also iterates up through superclasses to collect all fields of the class and its superclasses.
 
   * **`Field Narcissus.findField(Class<?> cls, String fieldName)`**
 
@@ -37,7 +37,7 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
 
   * **`List<Method> Narcissus.enumerateMethods(Class<?> cls)`**
 
-    Equivalent to `cls.getDeclaredMethods()`, but bypasses all security and visibility checks, and also iterates up through superclasses to collect all methods of the class and its superclasses.
+    Equivalent to `cls.getDeclaredMethods()`, but iterates up through superclasses to collect all methods of the class and its superclasses.
 
   * **`Method Narcissus.findMethod(Class<?> cls, String methodName, Class<?>... paramTypes)`**
 
@@ -96,6 +96,11 @@ Note: You should check the static Boolean value `Narcissus.libraryLoaded` to mak
   * **`Object Narcissus.invokeStaticMethod(Method method, Object... args)`**
   
     Invoke a static method. Automatically boxes the return type, if the method returns a primitive type.
+
+### Usage considerations
+
+1. You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
+2. You may want to also try using [**`ReflectionCache`**](https://github.com/toolfactory/narcissus/blob/main/src/main/java/io/github/toolfactory/narcissus/ReflectionCache.java) if you need to quickly find a lot of fields in the same class.
 
 ## Status
 
