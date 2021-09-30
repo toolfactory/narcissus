@@ -307,9 +307,9 @@ bool checkMethodReceiver(JNIEnv* env, jobject obj, jobject method) {
 }
 
 bool checkMethodReturnType(JNIEnv* env, jobject method, jclass primitive_class) {
-    jclass returnType = (*env)->CallObjectMethod(env, method, Method_getReturnType_methodID);
+    jclass return_type = (*env)->CallObjectMethod(env, method, Method_getReturnType_methodID);
     if (thrown(env)) { return false; }
-    jboolean is_correct_return_type = (*env)->IsSameObject(env, arg_type, primitive_class);
+    jboolean is_correct_return_type = (*env)->IsSameObject(env, return_type, primitive_class);
     if (thrown(env)) { return false; }
     if (!is_correct_return_type) {
         throwIllegalArgumentException(env, "Return type of method does not match primitive method invocation type");
