@@ -326,6 +326,8 @@ public class NarcissusTest {
             }
             return result;
         }
+        
+        static void x() {}
     }
 
     @Test
@@ -342,4 +344,11 @@ public class NarcissusTest {
                         .isEqualTo("xy12");
     }
 
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMethodReturnTypeMismatch() throws NoSuchMethodException {
+//        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x", String.class), "5");
+        System.out.println(Narcissus.findMethod(E.class, "x").getReturnType() == Void.TYPE);
+
+    }
 }
