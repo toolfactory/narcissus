@@ -347,25 +347,66 @@ public class NarcissusTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongMethodReturnType1() throws NoSuchMethodException {
-        final Method method = Narcissus.findMethod(E.class, "x", String.class);
-        Narcissus.invokeStaticObjectMethod(method, "5");
+        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x", String.class), "5");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongMethodReturnType2() throws NoSuchMethodException {
-        final Method method = Narcissus.findMethod(E.class, "x");
-        Narcissus.invokeStaticObjectMethod(method, "5");
+        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x"), "5");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWrongMethodReturnType3() throws NoSuchMethodException {
-        final Method method = Narcissus.findMethod(E.class, "x", String.class, Object[].class);
-        Narcissus.invokeStaticIntMethod(method, "5");
+        Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String.class, Object[].class), "5");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMethodReturnTypeMismatch() throws NoSuchMethodException {
-        final Method method = Narcissus.findMethod(E.class, "x", int[].class);
-        Narcissus.invokeStaticLongMethod(method, 5);
+        Narcissus.invokeStaticLongMethod(Narcissus.findMethod(E.class, "x", int[].class), 5);
+    }
+
+    static class F {
+        String f;
+
+        public F(String f) {
+            this.f = f;
+        }
+
+        public String get() {
+            return f;
+        }
+
+        static String f(F... fs) {
+            String result = "";
+            for (F f : fs) {
+                result += f.get();
+            }
+            return result;
+        }
+    }
+
+    static class G extends F {
+        public G(String f) {
+            super(f);
+        }
+
+        static String g(G... gs) {
+            String result = "";
+            for (G g : gs) {
+                result += g.get();
+            }
+            return result;
+        }
+    }
+
+    @Test
+    public void testVarargsSuperclass() throws NoSuchMethodException {
+        assertThat(Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(F.class, "f", F[].class), new G("a"),
+                new G("b"))).isEqualTo("ab");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testVarargsSubclass() throws NoSuchMethodException {
+        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(G.class, "g", G[].class), new F("a"), new F("b"));
     }
 }
