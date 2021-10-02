@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Narcissus</name>
@@ -18,7 +21,7 @@
         <link.opt.2 />
 
         <assertj-core.version>2.9.1</assertj-core.version>
-        <junit.version>4.13.2</junit.version> 
+        <junit.version>4.13.2</junit.version>
 
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -280,6 +283,26 @@
                         <goals>
                             <goal>run</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <!-- Put module-info.class in META-INF/versions/9 to maximize backwards compatibility. -->
+                        <id>add-module-info-to-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <jar
+                                    update="true"
+                                    destfile="${project.build.directory}/${project.build.finalName}.jar">
+                                    <zipfileset
+                                        prefix="META-INF/versions/9"
+                                        dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus"
+                                        includes="module-info.class" />
+                                </jar>
+                            </tasks>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
