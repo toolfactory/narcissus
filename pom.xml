@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Narcissus</name>
@@ -16,7 +19,7 @@
         <project.build.locales>en_US</project.build.locales>
         <link.opt.1 />
         <link.opt.2 />
- 
+
         <assertj-core.version>2.9.1</assertj-core.version>
         <junit.version>4.13.2</junit.version>
 
@@ -25,7 +28,9 @@
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+        <!-- maven-javadoc-plugin v3.1+ has a bug which prevents it from working with multi-release jars: -->
+        <!-- https://issues.apache.org/jira/projects/MJAVADOC/issues/MJAVADOC-673 -->
+        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -290,8 +295,13 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
-                                    <zipfileset prefix="META-INF/versions/9" dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus" includes="module-info.class" />
+                                <jar
+                                    update="true"
+                                    destfile="${project.build.directory}/${project.build.finalName}.jar">
+                                    <zipfileset
+                                        prefix="META-INF/versions/9"
+                                        dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus"
+                                        includes="module-info.class" />
                                 </jar>
                             </tasks>
                         </configuration>
