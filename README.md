@@ -8,6 +8,8 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 ## Usage
 
+Maven dependency details are [here](https://mvnrepository.com/artifact/io.github.toolfactory/narcissus).
+
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
 For each of the methods listed below, in contrast to the equivalent in the Java reflection API, the Narcissus method bypasses all visibility/accessibility checks, ignores security manager restrictions, and circumvents module encapsulation.
