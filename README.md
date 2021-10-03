@@ -8,7 +8,7 @@ Narcissus works on JDK 7+, however it is most useful for suppressing reflective 
 
 ## Usage
 
-Maven dependency details are [here](https://mvnrepository.com/artifact/io.github.toolfactory/narcissus).
+Maven dependency details are [here](https://mvnrepository.com/artifact/io.github.toolfactory/narcissus) (only Linux x86/x64, Windows x86/x64, and Mac OS X x64 are currently supported).
 
 The API is defined as static methods of [Narcissus.java](https://github.com/lukehutch/narcissus/blob/main/jni/src/main/java/narcissus/Narcissus.java).
 
