@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Narcissus reflection library.
  * 
- * @author Luke Hutchison
+ * @author Luke Hutchison 
  */
 public class Narcissus {
     /**
