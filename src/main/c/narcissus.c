@@ -499,32 +499,6 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findCla
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Get declared methods without any visibility checks
-JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredMethods(JNIEnv *env, jclass ignored, jclass cls) {
-    if (argIsNull(env, cls)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredMethods0", "(Z)[Ljava/lang/reflect/Method;");
-    if (methodID == 0 || thrown(env)) { return NULL; }
-    return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
-}
-
-// Get declared constructors without any visibility checks
-JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredConstructors(JNIEnv *env, jclass ignored, jclass cls) {
-    if (argIsNull(env, cls)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;");
-    if (methodID == 0 || thrown(env)) { return NULL; }
-    return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
-}
-
-// Get declared fields without any visibility checks
-JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_getDeclaredFields(JNIEnv *env, jclass ignored, jclass cls) {
-    if (argIsNull(env, cls)) { return NULL; }
-    const jmethodID methodID = (*env)->GetMethodID(env, Class_class, "getDeclaredFields0", "(Z)[Ljava/lang/reflect/Field;");
-    if (methodID == 0 || thrown(env)) { return NULL; }
-    return (*env)->CallObjectMethod(env, cls, methodID, (jboolean) 0);
-}
-
-// -----------------------------------------------------------------------------------------------------------------
-
 // Methods required by jvm-driver
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {

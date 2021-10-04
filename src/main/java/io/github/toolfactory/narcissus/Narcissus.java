@@ -26,8 +26,6 @@
  */
 package io.github.toolfactory.narcissus;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,6 +49,12 @@ public class Narcissus {
      * {@link UnsatisfiedLinkError} when you try calling methods in this class.
      */
     public static final boolean libraryLoaded;
+
+    private static Method getDeclaredMethods;
+
+    private static Method getDeclaredConstructors;
+
+    private static Method getDeclaredFields;
 
     // Whether or not to print error to stderr if library could not be loaded.
     private static final boolean DEBUG = true;
@@ -79,7 +83,30 @@ public class Narcissus {
                 throw new IllegalArgumentException("No native library available for this operating system");
             }
 
+            // Try loading dynamic library
             LibraryLoader.loadLibraryFromJar(libraryResourcePrefix + libraryResourceSuffix);
+
+            // Try finding getDeclared* methods
+            final Class<?> Class_class = findClass("java.lang.Class");
+            try {
+                getDeclaredMethods = findMethod(Class_class, "getDeclaredMethods0", boolean.class);
+            } catch (Throwable t) {
+                // For IBM Semeru
+                getDeclaredMethods = findMethod(Class_class, "getDeclaredMethodsImpl", boolean.class);
+            }
+            try {
+                getDeclaredConstructors = findMethod(Class_class, "getDeclaredConstructors0", boolean.class);
+            } catch (Throwable t) {
+                // For IBM Semeru
+                getDeclaredConstructors = findMethod(Class_class, "getDeclaredConstructorsImpl", boolean.class);
+            }
+            try {
+                getDeclaredFields = findMethod(Class_class, "getDeclaredFields0", boolean.class);
+            } catch (Throwable t) {
+                // For IBM Semeru
+                getDeclaredFields = findMethod(Class_class, "getDeclaredFieldImpl", boolean.class);
+            }
+
             loaded = true;
 
         } catch (final Throwable t) {
@@ -282,7 +309,7 @@ public class Narcissus {
      */
     public static Field findField(final Class<?> cls, final String fieldName) throws NoSuchFieldException {
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (final Field field : Narcissus.getDeclaredFields(c)) {
+            for (final Field field : getDeclaredFields(c)) {
                 if (field.getName().equals(fieldName)) {
                     return field;
                 }
@@ -302,7 +329,7 @@ public class Narcissus {
     public static List<Field> enumerateFields(final Class<?> cls) {
         final List<Field> fields = new ArrayList<>();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (final Field field : Narcissus.getDeclaredFields(c)) {
+            for (final Field field : getDeclaredFields(c)) {
                 fields.add(field);
             }
         }
@@ -318,7 +345,9 @@ public class Narcissus {
      *            the class
      * @return the declared methods
      */
-    public static native Method[] getDeclaredMethods(Class<?> cls);
+    public static Method[] getDeclaredMethods(Class<?> cls) {
+        return (Method[]) Narcissus.invokeObjectMethod(cls, getDeclaredMethods, false);
+    }
 
     /**
      * Get declared constructors, ignoring visibility and bypassing security checks.
@@ -329,7 +358,10 @@ public class Narcissus {
      *            the class
      * @return the declared constructors
      */
-    public static native <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
+    @SuppressWarnings("unchecked")
+    public static <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
+        return (Constructor<T>[]) Narcissus.invokeObjectMethod(cls, getDeclaredConstructors, false);
+    }
 
     /**
      * Get declared fields, ignoring visibility and bypassing security checks.
@@ -338,7 +370,9 @@ public class Narcissus {
      *            the class
      * @return the declared fields
      */
-    public static native Field[] getDeclaredFields(Class<?> cls);
+    public static Field[] getDeclaredFields(Class<?> cls) {
+        return (Field[]) Narcissus.invokeObjectMethod(cls, getDeclaredFields, false);
+    }
 
     // -------------------------------------------------------------------------------------------------------------
 
