@@ -162,24 +162,6 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Enumerate all fields in the given class, ignoring visibility and bypassing security checks. Also iterates up
-     * through superclasses, to collect all fields of the class and its superclasses.
-     *
-     * @param cls
-     *            the class
-     * @return a list of {@link Field} objects representing all fields declared by the class or a superclass.
-     */
-    public static List<Field> enumerateFields(final Class<?> cls) {
-        final List<Field> fields = new ArrayList<>();
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (final Field field : Narcissus.getDeclaredFields(c)) {
-                fields.add(field);
-            }
-        }
-        return fields;
-    }
-
     /** Iterator applied to each method of a class and its superclasses/interfaces. */
     private static interface MethodIterator {
         /** @return true to stop iterating, or false to continue iterating */
@@ -227,50 +209,6 @@ public class Narcissus {
                 }
             }
         }
-    }
-
-    /**
-     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks. Also iterates up
-     * through superclasses, to collect all methods of the class and its superclasses.
-     *
-     * @param cls
-     *            the class
-     * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
-     */
-    public static List<Method> enumerateMethods(final Class<?> cls) {
-        final List<Method> methodOrder = new ArrayList<>();
-        forAllMethods(cls, new MethodIterator() {
-            @Override
-            public boolean foundMethod(final Method m) {
-                methodOrder.add(m);
-                return false;
-            }
-        });
-        return methodOrder;
-    }
-
-    // -------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Find a field by name in the given class, ignoring visibility and bypassing security checks.
-     *
-     * @param cls
-     *            the class
-     * @param fieldName
-     *            the field name.
-     * @return the {@link Field}
-     * @throws NoSuchFieldException
-     *             if the class does not contain a field of the given name
-     */
-    public static Field findField(final Class<?> cls, final String fieldName) throws NoSuchFieldException {
-        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
-            for (final Field field : Narcissus.getDeclaredFields(c)) {
-                if (field.getName().equals(fieldName)) {
-                    return field;
-                }
-            }
-        }
-        throw new NoSuchFieldException(fieldName);
     }
 
     /**
@@ -327,6 +265,68 @@ public class Narcissus {
             }
         }
         throw new NoSuchMethodException(cls.getName());
+    }
+
+    /**
+     * Enumerate all methods in the given class, ignoring visibility and bypassing security checks. Also iterates up
+     * through superclasses, to collect all methods of the class and its superclasses.
+     *
+     * @param cls
+     *            the class
+     * @return a list of {@link Method} objects representing all methods declared by the class or a superclass.
+     */
+    public static List<Method> enumerateMethods(final Class<?> cls) {
+        final List<Method> methodOrder = new ArrayList<>();
+        forAllMethods(cls, new MethodIterator() {
+            @Override
+            public boolean foundMethod(final Method m) {
+                methodOrder.add(m);
+                return false;
+            }
+        });
+        return methodOrder;
+    }
+
+    // -------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Find a field by name in the given class, ignoring visibility and bypassing security checks.
+     *
+     * @param cls
+     *            the class
+     * @param fieldName
+     *            the field name.
+     * @return the {@link Field}
+     * @throws NoSuchFieldException
+     *             if the class does not contain a field of the given name
+     */
+    public static Field findField(final Class<?> cls, final String fieldName) throws NoSuchFieldException {
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (final Field field : Narcissus.getDeclaredFields(c)) {
+                if (field.getName().equals(fieldName)) {
+                    return field;
+                }
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
+    }
+
+    /**
+     * Enumerate all fields in the given class, ignoring visibility and bypassing security checks. Also iterates up
+     * through superclasses, to collect all fields of the class and its superclasses.
+     *
+     * @param cls
+     *            the class
+     * @return a list of {@link Field} objects representing all fields declared by the class or a superclass.
+     */
+    public static List<Field> enumerateFields(final Class<?> cls) {
+        final List<Field> fields = new ArrayList<>();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            for (final Field field : Narcissus.getDeclaredFields(c)) {
+                fields.add(field);
+            }
+        }
+        return fields;
     }
 
     // -------------------------------------------------------------------------------------------------------------
