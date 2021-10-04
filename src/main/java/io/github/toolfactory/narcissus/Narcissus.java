@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Narcissus.
+ * Narcissus reflection library.
  * 
  * @author Luke Hutchison
  */
