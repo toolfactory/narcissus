@@ -82,7 +82,7 @@ public class Narcissus {
             default:
                 throw new IllegalArgumentException("No native library available for this operating system");
             }
-
+ 
             // Try loading dynamic library
             LibraryLoader.loadLibraryFromJar(libraryResourcePrefix + libraryResourceSuffix);
 
