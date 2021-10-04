@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Narcissus reflection library.
  * 
- * @author Luke Hutchison 
+ * @author Luke Hutchison
  */
 public class Narcissus {
     /**
@@ -89,22 +89,28 @@ public class Narcissus {
             // Try finding getDeclared* methods
             final Class<?> Class_class = findClass("java.lang.Class");
             try {
-                getDeclaredMethods = findMethod(Class_class, "getDeclaredMethods0", boolean.class);
+                getDeclaredMethods = findMethodInternal(Class_class, "getDeclaredMethods0",
+                        "(Z)[Ljava/lang/reflect/Method;", false);
             } catch (Throwable t) {
                 // For IBM Semeru
-                getDeclaredMethods = findMethod(Class_class, "getDeclaredMethodsImpl", boolean.class);
+                getDeclaredMethods = findMethodInternal(Class_class, "getDeclaredMethodsImpl",
+                        "(Z)[Ljava/lang/reflect/Method;", false);
             }
             try {
-                getDeclaredConstructors = findMethod(Class_class, "getDeclaredConstructors0", boolean.class);
+                getDeclaredConstructors = findMethodInternal(Class_class, "getDeclaredConstructors0",
+                        "(Z)[Ljava/lang/reflect/Constructor;", false);
             } catch (Throwable t) {
                 // For IBM Semeru
-                getDeclaredConstructors = findMethod(Class_class, "getDeclaredConstructorsImpl", boolean.class);
+                getDeclaredConstructors = findMethodInternal(Class_class, "getDeclaredConstructorsImpl",
+                        "(Z)[Ljava/lang/reflect/Constructor;", false);
             }
             try {
-                getDeclaredFields = findMethod(Class_class, "getDeclaredFields0", boolean.class);
+                getDeclaredFields = findMethodInternal(Class_class, "getDeclaredFields0",
+                        "(Z)[Ljava/lang/reflect/Field;", false);
             } catch (Throwable t) {
                 // For IBM Semeru
-                getDeclaredFields = findMethod(Class_class, "getDeclaredFieldImpl", boolean.class);
+                getDeclaredFields = findMethodInternal(Class_class, "getDeclaredFieldsImpl",
+                        "(Z)[Ljava/lang/reflect/Field;", false);
             }
 
             loaded = true;
@@ -122,6 +128,12 @@ public class Narcissus {
     // Find a class by name with no security checks. Name should be of the form "java/lang/String",
     // or "[Ljava/lang/Object;" for an array class.
     private static native Class<?> findClassInternal(String classNameInternal);
+
+    // Find a method by name and Java-internal signature, with no security checks.
+    private static native Method findMethodInternal(Class<?> cls, String methodName, String sig, boolean isStatic);
+
+    // Find a field by name and Java-internal signature, with no security checks.
+    private static native Field findFieldInternal(Class<?> cls, String fieldName, String sig, boolean isStatic);
 
     /**
      * Finds a class by name (e.g. {@code "com.xyz.MyClass"}) using the current classloader or the system
@@ -346,7 +358,7 @@ public class Narcissus {
      * @return the declared methods
      */
     public static Method[] getDeclaredMethods(Class<?> cls) {
-        return (Method[]) Narcissus.invokeObjectMethod(cls, getDeclaredMethods, false);
+        return (Method[]) invokeObjectMethod(cls, getDeclaredMethods, false);
     }
 
     /**
@@ -360,7 +372,7 @@ public class Narcissus {
      */
     @SuppressWarnings("unchecked")
     public static <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
-        return (Constructor<T>[]) Narcissus.invokeObjectMethod(cls, getDeclaredConstructors, false);
+        return (Constructor<T>[]) invokeObjectMethod(cls, getDeclaredConstructors, false);
     }
 
     /**
@@ -371,7 +383,7 @@ public class Narcissus {
      * @return the declared fields
      */
     public static Field[] getDeclaredFields(Class<?> cls) {
-        return (Field[]) Narcissus.invokeObjectMethod(cls, getDeclaredFields, false);
+        return (Field[]) invokeObjectMethod(cls, getDeclaredFields, false);
     }
 
     // -------------------------------------------------------------------------------------------------------------

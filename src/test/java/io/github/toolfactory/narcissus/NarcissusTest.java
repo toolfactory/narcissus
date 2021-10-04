@@ -8,9 +8,17 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class NarcissusTest {
+    @Before
+    public void testInitialized() throws Exception {
+        if (!Narcissus.libraryLoaded) {
+            throw new RuntimeException("Narcissus library not loaded");
+        }
+    }
+    
     static class X {
         int triple(final int x) {
             return x * 3;

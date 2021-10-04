@@ -250,6 +250,13 @@ void throwNullPointerException(JNIEnv* env, char* msg) {
     }
 }
 
+void throwNoSuchMethodException(JNIEnv* env, char* msg) {
+    jclass cls = (*env)->FindClass(env, "java/lang/reflect/NoSuchMethodException");
+    if (cls) {
+        (*env)->ThrowNew(env, cls, msg);
+    }
+}
+
 bool argIsNull(JNIEnv* env, jobject obj) {
     if (!obj) {
         throwNullPointerException(env, "Argument cannot be null");
@@ -487,14 +494,56 @@ int unbox(JNIEnv *env, jobject method, jobjectArray args, jsize num_args, jvalue
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Find a class by name with no security checks. Name should be of the form "java/lang/String", or "[Ljava/lang/Object;" for an array class.
-JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findClassInternal(JNIEnv *env, jclass ignored, jstring class_name_internal) {
-    if (argIsNull(env, class_name_internal)) { return NULL; }
-    const char* class_name_internal_chars = (*env)->GetStringUTFChars(env, class_name_internal, NULL);
-    if (!class_name_internal_chars || thrown(env)) { return NULL; }
-    jclass class_ref = (*env)->FindClass(env, class_name_internal_chars);
-    (*env)->ReleaseStringUTFChars(env, class_name_internal, class_name_internal_chars);
+// Find a class by name. Name should be of the form "java/lang/String", or "[Ljava/lang/Object;" for an array class.
+JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findClassInternal(JNIEnv *env, jclass ignored, jstring class_name) {
+    if (argIsNull(env, class_name)) { return NULL; }
+    const char* class_name_chars = (*env)->GetStringUTFChars(env, class_name, NULL);
+    if (!class_name_chars || thrown(env)) { return NULL; }
+    jclass class_ref = (*env)->FindClass(env, class_name_chars);
+    (*env)->ReleaseStringUTFChars(env, class_name, class_name_chars);
     return class_ref;
+}
+
+// Find a method by name and signature. Signature should be of the form "(Z)[Ljava/lang/Class;"
+JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findMethodInternal(JNIEnv *env, jclass ignored, jclass cls, jstring method_name, jstring sig, jboolean is_static) {
+    if (argIsNull(env, cls) || argIsNull(env, method_name) || argIsNull(env, sig)) { return NULL; }
+    const char* method_name_chars = (*env)->GetStringUTFChars(env, method_name, NULL);
+    if (!method_name_chars || thrown(env)) { return NULL; }
+    const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
+    if (!sig_chars || thrown(env)) { return NULL; }
+    jmethodID methodID = (*env)->GetMethodID(env, cls, method_name_chars, sig_chars);
+    (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
+    (*env)->ReleaseStringUTFChars(env, method_name, method_name_chars);
+    if (!methodID) {
+        throwNoSuchMethodException(env, "Could not find method");
+        return NULL;
+    }
+    jobject method = (*env)->ToReflectedMethod(env, cls, methodID, is_static ? JNI_TRUE : JNI_FALSE);
+    if (thrown(env)) {
+        return NULL;
+    }
+    return method;
+}
+
+// Find a method by name and signature. Signature should be of the form "Ljava/lang/String;"
+JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFieldInternal(JNIEnv *env, jclass ignored, jclass cls, jstring field_name, jstring sig, jboolean is_static) {
+    if (argIsNull(env, cls) || argIsNull(env, field_name) || argIsNull(env, sig)) { return NULL; }
+    const char* field_name_chars = (*env)->GetStringUTFChars(env, field_name, NULL);
+    if (!field_name_chars || thrown(env)) { return NULL; }
+    const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
+    if (!sig_chars || thrown(env)) { return NULL; }
+    jfieldID fieldID = (*env)->GetFieldID(env, cls, field_name_chars, sig_chars);
+    (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
+    (*env)->ReleaseStringUTFChars(env, field_name, field_name_chars);
+    if (!fieldID) {
+        throwNoSuchFieldException(env, "Could not find field");
+        return NULL;
+    }
+    jobject field = (*env)->ToReflectedField(env, cls, fieldID, is_static ? JNI_TRUE : JNI_FALSE);
+    if (thrown(env)) {
+        return NULL;
+    }
+    return field;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
