@@ -86,8 +86,6 @@ jmethodID Field_getDeclaringClass_methodID;
 jmethodID Field_getModifiers_methodID;
 jmethodID Field_getType_methodID;
 
-jfieldID AccessibleObject_override_fieldID;
-
 
 // Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -184,9 +182,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     Field_getModifiers_methodID = (*env)->GetMethodID(env, Field_class, "getModifiers", "()I");
     if (thrown(env)) { return -1; }
     Field_getType_methodID = (*env)->GetMethodID(env, Field_class, "getType", "()Ljava/lang/Class;");
-    if (thrown(env)) { return -1; }
-
-    AccessibleObject_override_fieldID =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
     if (thrown(env)) { return -1; }
     
     return JNI_VERSION_1_1;
