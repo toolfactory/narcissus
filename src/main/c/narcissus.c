@@ -250,13 +250,6 @@ void throwNullPointerException(JNIEnv* env, char* msg) {
     }
 }
 
-void throwNoSuchMethodException(JNIEnv* env, char* msg) {
-    jclass cls = (*env)->FindClass(env, "java/lang/reflect/NoSuchMethodException");
-    if (cls) {
-        (*env)->ThrowNew(env, cls, msg);
-    }
-}
-
 bool argIsNull(JNIEnv* env, jobject obj) {
     if (!obj) {
         throwNullPointerException(env, "Argument cannot be null");
@@ -515,14 +508,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findMet
     (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
     (*env)->ReleaseStringUTFChars(env, method_name, method_name_chars);
     if (!methodID) {
-        throwNoSuchMethodException(env, "Could not find method");
         return NULL;
     }
-    jobject method = (*env)->ToReflectedMethod(env, cls, methodID, is_static ? JNI_TRUE : JNI_FALSE);
-    if (thrown(env)) {
-        return NULL;
-    }
-    return method;
+    return (*env)->ToReflectedMethod(env, cls, methodID, is_static ? JNI_TRUE : JNI_FALSE);
 }
 
 // Find a method by name and signature. Signature should be of the form "Ljava/lang/String;"
@@ -536,14 +524,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
     (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
     (*env)->ReleaseStringUTFChars(env, field_name, field_name_chars);
     if (!fieldID) {
-        throwNoSuchFieldException(env, "Could not find field");
         return NULL;
     }
-    jobject field = (*env)->ToReflectedField(env, cls, fieldID, is_static ? JNI_TRUE : JNI_FALSE);
-    if (thrown(env)) {
-        return NULL;
-    }
-    return field;
+    return (*env)->ToReflectedField(env, cls, fieldID, is_static ? JNI_TRUE : JNI_FALSE);
 }
 
 // -----------------------------------------------------------------------------------------------------------------
