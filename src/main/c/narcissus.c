@@ -86,8 +86,7 @@ jmethodID Field_getDeclaringClass_methodID;
 jmethodID Field_getModifiers_methodID;
 jmethodID Field_getType_methodID;
 
-jfieldID AccessibleObject_overrideFieldId;
-jfieldID Lookup_allowedModesFieldId;
+jfieldID AccessibleObject_override_fieldID;
 
 
 // Pre-look-up classes and methods for primitive types and Class, and allocate new global refs for them so they can be used across JNI calls
@@ -187,9 +186,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     Field_getType_methodID = (*env)->GetMethodID(env, Field_class, "getType", "()Ljava/lang/Class;");
     if (thrown(env)) { return -1; }
 
-    Lookup_allowedModesFieldId = (*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/invoke/MethodHandles$Lookup"), "allowedModes", "I");
-    if (thrown(env)) { return -1; }
-    AccessibleObject_overrideFieldId =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
+    AccessibleObject_override_fieldID =(*env)->GetFieldID(env, (*env)->FindClass(env, "java/lang/reflect/AccessibleObject"), "override", "Z");
     if (thrown(env)) { return -1; }
     
     return JNI_VERSION_1_1;
@@ -528,15 +525,7 @@ JNIEXPORT jobjectArray JNICALL Java_io_github_toolfactory_narcissus_Narcissus_ge
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// Some methods required by jvm-driver
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setAllowedModes(JNIEnv* env, jclass ignored, jobject consulter, jint modes) {
-	(*env)->SetIntField(env, consulter, Lookup_allowedModesFieldId, modes);
-}
-
-JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setAccessible(JNIEnv* env, jclass ignored, jobject accessibleObject, jboolean flag) {
-	(*env)->SetBooleanField(env, accessibleObject, AccessibleObject_overrideFieldId, flag);
-}
+// Methods required by jvm-driver
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {
 	return (*env)->AllocObject(env, instanceType);

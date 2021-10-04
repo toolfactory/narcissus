@@ -121,27 +121,7 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
-    // A few methods required by the JVM driver
-
-    /**
-     * Set the private field consulter.allowedModes to the value of modes. (For internal use.)
-     *
-     * @param consulter
-     *            the consulter
-     * @param modes
-     *            the allowed modes to set.
-     */
-    public static native void setAllowedModes(MethodHandles.Lookup consulter, int modes);
-
-    /**
-     * Set the private field target.override to the value of flag. (For internal use.)
-     *
-     * @param target
-     *            the target
-     * @param flag
-     *            the flag
-     */
-    public static native void setAccessible(AccessibleObject target, boolean flag);
+    // Methods required by the JVM driver
 
     /**
      * Allocate an object instance, without calling any constructor. (For internal use.)
