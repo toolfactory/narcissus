@@ -50,11 +50,15 @@ public class Narcissus {
      */
     public static final boolean libraryLoaded;
 
-    private static Method getDeclaredMethods;
+    private static interface Getter<T> {
+        T get(Class<?> cls);
+    }
 
-    private static Method getDeclaredConstructors;
+    private static Getter<Method[]> getDeclaredMethods;
 
-    private static Method getDeclaredFields;
+    private static Getter<Constructor<?>[]> getDeclaredConstructors;
+
+    private static Getter<Field[]> getDeclaredFields;
 
     // Whether or not to print error to stderr if library could not be loaded.
     private static final boolean DEBUG = true;
@@ -82,35 +86,75 @@ public class Narcissus {
             default:
                 throw new IllegalArgumentException("No native library available for this operating system");
             }
- 
+
             // Try loading dynamic library
             LibraryLoader.loadLibraryFromJar(libraryResourcePrefix + libraryResourceSuffix);
 
-            // Try finding getDeclared* methods
+            // Try finding necessary fields and methods
             final Class<?> Class_class = findClass("java.lang.Class");
             try {
-                getDeclaredMethods = findMethodInternal(Class_class, "getDeclaredMethods0",
-                        "(Z)[Ljava/lang/reflect/Method;", false);
-            } catch (Throwable t) {
+                // For Oracle JDK
+                final Method getDeclaredMethods_method = findMethodInternal(Class_class, "getDeclaredMethods0",
+                        "(Z)[Ljava/lang/reflect/Method;", /* isStatic = */ false);
+                getDeclaredMethods = new Getter<Method[]>() {
+                    @Override
+                    public Method[] get(final Class<?> cls) {
+                        return (Method[]) invokeObjectMethod(cls, getDeclaredMethods_method, false);
+                    }
+                };
+            } catch (final Throwable t) {
                 // For IBM Semeru
-                getDeclaredMethods = findMethodInternal(Class_class, "getDeclaredMethodsImpl",
-                        "(Z)[Ljava/lang/reflect/Method;", false);
+                final Method getDeclaredMethods_method = findMethodInternal(Class_class, "getDeclaredMethodsImpl",
+                        "()[Ljava/lang/reflect/Method;", /* isStatic = */ false);
+                getDeclaredMethods = new Getter<Method[]>() {
+                    @Override
+                    public Method[] get(final Class<?> cls) {
+                        return (Method[]) invokeObjectMethod(cls, getDeclaredMethods_method);
+                    }
+                };
             }
             try {
-                getDeclaredConstructors = findMethodInternal(Class_class, "getDeclaredConstructors0",
-                        "(Z)[Ljava/lang/reflect/Constructor;", false);
-            } catch (Throwable t) {
+                // For Oracle JDK
+                final Method getDeclaredConstructors_method = findMethodInternal(Class_class,
+                        "getDeclaredConstructors0", "(Z)[Ljava/lang/reflect/Constructor;", /* isStatic = */ false);
+                getDeclaredConstructors = new Getter<Constructor<?>[]>() {
+                    @Override
+                    public Constructor<?>[] get(final Class<?> cls) {
+                        return (Constructor<?>[]) invokeObjectMethod(cls, getDeclaredConstructors_method, false);
+                    }
+                };
+            } catch (final Throwable t) {
                 // For IBM Semeru
-                getDeclaredConstructors = findMethodInternal(Class_class, "getDeclaredConstructorsImpl",
-                        "(Z)[Ljava/lang/reflect/Constructor;", false);
+                final Method getDeclaredConstructors_method = findMethodInternal(Class_class,
+                        "getDeclaredConstructorsImpl", "()[Ljava/lang/reflect/Constructor;",
+                        /* isStatic = */ false);
+                getDeclaredConstructors = new Getter<Constructor<?>[]>() {
+                    @Override
+                    public Constructor<?>[] get(final Class<?> cls) {
+                        return (Constructor<?>[]) invokeObjectMethod(cls, getDeclaredConstructors_method);
+                    }
+                };
             }
             try {
-                getDeclaredFields = findMethodInternal(Class_class, "getDeclaredFields0",
-                        "(Z)[Ljava/lang/reflect/Field;", false);
-            } catch (Throwable t) {
+                // For Oracle JDK
+                final Method getDeclaredFields_method = findMethodInternal(Class_class, "getDeclaredFields0",
+                        "(Z)[Ljava/lang/reflect/Field;", /* isStatic = */ false);
+                getDeclaredFields = new Getter<Field[]>() {
+                    @Override
+                    public Field[] get(final Class<?> cls) {
+                        return (Field[]) invokeObjectMethod(cls, getDeclaredFields_method, false);
+                    }
+                };
+            } catch (final Throwable t) {
                 // For IBM Semeru
-                getDeclaredFields = findMethodInternal(Class_class, "getDeclaredFieldsImpl",
-                        "(Z)[Ljava/lang/reflect/Field;", false);
+                final Method getDeclaredFields_method = findMethodInternal(Class_class, "getDeclaredFieldsImpl",
+                        "()[Ljava/lang/reflect/Field;", /* isStatic = */ false);
+                getDeclaredFields = new Getter<Field[]>() {
+                    @Override
+                    public Field[] get(final Class<?> cls) {
+                        return (Field[]) invokeObjectMethod(cls, getDeclaredFields_method);
+                    }
+                };
             }
 
             loaded = true;
@@ -160,7 +204,7 @@ public class Narcissus {
 
     // -------------------------------------------------------------------------------------------------------------
 
-    // Methods required by the JVM driver
+    // Methods required by toolfactory/jvm-driver
 
     /**
      * Allocate an object instance, without calling any constructor. (For internal use.)
@@ -357,8 +401,8 @@ public class Narcissus {
      *            the class
      * @return the declared methods
      */
-    public static Method[] getDeclaredMethods(Class<?> cls) {
-        return (Method[]) invokeObjectMethod(cls, getDeclaredMethods, false);
+    public static Method[] getDeclaredMethods(final Class<?> cls) {
+        return getDeclaredMethods.get(cls);
     }
 
     /**
@@ -371,8 +415,8 @@ public class Narcissus {
      * @return the declared constructors
      */
     @SuppressWarnings("unchecked")
-    public static <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
-        return (Constructor<T>[]) invokeObjectMethod(cls, getDeclaredConstructors, false);
+    public static <T> Constructor<T>[] getDeclaredConstructors(final Class<T> cls) {
+        return (Constructor<T>[]) getDeclaredConstructors.get(cls);
     }
 
     /**
@@ -382,8 +426,8 @@ public class Narcissus {
      *            the class
      * @return the declared fields
      */
-    public static Field[] getDeclaredFields(Class<?> cls) {
-        return (Field[]) invokeObjectMethod(cls, getDeclaredFields, false);
+    public static Field[] getDeclaredFields(final Class<?> cls) {
+        return getDeclaredFields.get(cls);
     }
 
     // -------------------------------------------------------------------------------------------------------------
