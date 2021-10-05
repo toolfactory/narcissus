@@ -5,7 +5,7 @@
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
     <version>1.0.6-SNAPSHOT</version>
-
+ 
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
     <url>https://github.com/toolfactory/narcissus</url>
