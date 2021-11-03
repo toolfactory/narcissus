@@ -8,7 +8,7 @@
  
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
-    <url>https://github.com/toolfactory/narcissus</url>
+    <url>https://github.com/toolfactory/narcissus</url> 
 
     <properties>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
