@@ -29,7 +29,6 @@ package io.github.toolfactory.narcissus;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
@@ -114,10 +113,9 @@ class LibraryLoader {
     static void loadLibraryFromJar(final String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
-        InputStream inputSream = null;
-        try {
-            inputSream = Narcissus.class.getResourceAsStream(
-                    libraryResourcePath.startsWith("/") ? libraryResourcePath : "/" + libraryResourcePath);
+        Exception exception = null;
+        try (InputStream inputSream = Narcissus.class.getResourceAsStream(
+                libraryResourcePath.startsWith("/") ? libraryResourcePath : "/" + libraryResourcePath)) {
             if (inputSream == null) {
                 throw new FileNotFoundException("Could not find library within jar: " + libraryResourcePath);
             }
@@ -128,6 +126,7 @@ class LibraryLoader {
             final String baseName = dotIdx < 0 ? filename : filename.substring(0, dotIdx);
             final String suffix = dotIdx < 0 ? ".so" : filename.substring(dotIdx);
             tempFile = File.createTempFile(baseName + "_", suffix);
+            tempFile.deleteOnExit();
 
             try {
                 if (tempFile.toPath().getFileSystem().supportedFileAttributeViews().contains("posix")) {
@@ -138,37 +137,23 @@ class LibraryLoader {
             }
 
             final byte[] buffer = new byte[8192];
-            final OutputStream os = new FileOutputStream(tempFile);
-            try {
+            try (final OutputStream os = new FileOutputStream(tempFile)) {
                 for (int readBytes; (readBytes = inputSream.read(buffer)) != -1;) {
                     os.write(buffer, 0, readBytes);
                 }
-            } finally {
-                os.close();
             }
 
             // Load the library
             System.load(tempFile.getAbsolutePath());
 
         } catch (final Exception e) {
-            throw new RuntimeException("Could not load library " + libraryResourcePath + " : " + e);
-        } finally {
-            if (inputSream != null) {
-                try {
-                    inputSream.close();
-                } catch (final IOException e) {
-                    // Ignore
-                }
-            }
-            if (tempFile != null) {
-                boolean deleted = false;
-                if (tempFileIsPosix) {
-                    deleted = tempFile.delete();
-                }
-                if (!deleted) {
-                    tempFile.deleteOnExit();
-                }
-            }
+            exception = e;
+        }
+        if (tempFile != null && tempFileIsPosix) {
+            tempFile.delete();
+        }
+        if (exception != null) {
+            throw new RuntimeException("Could not load library " + libraryResourcePath + " : " + exception);
         }
     }
 }
