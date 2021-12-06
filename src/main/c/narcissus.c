@@ -529,10 +529,18 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
 // Methods required by jvm-driver
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {
+    if (instanceType == NULL) {
+        throwNullPointerException(env, "instanceType is null");
+        return NULL;
+    }
 	return (*env)->AllocObject(env, instanceType);
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThrow(JNIEnv* env, jclass ignored, jthrowable throwable) {
+    if (throwable == NULL) {
+        throwNullPointerException(env, "throwable is null");
+        return NULL;
+    }
 	(*env)->Throw(env, throwable);
 }
 
