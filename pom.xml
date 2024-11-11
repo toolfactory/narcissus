@@ -20,6 +20,8 @@
         <assertj-core.version>2.9.1</assertj-core.version>
         <junit.version>4.13.2</junit.version>
 
+        <linkerFinalName>libnarcissus-${os.type}-${sun.arch.data.model}</linkerFinalName>
+
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
@@ -126,6 +128,18 @@
                 <os.type>macos</os.type>
                 <os.dir>darwin</os.dir>
                 <lib.extn>dylib</lib.extn>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac-arm</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <linkerFinalName>libnarcissus-${os.type}-arm${sun.arch.data.model}</linkerFinalName>
             </properties>
         </profile>
         <profile>
@@ -259,10 +273,10 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <!-- The lib/ dir holds the native library, and is checked back into GitHub -->
                                 <mkdir dir="lib" />
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -272,12 +286,12 @@
                         <id>copy-lib-dir</id>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <!-- Copy lib/ dir to build directory so that lib/* is added to jar -->
                                 <copy todir="${project.build.directory}/classes/lib">
                                     <fileset dir="lib" />
                                 </copy>
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -291,11 +305,11 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
                                     <zipfileset prefix="META-INF/versions/9" dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus" includes="module-info.class" />
                                 </jar>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -340,7 +354,7 @@
                         <linkerEndOption>${link.opt.2}</linkerEndOption>
                     </linkerEndOptions>
                     <linkerOutputDirectory>${project.basedir}/lib</linkerOutputDirectory>
-                    <linkerFinalName>libnarcissus-${os.type}-${sun.arch.data.model}</linkerFinalName>
+                    <linkerFinalName>${linkerFinalName}</linkerFinalName>
                     <linkerFinalNameExt>${lib.extn}</linkerFinalNameExt>
                 </configuration>
                 <executions>
@@ -360,8 +374,8 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>7</source>
-                    <target>7</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
             <plugin>

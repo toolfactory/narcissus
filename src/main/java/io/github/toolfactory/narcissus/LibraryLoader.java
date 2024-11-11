@@ -43,6 +43,9 @@ class LibraryLoader {
     /** The machine word size. */
     public static int archBits;
 
+    /** The architecture name (empty except on Mac) */
+    public static String archName = "";
+
     /** The operating system type. */
     enum OperatingSystem {
         /** Windows. */
@@ -90,6 +93,10 @@ class LibraryLoader {
             OS = OperatingSystem.Unix;
         } else {
             OS = OperatingSystem.Unknown;
+        }
+
+        if (OS == OperatingSystem.MacOSX && "aarch64".equals(System.getProperty("os.arch"))) {
+            archName = "arm";
         }
 
         archBits = 64;
