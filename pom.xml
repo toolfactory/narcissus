@@ -37,6 +37,8 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <native-maven-plugin.version>1.0-alpha-11</native-maven-plugin.version>
+
+        <project_jdk_version>7</project_jdk_version>
     </properties>
 
     <licenses>
@@ -374,8 +376,8 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${project_jdk_version}</source>
+                    <target>${project_jdk_version}</target>
                 </configuration>
             </plugin>
             <plugin>
