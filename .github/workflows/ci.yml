@@ -72,6 +72,8 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        # We build for JDK 7, but only test for JDK 8+, because Maven
+        # no longer supports JDK 7
         java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         exclude:
           - os: macOS-latest
