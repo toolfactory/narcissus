@@ -38,7 +38,7 @@
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
         <native-maven-plugin.version>1.0-M1</native-maven-plugin.version>
 
-        <project_jdk_version>7</project_jdk_version>
+        <project_jdk_version>8</project_jdk_version>
     </properties>
 
     <licenses>
