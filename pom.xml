@@ -4,7 +4,7 @@
     <name>Narcissus</name>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10</version>
  
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
@@ -98,7 +98,7 @@
         <connection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</connection>
         <developerConnection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</developerConnection>
         <url>https://toolfactory.github.io/narcissus</url>
-        <tag>narcissus-0.0.12</tag>
+        <tag>narcissus-1.0.10</tag>
     </scm>
 
     <packaging>jar</packaging>
