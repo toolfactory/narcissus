@@ -553,7 +553,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThro
 JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_get ## _Prim_type ## Field(JNIEnv *env, jclass ignored, jobject obj, jobject field) { \
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (j ## _prim_type) 0; } \
     jfieldID fieldID = (*env)->FromReflectedField(env, field); \
-    if (thrown(env)) { return (jint) 0; } \
+    if (thrown(env)) { return (j ## _prim_type) 0; } \
     return (*env)->Get ## _Prim_type ## Field(env, obj, fieldID); \
 }
 
