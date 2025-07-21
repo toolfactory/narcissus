@@ -499,7 +499,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findMet
     if (!method_name_chars || thrown(env)) { return NULL; }
     const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
     if (!sig_chars || thrown(env)) { return NULL; }
-    jmethodID methodID = (*env)->GetMethodID(env, cls, method_name_chars, sig_chars);
+    jmethodID methodID = is_static
+            ? (*env)->GetStaticMethodID(env, cls, method_name_chars, sig_chars)
+            : (*env)->GetMethodID(env, cls, method_name_chars, sig_chars);
     (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
     (*env)->ReleaseStringUTFChars(env, method_name, method_name_chars);
     if (!methodID) {
@@ -515,7 +517,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
     if (!field_name_chars || thrown(env)) { return NULL; }
     const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
     if (!sig_chars || thrown(env)) { return NULL; }
-    jfieldID fieldID = (*env)->GetFieldID(env, cls, field_name_chars, sig_chars);
+    jfieldID fieldID = is_static
+            ? (*env)->GetStaticFieldID(env, cls, field_name_chars, sig_chars)
+            : (*env)->GetFieldID(env, cls, field_name_chars, sig_chars);
     (*env)->ReleaseStringUTFChars(env, sig, sig_chars);
     (*env)->ReleaseStringUTFChars(env, field_name, field_name_chars);
     if (!fieldID) {
