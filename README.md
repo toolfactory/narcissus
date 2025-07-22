@@ -16,7 +16,7 @@ For each of the methods listed below, in contrast to the equivalent in the Java 
 
 **Note:** You should check the static Boolean value `Narcissus.libraryLoaded` to make sure the library has actually loaded before you try calling any methods. Otherwise you may get an `UnsatisfiedLinkError` when calling other static methods of `Narcissus` if the library wasn't able to be loaded.
 
-* Finding classes
+* Finding classes 
   * **`Class<?> Narcissus.findClass(String className)`**
 
     Equivalent to `Class.forName(String className)`. Finds array classes if the class name is of the form `"com.xyz.MyClass[][]"`.
