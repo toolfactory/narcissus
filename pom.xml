@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Narcissus</name>
@@ -85,13 +87,6 @@
         <system>github.com</system>
         <url>https://github.com/toolfactory/narcissus/issues</url>
     </issueManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <scm>
         <connection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</connection>
@@ -352,8 +347,11 @@
                         </goals>
                         <configuration>
                             <target>
-                                <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
-                                    <zipfileset prefix="META-INF/versions/9" dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus" includes="module-info.class" />
+                                <jar update="true"
+                                    destfile="${project.build.directory}/${project.build.finalName}.jar">
+                                    <zipfileset prefix="META-INF/versions/9"
+                                        dir="${project.basedir}/src/module-info/io.github.toolfactory.narcissus"
+                                        includes="module-info.class" />
                                 </jar>
                             </target>
                         </configuration>
