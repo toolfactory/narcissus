@@ -396,18 +396,21 @@
                     <!-- Enable detailed reporting -->
                     <reportFormat>plain</reportFormat>
                     <useFile>false</useFile>
+                    <parallel>none</parallel>
+                    <threadCount>1</threadCount>                    
+                    <argLine>-Dsurefire.printTestMethodDetail=true</argLine>
                     <systemPropertyVariables>
                         <junit.jupiter.execution.parallel.enabled>false</junit.jupiter.execution.parallel.enabled>
                         <junit.platform.output.capture.stdout>true</junit.platform.output.capture.stdout>
                         <junit.platform.output.capture.stderr>true</junit.platform.output.capture.stderr>
                     </systemPropertyVariables>
-                            <properties>
-                    <configurationParameters>
-                        <junit.jupiter.testinstance.lifecycle.default>per_method</junit.jupiter.testinstance.lifecycle.default>
-                        <junit.platform.reporting.open.xml.enabled>true</junit.platform.reporting.open.xml.enabled>
-                        <junit.platform.reporting.output.dir>target/surefire-reports</junit.platform.reporting.output.dir>
-                    </configurationParameters>
-                </properties>
+                    <properties>
+                        <configurationParameters>
+                            <junit.jupiter.testinstance.lifecycle.default>per_method</junit.jupiter.testinstance.lifecycle.default>
+                            <junit.platform.reporting.open.xml.enabled>true</junit.platform.reporting.open.xml.enabled>
+                            <junit.platform.reporting.output.dir>target/surefire-reports</junit.platform.reporting.output.dir>
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
             <plugin>
