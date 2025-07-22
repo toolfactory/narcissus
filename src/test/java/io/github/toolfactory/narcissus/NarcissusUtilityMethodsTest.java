@@ -41,7 +41,7 @@ public class NarcissusUtilityMethodsTest {
             assertThat(false).isTrue(); // Should not reach here
         } catch (Throwable e) {
             assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("TestInterface");
+            assertThat(e.getMessage()).contains("Cannot instantiate abstract class or interface");
         }
     }
 
@@ -52,7 +52,7 @@ public class NarcissusUtilityMethodsTest {
             assertThat(false).isTrue(); // Should not reach here
         } catch (Throwable e) {
             assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("TestAbstractClass");
+            assertThat(e.getMessage()).contains("Cannot instantiate abstract class or interface");
         }
     }
 
@@ -63,7 +63,7 @@ public class NarcissusUtilityMethodsTest {
             assertThat(false).isTrue(); // Should not reach here
         } catch (Throwable e) {
             assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("[Ljava.lang.Object;");
+            assertThat(e.getMessage()).contains("Cannot instantiate array type");
         }
     }
 

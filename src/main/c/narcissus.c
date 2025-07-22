@@ -245,6 +245,28 @@ void throwNullPointerException(JNIEnv* env, char* msg) {
     }
 }
 
+void throwInstantiationException(JNIEnv* env, char* msg) {
+    jclass cls = (*env)->FindClass(env, "java/lang/InstantiationException");
+    if (cls) {
+        (*env)->ThrowNew(env, cls, msg);
+    }
+}
+
+void throwNoSuchMethodException(JNIEnv* env, char* msg) {
+    jclass cls = (*env)->FindClass(env, "java/lang/NoSuchMethodException");
+    if (cls) {
+        (*env)->ThrowNew(env, cls, msg);
+    }
+}
+
+void throwNoSuchFieldException(JNIEnv* env, char* msg) {
+    jclass cls = (*env)->FindClass(env, "java/lang/NoSuchFieldException");
+    if (cls) {
+        (*env)->ThrowNew(env, cls, msg);
+    }
+}
+
+
 bool argIsNull(JNIEnv* env, jobject obj) {
     if (!obj) {
         throwNullPointerException(env, "Argument cannot be null");
@@ -489,6 +511,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findCla
     if (!class_name_chars || thrown(env)) { return NULL; }
     jclass class_ref = (*env)->FindClass(env, class_name_chars);
     (*env)->ReleaseStringUTFChars(env, class_name, class_name_chars);
+    if (thrown(env)) { return NULL; }
     return class_ref;
 }
 
@@ -498,7 +521,10 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findMet
     const char* method_name_chars = (*env)->GetStringUTFChars(env, method_name, NULL);
     if (!method_name_chars || thrown(env)) { return NULL; }
     const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
-    if (!sig_chars || thrown(env)) { return NULL; }
+    if (!sig_chars || thrown(env)) { 
+        (*env)->ReleaseStringUTFChars(env, method_name, method_name_chars);
+        return NULL; 
+    }
     jmethodID methodID = is_static
             ? (*env)->GetStaticMethodID(env, cls, method_name_chars, sig_chars)
             : (*env)->GetMethodID(env, cls, method_name_chars, sig_chars);
@@ -507,7 +533,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findMet
     if (!methodID) {
         return NULL;
     }
-    return (*env)->ToReflectedMethod(env, cls, methodID, is_static ? JNI_TRUE : JNI_FALSE);
+    jobject result = (*env)->ToReflectedMethod(env, cls, methodID, is_static ? JNI_TRUE : JNI_FALSE);
+    if (thrown(env)) { return NULL; }
+    return result;
 }
 
 // Find a method by name and signature. Signature should be of the form "Ljava/lang/String;"
@@ -516,7 +544,10 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
     const char* field_name_chars = (*env)->GetStringUTFChars(env, field_name, NULL);
     if (!field_name_chars || thrown(env)) { return NULL; }
     const char* sig_chars = (*env)->GetStringUTFChars(env, sig, NULL);
-    if (!sig_chars || thrown(env)) { return NULL; }
+    if (!sig_chars || thrown(env)) { 
+        (*env)->ReleaseStringUTFChars(env, field_name, field_name_chars);
+        return NULL; 
+    }
     jfieldID fieldID = is_static
             ? (*env)->GetStaticFieldID(env, cls, field_name_chars, sig_chars)
             : (*env)->GetFieldID(env, cls, field_name_chars, sig_chars);
@@ -525,7 +556,9 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
     if (!fieldID) {
         return NULL;
     }
-    return (*env)->ToReflectedField(env, cls, fieldID, is_static ? JNI_TRUE : JNI_FALSE);
+    jobject result = (*env)->ToReflectedField(env, cls, fieldID, is_static ? JNI_TRUE : JNI_FALSE);
+    if (thrown(env)) { return NULL; }
+    return result;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -533,12 +566,37 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
 // Methods required by jvm-driver
 
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {
-    if (instanceType == NULL) {
-        throwNullPointerException(env, "instanceType is null");
+    if (argIsNull(env, instanceType)) { return NULL; }
+    
+    // Check if it's a primitive type first
+    jboolean isPrimitive = (*env)->CallBooleanMethod(env, instanceType, (*env)->GetMethodID(env, Class_class, "isPrimitive", "()Z"));
+    if (thrown(env)) { return NULL; }
+    if (isPrimitive) {
+        throwInstantiationException(env, "Cannot instantiate primitive type");
         return NULL;
-    } else {
-	    return (*env)->AllocObject(env, instanceType);
     }
+    
+    // Check if it's an array type next (arrays can have interface modifiers)
+    jboolean isArray = (*env)->CallBooleanMethod(env, instanceType, Class_isArray_methodID);
+    if (thrown(env)) { return NULL; }
+    if (isArray) {
+        throwInstantiationException(env, "Cannot instantiate array type (use Array.newInstance instead)");
+        return NULL;
+    }
+    
+    // Finally check modifiers for abstract/interface classes
+    jint modifiers = (*env)->CallIntMethod(env, instanceType, (*env)->GetMethodID(env, Class_class, "getModifiers", "()I"));
+    if (thrown(env)) { return NULL; }
+    
+    // Check for abstract (0x400) or interface (0x200)
+    if ((modifiers & 0x400) || (modifiers & 0x200)) {
+        throwInstantiationException(env, "Cannot instantiate abstract class or interface");
+        return NULL;
+    }
+    
+    jobject result = (*env)->AllocObject(env, instanceType);
+    if (thrown(env)) { return NULL; }
+    return result;
 }
 
 JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_sneakyThrow(JNIEnv* env, jclass ignored, jthrowable throwable) {
@@ -558,7 +616,9 @@ JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus
     if (argIsNull(env, obj) || argIsNull(env, field) || !checkFieldStaticModifier(env, field, false) || !checkFieldReceiver(env, obj, field)) { return (j ## _prim_type) 0; } \
     jfieldID fieldID = (*env)->FromReflectedField(env, field); \
     if (thrown(env)) { return (j ## _prim_type) 0; } \
-    return (*env)->Get ## _Prim_type ## Field(env, obj, fieldID); \
+    j ## _prim_type result = (*env)->Get ## _Prim_type ## Field(env, obj, fieldID); \
+    if (thrown(env)) { return (j ## _prim_type) 0; } \
+    return result; \
 }
 
 FIELD_GETTER(int, Int)
@@ -579,6 +639,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_set ## _Pr
     jfieldID fieldID = (*env)->FromReflectedField(env, field); \
     if (thrown(env)) { return; } \
     (*env)->Set ## _Prim_type ## Field(env, obj, fieldID, val); \
+    if (thrown(env)) { return; } \
 }
 
 FIELD_SETTER(int, Int, )
@@ -602,7 +663,9 @@ JNIEXPORT j ## _prim_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus
     if (thrown(env)) { return (j ## _prim_type) 0; } \
     jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID); \
     if (thrown(env)) { return (j ## _prim_type) 0; } \
-    return (*env)->GetStatic ## _Prim_type ## Field(env, cls, fieldID); \
+    j ## _prim_type result = (*env)->GetStatic ## _Prim_type ## Field(env, cls, fieldID); \
+    if (thrown(env)) { return (j ## _prim_type) 0; } \
+    return result; \
 }
 
 STATIC_FIELD_GETTER(int, Int)
@@ -625,6 +688,7 @@ JNIEXPORT void JNICALL Java_io_github_toolfactory_narcissus_Narcissus_setStatic 
     jclass cls = (*env)->CallObjectMethod(env, field, Field_getDeclaringClass_methodID); \
     if (thrown(env)) { return; } \
     (*env)->SetStatic ## _Prim_type ## Field(env, cls, fieldID, val); \
+    if (thrown(env)) { return; } \
 }
 
 STATIC_FIELD_SETTER(int, Int, )
@@ -651,6 +715,7 @@ JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_i
     jvalue arg_jvalues[num_args == 0 ? 1 : num_args]; \
     if (unbox(env, method, args, num_args, arg_jvalues)) { \
         _assign (*env)->Call ## _Prim_type ## MethodA(env, obj, methodID, arg_jvalues); \
+        if (thrown(env)) { return _err_return; } \
         return _assign_return; \
     } else {\
         return _err_return; \
@@ -684,6 +749,7 @@ JNIEXPORT _jni_ret_type JNICALL Java_io_github_toolfactory_narcissus_Narcissus_i
     jvalue arg_jvalues[num_args == 0 ? 1 : num_args]; \
     if (unbox(env, method, args, num_args, arg_jvalues)) { \
         _assign (*env)->CallStatic ## _Prim_type ## MethodA(env, cls, methodID, arg_jvalues); \
+        if (thrown(env)) { return _err_return; } \
         return _assign_return; \
     } else { \
         return _err_return; \

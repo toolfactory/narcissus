@@ -12,7 +12,7 @@ public class TestMethodNameLogger implements BeforeEachCallback {
     public void beforeEach(ExtensionContext context) throws Exception {
         String className = context.getTestClass().get().getSimpleName();
         String methodName = context.getTestMethod().get().getName();
-        System.out.println(">>> STARTING TEST: " + className + "." + methodName);
-        System.out.flush(); // Ensure immediate output
+        System.out.println(">>> RUNNING TEST: " + className + "." + methodName);
+        System.out.flush(); // Ensure immediate output (so we can see failure point if JVM crashes)
     }
 }

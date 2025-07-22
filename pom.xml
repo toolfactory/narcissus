@@ -399,8 +399,6 @@
                     <trimStackTrace>false</trimStackTrace>
                     <!-- Print summary of test results -->
                     <printSummary>true</printSummary>
-                    <!-- Enable detailed reporting -->
-                    <reportFormat>plain</reportFormat>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <useFile>false</useFile>
                     <parallel>none</parallel>
