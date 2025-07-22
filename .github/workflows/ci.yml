@@ -123,7 +123,7 @@ jobs:
       - name: Publish to the Maven central repository
         run: |
           export GPG_TTY=$(tty)
-          echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
           mkdir -p ~/.m2
           echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -142,9 +142,9 @@ jobs:
           git config pull.rebase false
           git pull origin ${{github.ref}}
           ./mvnw -B release:prepare release:perform deploy -Prelease -Prelease-sign-artifacts -Dproject_jdk_version=7 -DskipTests=true \
-             -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" \
-             -Dgpg.keyname=${{ secrets.gpg_key_id }} \
+             -Dgpg.keyname=${{ secrets.GPG_KEY_ID }} \
              -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
         env:
-          MAVEN_USERNAME: ${{ secrets.nexus_username }}
-          MAVEN_PASSWORD: ${{ secrets.nexus_password }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

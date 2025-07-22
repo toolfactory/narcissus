@@ -573,7 +573,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <autopublish>true</autopublish>
+                    <autoPublish>true</autoPublish>
                 </configuration>
                 <executions>
                     <execution>
