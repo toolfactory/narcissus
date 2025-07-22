@@ -18,7 +18,7 @@
         <link.opt.2 />
 
         <assertj-core.version>2.9.1</assertj-core.version>
-        <junit.version>4.13.2</junit.version>
+        <junit.version>5.11.3</junit.version>
 
         <linkerFinalName>libnarcissus-${os.type}-${sun.arch.data.model}</linkerFinalName>
 
@@ -105,8 +105,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
@@ -395,10 +401,23 @@
                     <printSummary>true</printSummary>
                     <!-- Enable detailed reporting -->
                     <reportFormat>plain</reportFormat>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <useFile>false</useFile>
                     <parallel>none</parallel>
                     <threadCount>1</threadCount>                    
                     <argLine>-Dsurefire.printTestMethodDetail=true</argLine>
+                    <systemPropertyVariables>
+                        <junit.jupiter.execution.parallel.enabled>false</junit.jupiter.execution.parallel.enabled>
+                        <junit.platform.output.capture.stdout>true</junit.platform.output.capture.stdout>
+                        <junit.platform.output.capture.stderr>true</junit.platform.output.capture.stderr>
+                    </systemPropertyVariables>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.testinstance.lifecycle.default=per_method
+                            junit.platform.reporting.open.xml.enabled=true
+                            junit.platform.reporting.output.dir=target/surefire-reports
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
             <plugin>

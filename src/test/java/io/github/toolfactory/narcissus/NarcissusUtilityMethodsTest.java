@@ -2,15 +2,17 @@ package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus utility methods: allocateInstance and sneakyThrow.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusUtilityMethodsTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

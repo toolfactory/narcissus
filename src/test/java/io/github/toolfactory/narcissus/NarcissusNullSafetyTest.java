@@ -5,20 +5,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus null safety and error handling.
  * Critical for preventing JNI crashes with null inputs.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusNullSafetyTest {
 
     private TestNullSafetyClass testObject;
     private Field testField;
     private Method testMethod;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

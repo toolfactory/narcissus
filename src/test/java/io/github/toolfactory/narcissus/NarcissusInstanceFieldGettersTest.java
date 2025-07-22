@@ -4,13 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus instance field getter methods.
  * Tests all primitive types: int, long, short, char, byte, boolean, float, double, Object.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusInstanceFieldGettersTest {
 
     private TestFieldClass testObject;
@@ -24,7 +26,7 @@ public class NarcissusInstanceFieldGettersTest {
     private Field doubleField;
     private Field objectField;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

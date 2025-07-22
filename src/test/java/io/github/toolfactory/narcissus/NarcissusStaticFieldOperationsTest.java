@@ -4,13 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus static field getter and setter methods.
  * Tests all primitive types: int, long, short, char, byte, boolean, float, double, Object.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusStaticFieldOperationsTest {
 
     private Field staticIntField;
@@ -23,7 +25,7 @@ public class NarcissusStaticFieldOperationsTest {
     private Field staticDoubleField;
     private Field staticObjectField;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

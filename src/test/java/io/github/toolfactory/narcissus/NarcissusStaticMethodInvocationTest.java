@@ -4,13 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus static method invocation methods.
  * Tests all return types: void, int, long, short, char, byte, boolean, float, double, Object.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusStaticMethodInvocationTest {
 
     private Method staticVoidMethod;
@@ -26,7 +28,7 @@ public class NarcissusStaticMethodInvocationTest {
     private Method staticMethodWithParams;
     private Method staticVarargsMethod;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

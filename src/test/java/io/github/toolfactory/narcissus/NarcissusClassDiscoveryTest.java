@@ -7,16 +7,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for Narcissus class discovery and reflection operations.
  * Tests findClass, findMethod, findField, findConstructor, and enumeration methods.
  */
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusClassDiscoveryTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");

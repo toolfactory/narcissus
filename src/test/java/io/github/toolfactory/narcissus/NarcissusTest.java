@@ -1,6 +1,8 @@
 package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -8,11 +10,13 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(TestMethodNameLogger.class)
 public class NarcissusTest {
-    @Before
+    @BeforeEach
     public void testInitialized() throws Exception {
         if (!Narcissus.libraryLoaded) {
             throw new RuntimeException("Narcissus library not loaded");
@@ -160,28 +164,48 @@ public class NarcissusTest {
         }
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testCheckNullPointerExceptionNonStatic() throws Exception {
         final Method dm = Narcissus.findMethod(Z.class, "d");
-        Narcissus.invokeDoubleMethod(null, dm);
+        assertThrows(NullPointerException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeDoubleMethod(null, dm);
+            }
+        });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testCheckNullPointerExceptionStatic() throws Exception {
         final Method _dm = Narcissus.findMethod(Z.class, "_d");
-        Narcissus.invokeDoubleMethod(null, _dm);
+        assertThrows(NullPointerException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeDoubleMethod(null, _dm);
+            }
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckStaticModifierException1() throws Exception {
         final Method dm = Narcissus.findMethod(Z.class, "d");
-        Narcissus.invokeStaticDoubleMethod(dm);
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticDoubleMethod(dm);
+            }
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckObjectClassDoesNotMatchDeclaringClass() throws Exception {
         final Method dm = Narcissus.findMethod(Z.class, "d");
-        Narcissus.invokeDoubleMethod(new Y(), dm);
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeDoubleMethod(new Y(), dm);
+            }
+        });
     }
 
     @Test
@@ -277,10 +301,15 @@ public class NarcissusTest {
         assertThat(c.a instanceof B);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAssignFieldSupertype() throws Exception {
         final C c = new C();
-        Narcissus.setField(c, Narcissus.findField(C.class, "b"), new A());
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.setField(c, Narcissus.findField(C.class, "b"), new A());
+            }
+        });
     }
 
     @Test
@@ -290,9 +319,14 @@ public class NarcissusTest {
         assertThat(retVal instanceof B);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCallWithParamSupertype() throws Exception {
-        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identB", B.class), new A());
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(C.class, "identB", B.class), new A());
+            }
+        });
     }
 
     static class D {
@@ -303,11 +337,16 @@ public class NarcissusTest {
         static int d = 2;
     }
 
-    @Test(expected = ExceptionInInitializerError.class)
+    @Test
     public void testExceptionInStaticInitializer() throws Exception {
         final Class<?> dCls = Class.forName(NarcissusTest.class.getName() + "$" + "D", false,
                 Thread.currentThread().getContextClassLoader());
-        assertThat(Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"))).isEqualTo(2);
+        assertThrows(ExceptionInInitializerError.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.getStaticIntField(Narcissus.findField(dCls, "d"));
+            }
+        });
     }
 
     static class E {
@@ -369,24 +408,44 @@ public class NarcissusTest {
                         .isEqualTo("xy12");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWrongMethodReturnType1() throws NoSuchMethodException {
-        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x", String.class), "5");
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x", String.class), "5");
+            }
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWrongMethodReturnType2() throws NoSuchMethodException {
-        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x"), "5");
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(E.class, "x"), "5");
+            }
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWrongMethodReturnType3() throws NoSuchMethodException {
-        Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String.class, Object[].class), "5");
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String.class, Object[].class), "5");
+            }
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMethodReturnTypeMismatch() throws NoSuchMethodException {
-        Narcissus.invokeStaticLongMethod(Narcissus.findMethod(E.class, "x", int[].class), 5);
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticLongMethod(Narcissus.findMethod(E.class, "x", int[].class), 5);
+            }
+        });
     }
 
     static class F {
@@ -429,8 +488,13 @@ public class NarcissusTest {
                 new G("b"))).isEqualTo("ab");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testVarargsSubclass() throws NoSuchMethodException {
-        Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(G.class, "g", G[].class), new F("a"), new F("b"));
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.invokeStaticObjectMethod(Narcissus.findMethod(G.class, "g", G[].class), new F("a"), new F("b"));
+            }
+        });
     }
 }
