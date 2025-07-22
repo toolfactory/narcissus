@@ -568,7 +568,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_findFie
 JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocateInstance(JNIEnv* env, jclass ignored, jclass instanceType) {
     if (argIsNull(env, instanceType)) { return NULL; }
     
-    // Check if it's a primitive type first
+    // Check if it's a primitive type first 
     jboolean isPrimitive = (*env)->CallBooleanMethod(env, instanceType, (*env)->GetMethodID(env, Class_class, "isPrimitive", "()Z"));
     if (thrown(env)) { return NULL; }
     if (isPrimitive) {
