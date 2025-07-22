@@ -189,6 +189,10 @@ public class NarcissusTest {
         final Class<?> cls = Narcissus.findClass(Y.class.getName());
         assertThat(cls).isNotNull();
         assertThat(cls.getName()).isEqualTo(Y.class.getName());
+    }
+
+    @Test
+    public void testFindArrayClass() throws Exception {
         final Class<?> arrCls = Narcissus.findClass(Y.class.getName() + "[]");
         assertThat(arrCls).isNotNull();
         assertThat(arrCls.getName()).isEqualTo("[L" + Y.class.getName() + ";");
@@ -340,14 +344,26 @@ public class NarcissusTest {
     }
 
     @Test
-    public void testVarargs() throws NoSuchMethodException {
+    public void testVarargsWithSingleStringParameter() throws NoSuchMethodException {
         assertThat(Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String.class), "5"))
                 .isEqualTo(5);
+    }
+
+    @Test
+    public void testVarargsWithStringArray() throws NoSuchMethodException {
         assertThat(
                 Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", String[].class), "1", "2", "3"))
                         .isEqualTo(6);
+    }
+
+    @Test
+    public void testVarargsWithIntArray() throws NoSuchMethodException {
         assertThat(Narcissus.invokeStaticIntMethod(Narcissus.findMethod(E.class, "x", int[].class), 2, 3, 4))
                 .isEqualTo(9);
+    }
+
+    @Test
+    public void testVarargsWithMixedParameters() throws NoSuchMethodException {
         assertThat((String) Narcissus.invokeStaticObjectMethod(
                 Narcissus.findMethod(E.class, "x", String.class, Object[].class), "x", "y", 1, 2))
                         .isEqualTo("xy12");
