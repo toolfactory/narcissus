@@ -26,7 +26,7 @@ For each of the methods listed below, in contrast to the equivalent in the Java 
 
     Equivalent to `cls.getDeclaredFields()`.
 
-  * **`List<Field> Narcissus.enumerateFields(Class<?> cls)`**
+  * **`List<Field> Narcissus.enumerateFields(Class<?> cls)`** 
 
     Equivalent to `cls.getDeclaredFields()`, but also iterates up through superclasses to collect all fields of the class and its superclasses.
 
