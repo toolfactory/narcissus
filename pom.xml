@@ -20,7 +20,10 @@
         <assertj-core.version>3.27.2</assertj-core.version>
         <junit.version>5.13.3</junit.version>
 
-        <linkerFinalName>libnarcissus-${os.type}-${sun.arch.data.model}</linkerFinalName>
+        <!-- Default architecture type (will be overridden by profiles) -->
+        <arch.type>x64</arch.type>
+        
+        <linkerFinalName>libnarcissus-${os.type}-${arch.type}-${sun.arch.data.model}</linkerFinalName>
 
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -147,7 +150,44 @@
                 </os>
             </activation>
             <properties>
-                <linkerFinalName>libnarcissus-${os.type}-arm${sun.arch.data.model}</linkerFinalName>
+                <arch.type>arm64</arch.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>Linux</name>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <arch.type>arm64</arch.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-arm</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <arch.type>arm64</arch.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>arch-x86</id>
+            <activation>
+                <property>
+                    <name>sun.arch.data.model</name>
+                    <value>32</value>
+                </property>
+            </activation>
+            <properties>
+                <arch.type>x86</arch.type>
             </properties>
         </profile>
         <profile>

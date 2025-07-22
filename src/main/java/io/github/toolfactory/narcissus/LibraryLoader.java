@@ -46,6 +46,9 @@ class LibraryLoader {
     /** The architecture name (empty except on Mac) */
     public static String archName = "";
 
+    /** The architecture type (x64, arm64, x86) */
+    public static String archType;
+
     /** The operating system type. */
     enum OperatingSystem {
         /** Windows. */
@@ -99,15 +102,27 @@ class LibraryLoader {
             archName = "arm";
         }
 
-        archBits = 64;
-        final String dataModel = System.getProperty("sun.arch.data.model");
-        if (dataModel != null && dataModel.contains("32")) {
-            archBits = 32;
+        // Determine architecture type
+        final String osArch = System.getProperty("os.arch");
+        if (osArch != null && "aarch64".equals(osArch)) {
+            archType = "arm64";
         } else {
-            final String osArch = System.getProperty("os.arch");
-            if (osArch != null && ((osArch.contains("86") && !osArch.contains("64")) || osArch.contains("32"))) {
+            archBits = 64;
+            final String dataModel = System.getProperty("sun.arch.data.model");
+            if (dataModel != null && dataModel.contains("32")) {
                 archBits = 32;
+                archType = "x86";
+            } else if (osArch != null && ((osArch.contains("86") && !osArch.contains("64")) || osArch.contains("32"))) {
+                archBits = 32;
+                archType = "x86";
+            } else {
+                archType = "x64";
             }
+        }
+
+        // Set archBits for ARM64
+        if ("arm64".equals(archType)) {
+            archBits = 64;
         }
     }
 
