@@ -23,7 +23,7 @@
         <!-- Default architecture type (will be overridden by profiles) -->
         <arch.type>x64</arch.type>
         
-        <linkerFinalName>libnarcissus-${os.type}-${arch.type}-${sun.arch.data.model}</linkerFinalName>
+        <linkerFinalName>libnarcissus-${os.type}-${arch.type}</linkerFinalName>
 
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>

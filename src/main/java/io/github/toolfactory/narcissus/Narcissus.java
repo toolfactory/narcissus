@@ -71,13 +71,13 @@ public class Narcissus {
             final String libraryResourceSuffix;
             switch (LibraryLoader.OS) {
             case Linux:
-                libraryResourceSuffix = "-linux-" + LibraryLoader.archType + "-" + LibraryLoader.archBits + ".so";
+                libraryResourceSuffix = "-linux-" + LibraryLoader.archType + ".so";
                 break;
             case MacOSX:
-                libraryResourceSuffix = "-macos-" + LibraryLoader.archType + "-" + LibraryLoader.archBits + ".dylib";
+                libraryResourceSuffix = "-macos-" + LibraryLoader.archType + ".dylib";
                 break;
             case Windows:
-                libraryResourceSuffix = "-win-" + LibraryLoader.archType + "-" + LibraryLoader.archBits + ".dll";
+                libraryResourceSuffix = "-win-" + LibraryLoader.archType + ".dll";
                 break;
             case BSD:
             case Solaris:
