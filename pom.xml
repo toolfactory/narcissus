@@ -4,7 +4,7 @@
     <name>Narcissus</name>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.11-SNAPSHOT</version>
 
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
@@ -493,11 +493,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
-                <configuration>
-                    <source>${project_jdk_version}</source>
-                    <doclint>all</doclint>
-                    <show>public</show>
-                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
