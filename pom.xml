@@ -389,6 +389,13 @@
                         <!-- Allow test classes to find the native library in ${project.basedir}/lib/ -->
                         <additionalClasspathElement>${project.basedir}</additionalClasspathElement>
                     </additionalClasspathElements>
+                    <!-- Show stack traces for test failures -->
+                    <trimStackTrace>false</trimStackTrace>
+                    <!-- Print summary of test results -->
+                    <printSummary>true</printSummary>
+                    <!-- Enable detailed reporting -->
+                    <reportFormat>plain</reportFormat>
+                    <useFile>false</useFile>
                 </configuration>
             </plugin>
             <plugin>
