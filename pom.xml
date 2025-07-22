@@ -4,7 +4,7 @@
     <name>Narcissus</name>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.11-SNAPSHOT</version>
 
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
@@ -545,13 +545,12 @@
                     <localCheckout>true</localCheckout>
                     <pushChanges>true</pushChanges>
                     <mavenExecutorId>forked-path</mavenExecutorId>
-                    <arguments>-Dgpg.passphrase="${gpg.passphrase}"</arguments>
                     <!-- Update version number with each release -->
                     <!-- <autoVersionSubmodules>true</autoVersionSubmodules> -->
                     <!-- Activate release profile -->
-                    <!-- <releaseProfiles>release</releaseProfiles> -->
+                    <releaseProfiles>release</releaseProfiles>
                     <!-- Work around bug where releaseProfiles tag doesn't actually work yet -->
-                    <!-- <arguments>-Prelease</arguments> -->
+                    <arguments>-Prelease</arguments>
                 </configuration>
                 <dependencies>
                     <dependency>
