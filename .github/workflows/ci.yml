@@ -23,10 +23,8 @@ jobs:
       max-parallel: 2
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        architecture: [x86, x64, arm64]
+        architecture: [x64, arm64]
         exclude:
-          - os: macos-latest
-            architecture: x86
           - os: ubuntu-latest
             architecture: arm64
           - os: windows-latest
@@ -36,23 +34,23 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        distribution: oracle
+        distribution: coretto
         java-version: 8
         architecture: ${{ matrix.architecture }}
     - name: print Java version
       run: java -version
-    - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
+    - if: startsWith(matrix.os, 'ubuntu')
       name: Set up C/C++ compiler
       run: |
         sudo apt update
         sudo apt-get -y install g++-multilib
-    - if: startsWith(matrix.os, 'windows') && startsWith(matrix.architecture, 'x86')
+    - if: startsWith(matrix.os, 'windows')
       name: Set up C/C++ compiler and compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }})
       run: |
-        choco install mingw --x86
+        choco install mingw
         $env:PATH = "C:\ProgramData\mingw64\mingw32\bin;" + $env:PATH
         ./mvnw -B --no-transfer-progress clean test package
-    - if: ${{ !(startsWith(matrix.os, 'windows') && startsWith(matrix.architecture, 'x86')) }}
+    - if: ${{ !(startsWith(matrix.os, 'windows')) }}
       name: Compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }})
       run: ./mvnw -B --no-transfer-progress clean test package
     - if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Update libraries')
@@ -74,14 +72,12 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        architecture: [x86, x64, arm64]
+        architecture: [x64, arm64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         # We build for JDK 7, but only test for JDK 8+, because Maven
         # no longer supports JDK 7
         java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
         exclude:
-          - os: macOS-latest
-            architecture: x86
           - os: ubuntu-latest
             architecture: arm64
           - os: windows-latest
