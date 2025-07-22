@@ -1,6 +1,7 @@
 package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 
 @ExtendWith(TestMethodNameLogger.class)
 public class ReflectionCacheTest {
@@ -44,22 +46,22 @@ public class ReflectionCacheTest {
 
     @Test
     public void testReflectionCacheConstructorWithNullClassName() {
-        try {
-            new ReflectionCache((String) null);
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                new ReflectionCache((String) null);
+            }
+        });
     }
 
     @Test
     public void testReflectionCacheConstructorWithInvalidClassName() {
-        try {
-            new ReflectionCache("invalid.class.Name");
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (NoClassDefFoundError e) {
-            // Expected - library throws NoClassDefFoundError for invalid class names
-        }
+        assertThrows(NoClassDefFoundError.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                new ReflectionCache("invalid.class.Name");
+            }
+        });
     }
 
     @Test
