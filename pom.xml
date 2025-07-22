@@ -92,7 +92,7 @@
         <connection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</connection>
         <developerConnection>scm:git:https://toolfactory@github.com/toolfactory/narcissus.git</developerConnection>
         <url>https://toolfactory.github.io/narcissus</url>
-        <tag>narcissus-1.0.11</tag>
+        <tag>narcissus-1.0.11</tag> 
     </scm>
 
     <packaging>jar</packaging>
