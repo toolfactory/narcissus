@@ -4,7 +4,7 @@
     <name>Narcissus</name>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>narcissus</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.11-SNAPSHOT</version>
 
     <description>Reflection API for circumventing Java security, visibility, and encapsulation mechanisms</description>
 
@@ -39,7 +39,6 @@
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-scm-provider-gitexe.version>2.1.0</maven-scm-provider-gitexe.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-        <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
         <native-maven-plugin.version>1.0-M1</native-maven-plugin.version>
 
         <project_jdk_version>7</project_jdk_version>
@@ -88,13 +87,9 @@
     </issueManagement>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -580,6 +575,15 @@
                     <publishingServerId>central</publishingServerId>
                     <autopublish>true</autopublish>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>publish</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>publish</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
