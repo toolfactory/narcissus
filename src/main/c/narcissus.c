@@ -41,6 +41,9 @@ bool thrown(JNIEnv* env) {
 jclass Class_class;
 jmethodID Class_isArray_methodID;
 jmethodID Class_getComponentType_methodID;
+jmethodID Class_getName_methodID;
+jmethodID Class_isPrimitive_methodID;
+jmethodID Class_getModifiers_methodID;
 
 jclass void_class;
 
@@ -99,6 +102,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     Class_isArray_methodID = (*env)->GetMethodID(env, Class_class, "isArray", "()Z");
     if (thrown(env)) { return -1; }
     Class_getComponentType_methodID = (*env)->GetMethodID(env, Class_class, "getComponentType", "()Ljava/lang/Class;");
+    if (thrown(env)) { return -1; }
+    Class_getName_methodID = (*env)->GetMethodID(env, Class_class, "getName", "()Ljava/lang/String;");
+    if (thrown(env)) { return -1; }
+    Class_isPrimitive_methodID = (*env)->GetMethodID(env, Class_class, "isPrimitive", "()Z");
+    if (thrown(env)) { return -1; }
+    Class_getModifiers_methodID = (*env)->GetMethodID(env, Class_class, "getModifiers", "()I");
     if (thrown(env)) { return -1; }
 
     jclass Void_class = (*env)->FindClass(env, "java/lang/Void");
@@ -225,7 +234,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 // Utility functions
 
 void printClassName(JNIEnv* env, jclass cls) {
-    jstring strObj = (jstring) (*env)->CallObjectMethod(env, cls, (*env)->GetMethodID(env, Class_class, "getName", "()Ljava/lang/String;"));
+    jstring strObj = (jstring) (*env)->CallObjectMethod(env, cls, Class_getName_methodID);
     const char* str = (*env)->GetStringUTFChars(env, strObj, NULL);
     printf("%s\n", str);
     (*env)->ReleaseStringUTFChars(env, strObj, str);
@@ -569,7 +578,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocat
     if (argIsNull(env, instanceType)) { return NULL; }
     
     // Check if it's a primitive type first 
-    jboolean isPrimitive = (*env)->CallBooleanMethod(env, instanceType, (*env)->GetMethodID(env, Class_class, "isPrimitive", "()Z"));
+    jboolean isPrimitive = (*env)->CallBooleanMethod(env, instanceType, Class_isPrimitive_methodID);
     if (thrown(env)) { return NULL; }
     if (isPrimitive) {
         throwInstantiationException(env, "Cannot instantiate primitive type");
@@ -585,7 +594,7 @@ JNIEXPORT jobject JNICALL Java_io_github_toolfactory_narcissus_Narcissus_allocat
     }
     
     // Finally check modifiers for abstract/interface classes
-    jint modifiers = (*env)->CallIntMethod(env, instanceType, (*env)->GetMethodID(env, Class_class, "getModifiers", "()I"));
+    jint modifiers = (*env)->CallIntMethod(env, instanceType, Class_getModifiers_methodID);
     if (thrown(env)) { return NULL; }
     
     // Check for abstract (0x400) or interface (0x200)

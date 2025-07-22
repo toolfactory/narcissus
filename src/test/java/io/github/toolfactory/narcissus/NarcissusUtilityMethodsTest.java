@@ -1,10 +1,12 @@
 package io.github.toolfactory.narcissus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 
 /**
  * Tests for Narcissus utility methods: allocateInstance and sneakyThrow.
@@ -36,45 +38,45 @@ public class NarcissusUtilityMethodsTest {
 
     @Test
     public void testAllocateInstanceWithInterface() {
-        try {
-            Narcissus.allocateInstance(TestInterface.class);
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (Throwable e) {
-            assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("Cannot instantiate abstract class or interface");
-        }
+        Throwable exception = assertThrows(InstantiationException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.allocateInstance(TestInterface.class);
+            }
+        });
+        assertThat(exception.getMessage()).contains("Cannot instantiate abstract class or interface");
     }
 
     @Test
     public void testAllocateInstanceWithAbstractClass() {
-        try {
-            Narcissus.allocateInstance(TestAbstractClass.class);
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (Throwable e) {
-            assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("Cannot instantiate abstract class or interface");
-        }
+        InstantiationException exception = assertThrows(InstantiationException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.allocateInstance(TestAbstractClass.class);
+            }
+        });
+        assertThat(exception.getMessage()).contains("Cannot instantiate abstract class or interface");
     }
 
     @Test
     public void testAllocateInstanceWithArrayClass() {
-        try {
-            Narcissus.allocateInstance(Object[].class);
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (Throwable e) {
-            assertThat(e).isInstanceOf(InstantiationException.class);
-            assertThat(e.getMessage()).contains("Cannot instantiate array type");
-        }
+        InstantiationException exception = assertThrows(InstantiationException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.allocateInstance(Object[].class);
+            }
+        });
+        assertThat(exception.getMessage()).contains("Cannot instantiate array type");
     }
 
     @Test
     public void testAllocateInstanceWithPrimitiveClass() {
-        try {
-            Narcissus.allocateInstance(int.class);
-            assertThat(false).isTrue(); // Should not reach here
-        } catch (Throwable e) {
-            // Expected - primitive types cannot be instantiated
-        }
+        assertThrows(InstantiationException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Narcissus.allocateInstance(int.class);
+            }
+        });
     }
 
     @Test
