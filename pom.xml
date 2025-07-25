@@ -94,14 +94,6 @@
 
     <packaging>jar</packaging>
 
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
