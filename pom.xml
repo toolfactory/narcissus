@@ -289,7 +289,6 @@
                                     <excludes>
                                         <exclude>**/*.zip</exclude>
                                     </excludes>
-                                    <keyname>OBFUSCATED123</keyname>
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
