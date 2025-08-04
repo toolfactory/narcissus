@@ -20,7 +20,7 @@
         <assertj-core.version>3.27.2</assertj-core.version>
         <junit.version>5.13.3</junit.version>
 
-        <!-- Default architecture type (will be overridden by profiles) -->
+        <!-- Default architecture type (will be overridden by profiles) --> 
         <arch.type>x64</arch.type>
 
         <linkerFinalName>libnarcissus-${os.type}-${arch.type}</linkerFinalName>
