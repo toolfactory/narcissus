@@ -524,7 +524,7 @@
                 <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>portal-production</publishingServerId>
+                    <publishingServerId>central</publishingServerId>
                     <autoPublish>false</autoPublish>
                     <waitUntil>uploaded</waitUntil>
                 </configuration>
