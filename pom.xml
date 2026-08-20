@@ -542,8 +542,12 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <autoPublish>false</autoPublish>
-                    <waitUntil>uploaded</waitUntil>
+                    <!-- Publish to Maven Central without a manual step, and do not let the build finish until
+                    Central confirms the deployment is published. Waiting only until "uploaded" would return
+                    while the deployment is still being validated, so a deployment that failed validation would
+                    leave the release job green with nothing published. -->
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
                 </configuration>
             </plugin>
         </plugins>
