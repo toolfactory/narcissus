@@ -116,6 +116,23 @@
 
     <profiles>
         <profile>
+            <!-- javac dropped -source/-target 7 in JDK 20, under the JEP 182 retirement policy,
+            and will not accept anything lower than 8 from there on. The released jar is always
+            compiled for JDK 7: the release job runs on a JDK that still accepts 7, and passes
+            -Dproject_jdk_version=7 explicitly, so that if that ever stops being true the release
+            fails rather than silently shipping newer bytecode. The CI test matrix, on the other
+            hand, runs on every JDK up to the current release, so there it falls back to the
+            lowest version javac will still accept. When javac drops 8 as well, add another
+            profile here for that JDK range. -->
+            <id>jdk-20-and-later</id>
+            <activation>
+                <jdk>[20,)</jdk>
+            </activation>
+            <properties>
+                <project_jdk_version>8</project_jdk_version>
+            </properties>
+        </profile>
+        <profile>
             <id>mac</id>
             <activation>
                 <os>
