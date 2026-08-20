@@ -180,9 +180,50 @@ public class Narcissus {
     private static native Field findFieldInternal(Class<?> cls, String fieldName, String sig, boolean isStatic);
 
     /**
-     * Finds a class by name (e.g. {@code "com.xyz.MyClass"}) using the current classloader or the system
-     * classloader, ignoring visibility and bypassing security checks. Finds array classes if the class name is of
-     * the form {@code "com.xyz.MyClass[][]"}.
+     * The names, classes and type descriptors of the primitive types, held in a nested class so that they are
+     * initialized on first use, rather than in the initialization order of {@link Narcissus} itself (the static
+     * initializer block of {@link Narcissus} calls {@link #findClass(String)}, which reads these arrays).
+     */
+    private static class Primitives {
+        /** The primitive type names, in the same order as {@link #CLASSES} and {@link #DESCRIPTORS}. */
+        static final String[] NAMES = { "int", "long", "short", "char", "boolean", "byte", "float", "double",
+                "void" };
+
+        /** The primitive classes, in the same order as {@link #NAMES}. */
+        static final Class<?>[] CLASSES = { int.class, long.class, short.class, char.class, boolean.class,
+                byte.class, float.class, double.class, void.class };
+
+        /** The primitive type descriptors, in the same order as {@link #NAMES}. */
+        static final String[] DESCRIPTORS = { "I", "J", "S", "C", "Z", "B", "F", "D", "V" };
+    }
+
+    /**
+     * Get the index of a primitive type name in {@link Primitives#NAMES}.
+     *
+     * @param typeName
+     *            the type name
+     * @return the index of the type name, or -1 if the name is not the name of a primitive type
+     */
+    private static int primitiveTypeIdx(final String typeName) {
+        for (int i = 0; i < Primitives.NAMES.length; i++) {
+            if (Primitives.NAMES[i].equals(typeName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Finds a class by name (e.g. {@code "com.xyz.MyClass"}), ignoring visibility and bypassing security checks.
+     * Finds array classes if the class name is of the form {@code "com.xyz.MyClass[][]"}, and returns the primitive
+     * class if the class name is the name of a primitive type (e.g. {@code "int"} returns {@code int.class}).
+     *
+     * <p>
+     * The class is resolved by the classloader that loaded Narcissus, which is not necessarily the classloader of
+     * the caller. A class that is not visible to that classloader cannot be found by this method, even if it is
+     * visible to the caller -- use {@link Class#forName(String, boolean, ClassLoader)} for those. Note also that
+     * this method throws {@link NoClassDefFoundError} rather than {@link ClassNotFoundException} if the class
+     * cannot be found, since that is what the underlying JNI {@code FindClass} function throws.
      *
      * @param className
      *            the class name
@@ -193,13 +234,27 @@ public class Narcissus {
             throw new IllegalArgumentException("Class name cannot be null");
         }
         String classNameInternal = className.replace('.', '/');
-        String arrayDims = "";
+        int arrayDims = 0;
         while (classNameInternal.endsWith("[]")) {
-            arrayDims += '[';
+            arrayDims++;
             classNameInternal = classNameInternal.substring(0, classNameInternal.length() - 2);
         }
-        return findClassInternal(
-                arrayDims.isEmpty() ? classNameInternal : arrayDims + 'L' + classNameInternal + ';');
+        final int primitiveIdx = primitiveTypeIdx(classNameInternal);
+        if (arrayDims == 0) {
+            // JNI FindClass cannot look up a primitive type, since primitive types have no binary name
+            return primitiveIdx >= 0 ? Primitives.CLASSES[primitiveIdx] : findClassInternal(classNameInternal);
+        }
+        // Build the array class descriptor, e.g. "[[I" for "int[][]", or "[Ljava/lang/String;" for "String[]"
+        final StringBuilder descriptor = new StringBuilder();
+        for (int i = 0; i < arrayDims; i++) {
+            descriptor.append('[');
+        }
+        if (primitiveIdx >= 0) {
+            descriptor.append(Primitives.DESCRIPTORS[primitiveIdx]);
+        } else {
+            descriptor.append('L').append(classNameInternal).append(';');
+        }
+        return findClassInternal(descriptor.toString());
     }
 
     // -------------------------------------------------------------------------------------------------------------
@@ -545,10 +600,10 @@ public class Narcissus {
      */
     public static Object getField(final Object object, final Field field) {
         if (object == null) {
-            throw new IllegalArgumentException("object cannot be null");
+            throw new NullPointerException("object cannot be null");
         }
         if (field == null) {
-            throw new IllegalArgumentException("field cannot be null");
+            throw new NullPointerException("field cannot be null");
         }
         if (Modifier.isStatic(field.getModifiers())) {
             throw new IllegalArgumentException("field is static, call getStaticField() instead");
@@ -684,8 +739,167 @@ public class Narcissus {
     public static native void setObjectField(Object object, Field field, Object val);
 
     /**
-     * Set the value of an object field, ignoring visibility and bypassing security checks, unboxing the passed
-     * value if necessary.
+     * Build an {@link IllegalArgumentException} describing a value that cannot be assigned to a field.
+     *
+     * @param field
+     *            the field
+     * @param val
+     *            the value that could not be assigned to the field
+     * @return the exception to throw
+     */
+    private static IllegalArgumentException badValue(final Field field, final Object val) {
+        return new IllegalArgumentException("Cannot assign a value of type "
+                + (val == null ? "null" : val.getClass().getName()) + " to field "
+                + field.getDeclaringClass().getName() + "." + field.getName() + " of type "
+                + field.getType().getName());
+    }
+
+    /**
+     * Unbox a value for assignment to a boolean-typed field.
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static boolean booleanValue(final Field field, final Object val) {
+        if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a byte-typed field.
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static byte byteValue(final Field field, final Object val) {
+        if (val instanceof Byte) {
+            return ((Byte) val).byteValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a char-typed field.
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static char charValue(final Field field, final Object val) {
+        if (val instanceof Character) {
+            return ((Character) val).charValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a short-typed field, applying widening primitive conversion (JLS 5.1.2).
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static short shortValue(final Field field, final Object val) {
+        if (val instanceof Short || val instanceof Byte) {
+            return ((Number) val).shortValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to an int-typed field, applying widening primitive conversion (JLS 5.1.2).
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static int intValue(final Field field, final Object val) {
+        if (val instanceof Integer || val instanceof Short || val instanceof Byte) {
+            return ((Number) val).intValue();
+        }
+        if (val instanceof Character) {
+            return ((Character) val).charValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a long-typed field, applying widening primitive conversion (JLS 5.1.2).
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static long longValue(final Field field, final Object val) {
+        if (val instanceof Long || val instanceof Integer || val instanceof Short || val instanceof Byte) {
+            return ((Number) val).longValue();
+        }
+        if (val instanceof Character) {
+            return ((Character) val).charValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a float-typed field, applying widening primitive conversion (JLS 5.1.2).
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static float floatValue(final Field field, final Object val) {
+        if (val instanceof Float || val instanceof Long || val instanceof Integer || val instanceof Short
+                || val instanceof Byte) {
+            return ((Number) val).floatValue();
+        }
+        if (val instanceof Character) {
+            return ((Character) val).charValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Unbox a value for assignment to a double-typed field, applying widening primitive conversion (JLS 5.1.2).
+     *
+     * @param field
+     *            the field the value is being assigned to
+     * @param val
+     *            the value to unbox
+     * @return the unboxed value
+     */
+    private static double doubleValue(final Field field, final Object val) {
+        if (val instanceof Double || val instanceof Float || val instanceof Long || val instanceof Integer
+                || val instanceof Short || val instanceof Byte) {
+            return ((Number) val).doubleValue();
+        }
+        if (val instanceof Character) {
+            return ((Character) val).charValue();
+        }
+        throw badValue(field, val);
+    }
+
+    /**
+     * Set the value of a field, ignoring visibility and bypassing security checks, unboxing the passed value if
+     * the field is of primitive type. Widening primitive conversion (JLS 5.1.2) is applied to the unboxed value if
+     * necessary, so for example an {@link Integer} may be assigned to a {@code long} field.
      *
      * @param object
      *            the object instance in which to set the field value
@@ -693,6 +907,8 @@ public class Narcissus {
      *            the non-static field
      * @param val
      *            the value to set
+     * @throws IllegalArgumentException
+     *             if the field is of primitive type and the value cannot be converted to that type
      */
     public static void setField(final Object object, final Field field, final Object val) {
         if (object == null) {
@@ -706,21 +922,21 @@ public class Narcissus {
         }
         final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
-            setIntField(object, field, ((Integer) val).intValue());
+            setIntField(object, field, intValue(field, val));
         } else if (fieldType == long.class) {
-            setLongField(object, field, ((Long) val).longValue());
+            setLongField(object, field, longValue(field, val));
         } else if (fieldType == short.class) {
-            setShortField(object, field, ((Short) val).shortValue());
+            setShortField(object, field, shortValue(field, val));
         } else if (fieldType == char.class) {
-            setCharField(object, field, ((Character) val).charValue());
+            setCharField(object, field, charValue(field, val));
         } else if (fieldType == boolean.class) {
-            setBooleanField(object, field, ((Boolean) val).booleanValue());
+            setBooleanField(object, field, booleanValue(field, val));
         } else if (fieldType == byte.class) {
-            setByteField(object, field, ((Byte) val).byteValue());
+            setByteField(object, field, byteValue(field, val));
         } else if (fieldType == float.class) {
-            setFloatField(object, field, ((Float) val).floatValue());
+            setFloatField(object, field, floatValue(field, val));
         } else if (fieldType == double.class) {
-            setDoubleField(object, field, ((Double) val).doubleValue());
+            setDoubleField(object, field, doubleValue(field, val));
         } else {
             setObjectField(object, field, val);
         }
@@ -940,12 +1156,15 @@ public class Narcissus {
 
     /**
      * Set the value of a static field, ignoring visibility and bypassing security checks, unboxing the passed value
-     * if necessary.
+     * if the field is of primitive type. Widening primitive conversion (JLS 5.1.2) is applied to the unboxed value
+     * if necessary, so for example an {@link Integer} may be assigned to a {@code long} field.
      *
      * @param field
      *            the static field
      * @param val
      *            the value to set
+     * @throws IllegalArgumentException
+     *             if the field is of primitive type and the value cannot be converted to that type
      */
     public static void setStaticField(final Field field, final Object val) {
         if (field == null) {
@@ -956,21 +1175,21 @@ public class Narcissus {
         }
         final Class<?> fieldType = field.getType();
         if (fieldType == int.class) {
-            setStaticIntField(field, ((Integer) val).intValue());
+            setStaticIntField(field, intValue(field, val));
         } else if (fieldType == long.class) {
-            setStaticLongField(field, ((Long) val).longValue());
+            setStaticLongField(field, longValue(field, val));
         } else if (fieldType == short.class) {
-            setStaticShortField(field, ((Short) val).shortValue());
+            setStaticShortField(field, shortValue(field, val));
         } else if (fieldType == char.class) {
-            setStaticCharField(field, ((Character) val).charValue());
+            setStaticCharField(field, charValue(field, val));
         } else if (fieldType == boolean.class) {
-            setStaticBooleanField(field, ((Boolean) val).booleanValue());
+            setStaticBooleanField(field, booleanValue(field, val));
         } else if (fieldType == byte.class) {
-            setStaticByteField(field, ((Byte) val).byteValue());
+            setStaticByteField(field, byteValue(field, val));
         } else if (fieldType == float.class) {
-            setStaticFloatField(field, ((Float) val).floatValue());
+            setStaticFloatField(field, floatValue(field, val));
         } else if (fieldType == double.class) {
-            setStaticDoubleField(field, ((Double) val).doubleValue());
+            setStaticDoubleField(field, doubleValue(field, val));
         } else {
             setStaticObjectField(field, val);
         }

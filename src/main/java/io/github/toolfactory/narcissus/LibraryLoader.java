@@ -40,14 +40,8 @@ class LibraryLoader {
     /** The operating system type. */
     public static final OperatingSystem OS;
 
-    /** The machine word size. */
-    public static int archBits;
-
-    /** The architecture name (empty except on Mac) */
-    public static String archName = "";
-
-    /** The architecture type (x64, arm64, x86) */
-    public static String archType;
+    /** The architecture type (x64, x86, arm64 or arm32). */
+    public static final String archType;
 
     /** The operating system type. */
     enum OperatingSystem {
@@ -91,38 +85,41 @@ class LibraryLoader {
         } else if (osName.contains("sunos") || osName.contains("solaris")) {
             OS = OperatingSystem.Solaris;
         } else if (osName.contains("bsd")) {
-            OS = OperatingSystem.Unix;
+            OS = OperatingSystem.BSD;
         } else if (osName.contains("nix") || osName.contains("aix")) {
             OS = OperatingSystem.Unix;
         } else {
             OS = OperatingSystem.Unknown;
         }
 
-        if (OS == OperatingSystem.MacOSX && "aarch64".equals(System.getProperty("os.arch"))) {
-            archName = "arm";
+        // Determine architecture type. Note that ARM has to be distinguished from x86 before the word size is
+        // consulted, otherwise a 32-bit ARM machine is labeled "x86", and the loader then tries to load an x86
+        // library on an ARM machine.
+        String osArch = null;
+        try {
+            osArch = System.getProperty("os.arch", "").toLowerCase(Locale.ENGLISH);
+        } catch (final SecurityException e) {
+            // Ignore
         }
-
-        // Determine architecture type
-        final String osArch = System.getProperty("os.arch");
-        if (osArch != null && "aarch64".equals(osArch)) {
+        String dataModel = null;
+        try {
+            dataModel = System.getProperty("sun.arch.data.model");
+        } catch (final SecurityException e) {
+            // Ignore
+        }
+        final boolean is32Bit = dataModel != null && dataModel.contains("32");
+        if (osArch == null) {
+            archType = is32Bit ? "x86" : "x64";
+        } else if (osArch.equals("aarch64") || osArch.equals("arm64")) {
             archType = "arm64";
+        } else if (osArch.startsWith("arm")) {
+            // 32-bit ARM (armv7l, armhf, etc.) -- no library is built for this architecture, but naming it
+            // correctly produces a clearer error than trying to load the x86 library
+            archType = "arm32";
+        } else if (is32Bit || (osArch.contains("86") && !osArch.contains("64")) || osArch.contains("32")) {
+            archType = "x86";
         } else {
-            archBits = 64;
-            final String dataModel = System.getProperty("sun.arch.data.model");
-            if (dataModel != null && dataModel.contains("32")) {
-                archBits = 32;
-                archType = "x86";
-            } else if (osArch != null && ((osArch.contains("86") && !osArch.contains("64")) || osArch.contains("32"))) {
-                archBits = 32;
-                archType = "x86";
-            } else {
-                archType = "x64";
-            }
-        }
-
-        // Set archBits for ARM64
-        if ("arm64".equals(archType)) {
-            archBits = 64;
+            archType = "x64";
         }
     }
 
@@ -135,7 +132,7 @@ class LibraryLoader {
     static void loadLibraryFromJar(final String libraryResourcePath) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
-        Exception exception = null;
+        Throwable exception = null;
         try (InputStream inputSream = Narcissus.class.getResourceAsStream(
                 libraryResourcePath.startsWith("/") ? libraryResourcePath : "/" + libraryResourcePath)) {
             if (inputSream == null) {
@@ -157,6 +154,12 @@ class LibraryLoader {
             } catch (final Exception e) {
                 // Ignore
             }
+            if (!tempFileIsPosix) {
+                // A non-POSIX filesystem (i.e. Windows) will not let the temp file be deleted while it is
+                // mapped into this process, so delete any temp files left behind by previous JVMs instead.
+                // A file that is still mapped into a running JVM simply fails to delete.
+                deleteStaleTempFiles(tempFile.getParentFile(), baseName + "_", suffix, tempFile);
+            }
 
             final byte[] buffer = new byte[8192];
             try (final OutputStream os = new FileOutputStream(tempFile)) {
@@ -168,14 +171,57 @@ class LibraryLoader {
             // Load the library
             System.load(tempFile.getAbsolutePath());
 
-        } catch (final Exception e) {
-            exception = e;
+            // Catch Throwable rather than Exception, since System.load() throws UnsatisfiedLinkError, which
+            // would otherwise skip the deletion of the temp file below
+        } catch (final Throwable t) {
+            exception = t;
         }
-        if (tempFile != null && tempFileIsPosix) {
+        if (tempFile != null && (tempFileIsPosix || exception != null)) {
+            // On POSIX filesystems the library stays mapped into the process after the file is unlinked, so
+            // the temp file can be deleted as soon as it has been loaded. On other filesystems (i.e. Windows)
+            // a mapped file cannot be deleted, so the temp file can only be deleted if the load failed, which
+            // means nothing was mapped. (Deletion is best-effort in that case -- if it fails, the file is
+            // deleted on exit, or swept as a stale temp file by the next JVM.)
             tempFile.delete();
         }
         if (exception != null) {
-            throw new RuntimeException("Could not load library " + libraryResourcePath + " : " + exception);
+            throw new RuntimeException("Could not load library " + libraryResourcePath + " : " + exception,
+                    exception);
+        }
+    }
+
+    /**
+     * Delete temp files extracted by previous JVM invocations, which could not be deleted at the time because the
+     * library was still mapped into the process.
+     *
+     * @param tempDir
+     *            the temporary directory
+     * @param prefix
+     *            the temp filename prefix
+     * @param suffix
+     *            the temp filename suffix
+     * @param currentTempFile
+     *            the temp file extracted by this JVM, which must not be deleted
+     */
+    private static void deleteStaleTempFiles(final File tempDir, final String prefix, final String suffix,
+            final File currentTempFile) {
+        try {
+            if (tempDir == null) {
+                return;
+            }
+            final File[] files = tempDir.listFiles();
+            if (files == null) {
+                return;
+            }
+            for (final File file : files) {
+                final String name = file.getName();
+                if (name.startsWith(prefix) && name.endsWith(suffix) && !file.equals(currentTempFile)) {
+                    // Fails harmlessly if the file is still mapped into another running JVM
+                    file.delete();
+                }
+            }
+        } catch (final Exception e) {
+            // Ignore -- sweeping stale temp files is best-effort
         }
     }
 }

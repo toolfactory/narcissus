@@ -59,7 +59,12 @@ public class ReflectionCache {
             methodsForName.add(method);
         }
         for (final Field field : Narcissus.enumerateFields(cls)) {
-            fieldNameToField.put(field.getName(), field);
+            // enumerateFields() lists the fields of the class before the fields of its superclasses, so if a
+            // field shadows a field of the same name in a superclass, the shadowing field is seen first, and
+            // must be the one that is cached -- this matches the behavior of Narcissus.findField()
+            if (!fieldNameToField.containsKey(field.getName())) {
+                fieldNameToField.put(field.getName(), field);
+            }
         }
     }
 
