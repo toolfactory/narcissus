@@ -22,11 +22,15 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # On macOS both architectures build on the same runner, but arm64 Linux is a separate
+        # runner label -- there is no "ubuntu-latest-arm", so the Ubuntu version is pinned here.
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest]
         architecture: [x64, arm64]
         exclude:
           - os: ubuntu-latest
             architecture: arm64
+          - os: ubuntu-24.04-arm
+            architecture: x64
           - os: windows-latest
             architecture: arm64
     steps:
@@ -39,7 +43,9 @@ jobs:
         architecture: ${{ matrix.architecture }}
     - name: print Java version
       run: java -version
-    - if: startsWith(matrix.os, 'ubuntu')
+    - if: startsWith(matrix.os, 'ubuntu') && matrix.architecture == 'x64'
+      # gcc is preinstalled on the Ubuntu images; this step only adds the 32-bit x86 libraries
+      # that -m32 needs. The package does not exist on arm64, and nothing there needs it.
       name: Set up C/C++ compiler
       run: |
         sudo apt update
@@ -73,7 +79,7 @@ jobs:
       max-parallel: 15
       matrix:
         architecture: [x64, arm64]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macOS-latest, windows-latest]
         # The jar is built for JDK 7, but is only tested on JDK 8 and later,
         # because Maven no longer runs on JDK 7. From JDK 20 onwards javac no
         # longer accepts -source/-target 7, so the build falls back to 8 there
@@ -82,6 +88,8 @@ jobs:
         exclude:
           - os: ubuntu-latest
             architecture: arm64
+          - os: ubuntu-24.04-arm
+            architecture: x64
           - os: windows-latest
             architecture: arm64
     runs-on: ${{ matrix.os }}

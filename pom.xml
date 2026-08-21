@@ -23,6 +23,12 @@
         <!-- Default architecture type (will be overridden by profiles) --> 
         <arch.type>x64</arch.type>
 
+        <!-- Flag selecting the target bitness. -m32/-m64 are x86-only options: the AArch64 gcc
+        backend has no such option and fails with "unrecognized command-line option '-m64'", so the
+        arm64 profiles below clear this. An empty option is dropped by native-maven-plugin rather
+        than passed to gcc as an empty argument. -->
+        <arch.opt>-m${sun.arch.data.model}</arch.opt>
+
         <linkerFinalName>libnarcissus-${os.type}-${arch.type}</linkerFinalName>
 
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
@@ -155,6 +161,7 @@
             </activation>
             <properties>
                 <arch.type>arm64</arch.type>
+                <arch.opt />
             </properties>
         </profile>
         <profile>
@@ -168,6 +175,7 @@
             </activation>
             <properties>
                 <arch.type>arm64</arch.type>
+                <arch.opt />
             </properties>
         </profile>
         <profile>
@@ -180,6 +188,7 @@
             </activation>
             <properties>
                 <arch.type>arm64</arch.type>
+                <arch.opt />
             </properties>
         </profile>
         <profile>
@@ -396,7 +405,7 @@
                         <compilerEndOption>-Wall</compilerEndOption>
                         <compilerEndOption>-fPIC</compilerEndOption>
                         <compilerEndOption>-std=c99</compilerEndOption>
-                        <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
+                        <compilerEndOption>${arch.opt}</compilerEndOption>
                     </compilerEndOptions>
                     <linkerStartOptions>
                         <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
@@ -406,7 +415,7 @@
                     <linkerEndOptions>
                         <linkerEndOption>-fPIC</linkerEndOption>
                         <linkerEndOption>-shared</linkerEndOption>
-                        <compilerEndOption>-m${sun.arch.data.model}</compilerEndOption>
+                        <linkerEndOption>${arch.opt}</linkerEndOption>
                         <linkerEndOption>${link.opt.1}</linkerEndOption>
                         <linkerEndOption>${link.opt.2}</linkerEndOption>
                     </linkerEndOptions>
