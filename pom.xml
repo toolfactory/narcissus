@@ -552,11 +552,13 @@
                 <configuration>
                     <publishingServerId>central</publishingServerId>
                     <!-- Publish to Maven Central without a manual step, and do not let the build finish until
-                    Central confirms the deployment is published. Waiting only until "uploaded" would return
-                    while the deployment is still being validated, so a deployment that failed validation would
-                    leave the release job green with nothing published. -->
+                    Central has validated the deployment. Waiting only until "uploaded" would return while the
+                    deployment is still being validated, so a deployment that failed validation would leave the
+                    release job green with nothing published. Waiting until "published" fails the job when
+                    publishing takes longer than the plugin's 30-minute limit, though the release still goes out:
+                    1.0.14 was still publishing two hours after it was uploaded. -->
                     <autoPublish>true</autoPublish>
-                    <waitUntil>published</waitUntil>
+                    <waitUntil>validated</waitUntil>
                 </configuration>
             </plugin>
         </plugins>
