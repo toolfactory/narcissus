@@ -36,11 +36,11 @@ jobs:
           - os: windows-11-arm
             architecture: x64
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     # Nobody builds JDK 8 for Windows on arm64, so that runner builds with Liberica 17, whose javac
     # still accepts -source/-target 7. Only the native library this job builds is pushed back.
     - name: Set up JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
       with:
         distribution: ${{ matrix.os == 'windows-11-arm' && 'liberica' || 'corretto' }}
         java-version: ${{ matrix.os == 'windows-11-arm' && '17' || '8' }}
@@ -109,9 +109,9 @@ jobs:
             architecture: arm64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: zulu
           java-version: ${{ matrix.java }}
@@ -140,9 +140,9 @@ jobs:
         java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
     runs-on: windows-11-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: liberica
           java-version: ${{ matrix.java }}
@@ -163,9 +163,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           java-version: 17
           distribution: 'zulu'

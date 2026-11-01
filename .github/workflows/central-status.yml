@@ -1,0 +1,24 @@
+name: Maven Central deployment status
+
+# Prints the state of a Maven Central Portal deployment (PENDING, VALIDATING, VALIDATED, PUBLISHING,
+# PUBLISHED or FAILED, with the reasons for a failure). The release job prints the deployment ID.
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-id:
+        description: Deployment ID
+        required: true
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the Central Portal
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          DEPLOYMENT_ID: ${{ inputs.deployment-id }}
+        run: |
+          token=$(printf '%s:%s' "$MAVEN_USERNAME" "$MAVEN_PASSWORD" | base64 -w0)
+          curl -sS --fail-with-body -X POST -H "Authorization: Bearer $token" \
+            "https://central.sonatype.com/api/v1/publisher/status?id=$DEPLOYMENT_ID" | jq .
