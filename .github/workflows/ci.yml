@@ -24,7 +24,7 @@ jobs:
       matrix:
         # On macOS both architectures build on the same runner, but arm64 Linux is a separate
         # runner label -- there is no "ubuntu-latest-arm", so the Ubuntu version is pinned here.
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest]
         architecture: [x64, arm64]
         exclude:
           - os: ubuntu-latest
@@ -33,13 +33,17 @@ jobs:
             architecture: x64
           - os: windows-latest
             architecture: arm64
+          - os: windows-11-arm
+            architecture: x64
     steps:
     - uses: actions/checkout@v4
+    # Nobody builds JDK 8 for Windows on arm64, so that runner builds with Liberica 17, whose javac
+    # still accepts -source/-target 7. Only the native library this job builds is pushed back.
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        distribution: corretto
-        java-version: 8
+        distribution: ${{ matrix.os == 'windows-11-arm' && 'liberica' || 'corretto' }}
+        java-version: ${{ matrix.os == 'windows-11-arm' && '17' || '8' }}
         architecture: ${{ matrix.architecture }}
     - name: print Java version
       run: java -version
@@ -50,11 +54,22 @@ jobs:
       run: |
         sudo apt update
         sudo apt-get -y install g++-multilib
-    - if: startsWith(matrix.os, 'windows')
-      name: Set up C/C++ compiler and compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }}) 
+    - if: matrix.os == 'windows-latest'
+      name: Set up C/C++ compiler and compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }})
       run: |
         choco install mingw
         $env:PATH = "C:\ProgramData\mingw64\mingw32\bin;" + $env:PATH
+        ./mvnw -B --no-transfer-progress clean test package
+    - if: matrix.os == 'windows-11-arm'
+      # MinGW-w64 GCC does not target Windows on arm64. llvm-mingw is clang-based, and ships gcc.exe as
+      # a driver that takes the same options, so the native-maven-plugin configuration is unchanged.
+      name: Set up C/C++ compiler and compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }})
+      run: |
+        $llvmMingw = "llvm-mingw-20261020-ucrt-aarch64"
+        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/20261020/$llvmMingw.zip" -OutFile "$env:RUNNER_TEMP\$llvmMingw.zip"
+        Expand-Archive -Path "$env:RUNNER_TEMP\$llvmMingw.zip" -DestinationPath "$env:RUNNER_TEMP"
+        $env:PATH = "$env:RUNNER_TEMP\$llvmMingw\bin;" + $env:PATH
+        gcc --version
         ./mvnw -B --no-transfer-progress clean test package
     - if: ${{ !(startsWith(matrix.os, 'windows')) }}
       name: Compile, run tests, and build package with Maven (${{ matrix.os }} ${{ matrix.architecture }})
@@ -115,8 +130,35 @@ jobs:
         run: ./mvnw -B clean test -X -e -Dproject_jdk_version=18 -DskipTests=false -Dmassive_test_mode=enabled
 
 
+  test-on-windows-arm64:
+    name: Testing on windows-11-arm arm64, JVM ${{ matrix.java }}
+    needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        # Liberica is the only distribution with a Windows arm64 build of each of these JDKs
+        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: ${{ matrix.java }}
+          architecture: arm64
+      - name: Update repositories
+        run: |
+          git config user.name "toolfactory"
+          git config user.email "tool.factory.heads@gmail.com"
+          git config pull.rebase false
+          git pull origin ${{github.ref}}
+      - name: Build and test with final version JDK
+        run: ./mvnw -B --no-transfer-progress clean test -X -e -DskipTests=false -Dmassive_test_mode=enabled
+
+
   release:
-    needs: [test-with-Java-7-and-later]
+    needs: [test-with-Java-7-and-later, test-on-windows-arm64]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Release new version')
